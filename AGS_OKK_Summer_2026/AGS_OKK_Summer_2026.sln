@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36930.0 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AGS_OKK_Summer_2026", "AGS_OKK_Summer_2026.vcxproj", "{E84588A8-A08B-4B2C-AA38-7D4613DC28EC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E84588A8-A08B-4B2C-AA38-7D4613DC28EC}.Debug|x64.ActiveCfg = Debug|x64
+		{E84588A8-A08B-4B2C-AA38-7D4613DC28EC}.Debug|x64.Build.0 = Debug|x64
+		{E84588A8-A08B-4B2C-AA38-7D4613DC28EC}.Debug|x86.ActiveCfg = Debug|Win32
+		{E84588A8-A08B-4B2C-AA38-7D4613DC28EC}.Debug|x86.Build.0 = Debug|Win32
+		{E84588A8-A08B-4B2C-AA38-7D4613DC28EC}.Release|x64.ActiveCfg = Release|x64
+		{E84588A8-A08B-4B2C-AA38-7D4613DC28EC}.Release|x64.Build.0 = Release|x64
+		{E84588A8-A08B-4B2C-AA38-7D4613DC28EC}.Release|x86.ActiveCfg = Release|Win32
+		{E84588A8-A08B-4B2C-AA38-7D4613DC28EC}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6AFBEFEE-35A6-4EB7-85AF-3D070E9127C6}
+	EndGlobalSection
+EndGlobal
