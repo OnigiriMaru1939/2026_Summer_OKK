@@ -1,6 +1,120 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Application.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="Fps.cpp">
+      <Filter>Util\FPS</Filter>
+    </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>Manager\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Manager\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneTitle.cpp">
+      <Filter>Scene\Title</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneStageSelect.cpp">
+      <Filter>Scene\StageSelect</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneGame.cpp">
+      <Filter>Scene\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneResult.cpp">
+      <Filter>Scene\Result</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Application">
+      <UniqueIdentifier>{dc76cda4-416d-4326-b5a5-cc9993b038a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager">
+      <UniqueIdentifier>{7ed1e3d6-2fd1-4e67-8ea4-8b820518fcf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{37470ba3-0731-4e73-8557-5037758bab10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util\FPS">
+      <UniqueIdentifier>{92c22636-5e05-4f74-b3e0-b0d9ad5a0742}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager\Input">
+      <UniqueIdentifier>{6fb75b3c-c41b-4179-9ab4-3bf72f148645}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager\File">
+      <UniqueIdentifier>{5654e92b-0044-407f-8ef3-c76c9ebb4ca0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager\Scene">
+      <UniqueIdentifier>{ddf6975f-bf16-44b4-8f3d-6a4439effbe9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{ad8b986c-3295-4972-986e-64edcaaa276d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Title">
+      <UniqueIdentifier>{7f3a7e3b-d8e9-42ee-9a53-8fa4917013d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\StageSelect">
+      <UniqueIdentifier>{28997a86-b6ac-4ea9-a683-d7984cbc8e88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Game">
+      <UniqueIdentifier>{14bb5911-a03d-4e46-ad0d-3bb8c5ab674e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Result">
+      <UniqueIdentifier>{47411c5c-57bd-49b3-8286-501a92f3278f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{d4f689d7-28ca-4b5d-9c18-1cca7912f737}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager\File\Resource">
+      <UniqueIdentifier>{96243fae-f9df-4779-9516-691284f0032c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Application.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSuper.h">
+      <Filter>Manager\File\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageFile.h">
+      <Filter>Manager\File\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundFile.h">
+      <Filter>Manager\File\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Fps.h">
+      <Filter>Util\FPS</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Manager\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="FileManager.h">
+      <Filter>Manager\File</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Manager\File</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>Manager\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneSuper.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneTitle.h">
+      <Filter>Scene\Title</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneStageSelect.h">
+      <Filter>Scene\StageSelect</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneGame.h">
+      <Filter>Scene\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneResult.h">
+      <Filter>Scene\Result</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
