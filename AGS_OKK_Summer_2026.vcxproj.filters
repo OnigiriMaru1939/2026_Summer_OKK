@@ -29,6 +29,7 @@
       <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="KeyConfig.cpp" />
+    <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Application">
@@ -118,5 +119,6 @@
       <Filter>Scene\Result</Filter>
     </ClInclude>
     <ClInclude Include="KeyConfig.h" />
+    <ClInclude Include="Player.h" />
   </ItemGroup>
 </Project>
