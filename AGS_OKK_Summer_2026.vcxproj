@@ -148,6 +148,7 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Fps.cpp" />
     <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="KeyConfig.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SceneGame.cpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="Fps.h" />
     <ClInclude Include="ImageFile.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="KeyConfig.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="SceneGame.h" />

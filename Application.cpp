@@ -65,6 +65,25 @@ void Application::Update()
 
 void Application::Draw()
 {
+	static float x = 0;
+	static float y = 0;
+	float moveSpeed = 5.0f;
 	sceneMng->Draw();
 	InputManager::GetInstance().DrawDebug(0, 40);
+	if (InputManager::GetInstance().IsActionPressed(JUMP_ACTION))
+	{
+		DrawString(SCREEN_WID / 2, 60, "Jump Pressed", 0xffffff);
+	}
+	if (InputManager::GetInstance().IsActionPressed(MOVE_UD_ACTION))
+	{
+		DrawString(SCREEN_WID / 2, 80, "Move Down or Up Pressed", 0xffffff);
+	}
+	if (InputManager::GetInstance().IsActionPressed(MOVE_LR_ACTION))
+	{
+		DrawString(SCREEN_WID / 2, 100, "Move Left or Right Pressed", 0xffffff);
+	}
+	x += InputManager::GetInstance().GetActionValue(MOVE_LR_ACTION) * moveSpeed;
+	y += InputManager::GetInstance().GetActionValue(MOVE_UD_ACTION) * moveSpeed;
+	DrawBox(100 + (int)x, 100 + (int)y, 150 + (int)x, 150 + (int)y, 0xff0000, true);
+
 }

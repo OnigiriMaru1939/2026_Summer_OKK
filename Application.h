@@ -9,6 +9,10 @@ public:
 	static constexpr int SCREEN_WID = 1920; // ゲーム画面の横サイズ
 	static constexpr int SCREEN_HIG = 1080; // ゲーム画面の縦サイズ
 
+	static constexpr const wchar_t* MOVE_UD_ACTION = L"MoveUD";
+	static constexpr const wchar_t* MOVE_LR_ACTION = L"MoveLR";
+	static constexpr const wchar_t* JUMP_ACTION = L"Jump";
+
 	Application();
 	~Application();
 

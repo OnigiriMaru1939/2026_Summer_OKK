@@ -1,7 +1,9 @@
 ﻿#include <DxLib.h>
 
 #include "InputManager.h"
+#include "KeyConfig.h"
 
+// デバッグ表示用の関数
 void InputManager::DrawDebug(int x, int y) const
 {
 	int curY = y;
@@ -11,7 +13,7 @@ void InputManager::DrawDebug(int x, int y) const
 	// 1. キーボード情報 (押されているキーのみ表示)
 	DrawString(x, curY, "--- Keyboard (Active Keys) ---", color);
 	curY += 20;
-	for (int i = 0; i < 256; i++)
+	for (int i = 0; i < KEY_COUNT; i++)
 	{
 		if (key[i] > 0)
 		{
@@ -23,7 +25,7 @@ void InputManager::DrawDebug(int x, int y) const
 	// 2. マウス情報
 	DrawFormatString(x, curY, color, "--- Mouse: (%d, %d) ---", mouseX, mouseY);
 	curY += 20;
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < MOUSE_BUTTON_COUNT; i++)
 	{
 		if (mouseButton[i] > 0)
 		{
@@ -52,7 +54,7 @@ void InputManager::DrawDebug(int x, int y) const
 		curY += 20;
 
 		// ボタン状態 (押されているボタンのみ表示)
-		const char* btnNames[] = { "F_Left", "F_Right", "F_Top", "F_Down", "Up", "Down", "Left", "Right", "L_S", "R_S", "L_T", "R_T" };
+		const char* btnNames[] = { "F_Left", "F_Right", "F_Top", "F_Down", "Up", "Down", "Left", "Right", "L_S", "R_S", "L_T", "R_T", "L_StickClick", "R_StickClick", "Start", "Back"};
 		for (int b = 0; b < (int)PadButton::Max; b++)
 		{
 			if (padButton[no][b] > 0)
@@ -65,6 +67,7 @@ void InputManager::DrawDebug(int x, int y) const
 	}
 }
 
+// ジョイパッドのタイプに応じた名前を返す関数
 const char* InputManager::GetPadName(int type) const
 {
 	switch (type)
@@ -81,9 +84,10 @@ const char* InputManager::GetPadName(int type) const
 	}
 }
 
+// コントローラーのボタンマッピングを解決する関数
 InputManager::InputManager()
 {
-	// 配列の初期化を明示
+	// 配列の初期化を明示 (必須ではないが、可読性向上のため)
 	memset(key, 0, sizeof(key));
 	memset(prevKey, 0, sizeof(prevKey));
 	memset(padButton, 0, sizeof(padButton));
@@ -100,13 +104,13 @@ InputManager::InputManager()
 void InputManager::Update()
 {
 	// キー入力
-	for (int i = 0; i < 256; i++)
+	for (int i = 0; i < KEY_COUNT; i++)
 	{
 		prevKey[i] = key[i];
 	}
-	char tmpKey[256];
+	char tmpKey[KEY_COUNT];
 	GetHitKeyStateAll(tmpKey);
-	for (int i = 0; i < 256; i++)
+	for (int i = 0; i < KEY_COUNT; i++)
 	{
 		key[i] = (tmpKey[i] != 0) ? key[i] + 1 : 0;
 	}
@@ -118,7 +122,7 @@ void InputManager::Update()
 
 	// マウスボタン
 	int mouseInput = GetMouseInput();
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < MOUSE_BUTTON_COUNT; i++)
 	{
 		prevMouseButton[i] = mouseButton[i];
 	}
@@ -139,6 +143,7 @@ void InputManager::Update()
 
 		padLX[no] = dState.X;
 		padLY[no] = dState.Y;
+		// XboxコントローラーはRx/Ryが右スティック
 		if (type == DX_PADTYPE_XBOX_360 || type == DX_PADTYPE_XBOX_ONE)
 		{
 			padRX[no] = dState.Rx;
@@ -165,9 +170,176 @@ void InputManager::Update()
 	}
 }
 
-bool InputManager::GetRawState(int no, PadButton btn)
+// キーボード入力
+bool InputManager::IsKeyPressed(int keyCode) const
 {
-	int dxNo = no + 1;
+	return IsInputPressed(key[keyCode]);
+}
+bool InputManager::IsKeyTriggered(int keyCode) const
+{
+	return IsInputTriggered(key[keyCode], prevKey[keyCode]);
+}
+bool InputManager::IsKeyReleased(int keyCode) const
+{
+	return IsInputReleased(key[keyCode], prevKey[keyCode]);
+}
+
+// マウス入力
+bool InputManager::IsMousePressed(MouseButton button) const
+{
+	return IsInputPressed(mouseButton[(int)button]);
+}
+bool InputManager::IsMouseTriggered(MouseButton button) const
+{
+	return IsInputTriggered(mouseButton[(int)button], prevMouseButton[(int)button]);
+}
+bool InputManager::IsMouseReleased(MouseButton button) const
+{
+	return IsInputReleased(mouseButton[(int)button], prevMouseButton[(int)button]);
+}
+
+// コントローラー入力
+bool InputManager::IsPadPressed(int no, PadButton btn) const
+{
+	return IsInputPressed(padButton[no][(int)btn]);
+}
+bool InputManager::IsPadTriggered(int no, PadButton btn) const
+{
+	return IsInputTriggered(padButton[no][(int)btn], prevPadButton[no][(int)btn]);
+}
+bool InputManager::IsPadReleased(int no, PadButton btn) const
+{
+	return IsInputReleased(padButton[no][(int)btn], prevPadButton[no][(int)btn]);
+}
+
+// スティックの値を-1.0f〜1.0fの範囲で取得する関数
+float InputManager::GetAxisValue(int padNo, PadAxis axis) const
+{
+	int rawValue = 0;
+	switch (axis)
+	{
+		case PadAxis::L_X: rawValue = padLX[padNo]; break;
+		case PadAxis::L_Y: rawValue = padLY[padNo]; break;
+		case PadAxis::R_X: rawValue = padRX[padNo]; break;
+		case PadAxis::R_Y: rawValue = padRY[padNo]; break;
+	}
+
+	if (abs(rawValue) < DEADZONE) return 0.0f; // デッドゾーン内は0とみなす
+
+	float normalized = (float)(abs(rawValue) - DEADZONE) / (STICK_MAX - DEADZONE);
+	return (rawValue > 0) ? normalized : -normalized;
+}
+
+// アクションに対する入力値を取得する関数
+float InputManager::GetActionValue(const std::wstring& action, int padNo) const
+{
+	const auto& mappings = KeyConfig::GetInstance().GetMappings(action);
+	if (mappings.empty()) return 0.0f; // アクションにマッピングがない場合は0を返す
+
+	float total = 0.0f;
+
+	for (const auto& m : mappings)
+	{
+		float val = 0.0f;
+		switch (m.inputType)
+		{
+			case InputType::Keyboard:
+				val = IsKeyPressed(m.code) ? 1.0f : 0.0f;
+				break;
+			case InputType::GamepadButton:
+				val = IsPadPressed(padNo, (PadButton)m.code) ? 1.0f : 0.0f;
+				break;
+			case InputType::GamepadAxis:
+				val = GetAxisValue(padNo, (PadAxis)m.code);
+				break;
+			case InputType::Mouse:
+				val = IsMousePressed((MouseButton)m.code) ? 1.0f : 0.0f;
+				break;
+		}
+		total += val * m.scale; // スケールをかけて加算
+	}
+
+	// 複数の入力がある場合は合算するが、値が-1.0f〜1.0fの範囲を超えないようにクランプする
+	return (total > 1.0f) ? 1.0f : (total < -1.0f) ? -1.0f : total;
+}
+
+// アクションに対する入力状態を取得する関数
+bool InputManager::IsActionPressed(const std::wstring& action, int padNo) const
+{
+	const auto& mappings = KeyConfig::GetInstance().GetMappings(action);
+	for (const auto& m : mappings)
+	{
+		switch (m.inputType)
+		{
+			case InputType::Keyboard:
+				if (IsKeyPressed(m.code)) return true;
+				break;
+			case InputType::GamepadButton:
+				if (IsPadPressed(padNo, (PadButton)m.code)) return true;
+				break;
+			case InputType::GamepadAxis:
+			{
+				float axisVal = GetAxisValue(padNo, (PadAxis)m.code);
+				if (axisVal * m.scale > AXIS_THRESHOLD || axisVal * m.scale < -AXIS_THRESHOLD) return true;
+				break;
+			}
+			case InputType::Mouse:
+				if (IsMousePressed((MouseButton)m.code)) return true;
+				break;
+		}
+	}
+	return false;
+}
+
+bool InputManager::IsActionTriggered(const std::wstring& action, int padNo) const
+{
+	const auto& mappings = KeyConfig::GetInstance().GetMappings(action);
+	for (const auto& m : mappings)
+	{
+		switch (m.inputType)
+		{
+			case InputType::Keyboard:
+				if (IsKeyTriggered(m.code)) return true;
+				break;
+			case InputType::GamepadButton:
+				if (IsPadTriggered(padNo, (PadButton)m.code)) return true;
+				break;
+			case InputType::GamepadAxis:
+				break; // 連続値のため、実装しない
+			case InputType::Mouse:
+				if (IsMouseTriggered((MouseButton)m.code)) return true;
+				break;
+		}
+	}
+	return false;
+}
+
+bool InputManager::IsActionReleased(const std::wstring& action, int padNo) const
+{
+	const auto& mappings = KeyConfig::GetInstance().GetMappings(action);
+	for (const auto& m : mappings)
+	{
+		switch (m.inputType)
+		{
+			case InputType::Keyboard:
+				if (IsKeyReleased(m.code)) return true;
+				break;
+			case InputType::GamepadButton:
+				if (IsPadReleased(padNo, (PadButton)m.code)) return true;
+				break;
+			case InputType::GamepadAxis:
+				break; // 連続値のため、実装しない
+			case InputType::Mouse:
+				if (IsMouseReleased((MouseButton)m.code)) return true;
+				break;
+		}
+	}
+	return false;
+}
+
+bool InputManager::GetRawState(int padNo, PadButton btn)
+{
+	int dxNo = padNo + 1;
 	int type = GetJoypadType(dxNo);
 	DINPUT_JOYSTATE dState;
 	XINPUT_STATE xState;
@@ -205,10 +377,17 @@ bool InputManager::GetRawState(int no, PadButton btn)
 
 		case PadButton::L_Trigger:
 			// XInputは0-255の値が来るので、30以上を「押し込み」と判定
-			return (xState.LeftTrigger > 30) || (dState.Buttons[6] != 0);
+			if (type == DX_PADTYPE_XBOX_360 || type == DX_PADTYPE_XBOX_ONE) return xState.LeftTrigger > 30;
+			return (dState.Buttons[6] != 0);
 		case PadButton::R_Trigger:
-			return (xState.RightTrigger > 30) || (dState.Buttons[7] != 0);
-
+			if (type == DX_PADTYPE_XBOX_360 || type == DX_PADTYPE_XBOX_ONE) return xState.RightTrigger > 30;
+			return (dState.Buttons[7] != 0);
+		case PadButton::L_Thumb: return (dState.Buttons[8] != 0) || (xState.Buttons[XINPUT_BUTTON_LEFT_THUMB] != 0);
+		case PadButton::R_Thumb: return (dState.Buttons[9] != 0) || (xState.Buttons[XINPUT_BUTTON_RIGHT_THUMB] != 0);
+		case PadButton::Start:
+			return (dState.Buttons[10] != 0) || (xState.Buttons[XINPUT_BUTTON_START] != 0);
+		case PadButton::back:
+			return (dState.Buttons[11] != 0) || (xState.Buttons[XINPUT_BUTTON_BACK] != 0);
 		default: return false;
 	}
 }
