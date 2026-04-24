@@ -66,4 +66,5 @@ void Application::Update()
 void Application::Draw()
 {
 	sceneMng->Draw();
+	InputManager::GetInstance().DrawDebug(0, 40);
 }
