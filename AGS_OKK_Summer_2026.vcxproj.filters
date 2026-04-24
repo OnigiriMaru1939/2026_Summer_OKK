@@ -28,6 +28,9 @@
     <ClCompile Include="main.cpp">
       <Filter>Main</Filter>
     </ClCompile>
+    <ClCompile Include="EnemyBase.cpp">
+      <Filter>Enemy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Application">
@@ -72,6 +75,9 @@
     <Filter Include="Manager\File\Resource">
       <UniqueIdentifier>{96243fae-f9df-4779-9516-691284f0032c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Enemy">
+      <UniqueIdentifier>{377f2cb1-d365-4166-a8a9-21bd91a4ab4a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -115,6 +121,9 @@
     </ClInclude>
     <ClInclude Include="SceneResult.h">
       <Filter>Scene\Result</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyBase.h">
+      <Filter>Enemy</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
