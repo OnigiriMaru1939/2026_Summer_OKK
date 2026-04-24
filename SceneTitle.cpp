@@ -1,5 +1,6 @@
 ﻿#include "SceneTitle.h"
 #include "InputManager.h"
+#include "Application.h"
 
 SceneTitle::SceneTitle(FileManager& fileMng) : SceneSuper(fileMng)
 {
