@@ -4,7 +4,8 @@
 
 SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
 {
-	player = std::make_unique<Player>();
+	player = std::make_unique<Player>(fileMng);
+
 	player->SystemInit();
 }
 
