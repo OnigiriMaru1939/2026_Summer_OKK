@@ -18,14 +18,14 @@ Application::Application()
 	SetGraphMode(SCREEN_WID, SCREEN_HIG, 32);
 	ChangeWindowMode(false);
 
-#ifdef _WIN64
-	Live2D_SetCubism4CoreDLLPath(TEXT("CubismSdkForNative-5-r.4.1/Core/dll/windows/x86_64/Live2DCubismCore.dll"));
-#else
-	Live2D_SetCubism4CoreDLLPath(TEXT("CubismSdkForNative-5-r.4.1/Core/dll/windows/x86/Live2DCubismCore.dll"));
-#endif
+//#ifdef _WIN64
+//	Live2D_SetCubism4CoreDLLPath(TEXT("CubismSdkForNative-5-r.4.1/Core/dll/windows/x86_64/Live2DCubismCore.dll"));
+//#else
+//	Live2D_SetCubism4CoreDLLPath(TEXT("CubismSdkForNative-5-r.4.1/Core/dll/windows/x86/Live2DCubismCore.dll"));
+//#endif
 
 	DxLib_Init();
-	SetMouseDispFlag(true);
+	//SetMouseDispFlag(true);
 	fileMng = std::make_unique<FileManager>();
 	sceneMng = std::make_unique<SceneManager>(*fileMng);
 	// デバッグ----------------------------------------------------
