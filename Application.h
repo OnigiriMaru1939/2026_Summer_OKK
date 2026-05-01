@@ -4,6 +4,9 @@
 class SceneManager;
 class FileManager;
 
+// -デバッグ------------------
+class ParticleManager;
+// --------------------------
 class Application
 {
 public:
@@ -15,7 +18,8 @@ public:
 
 	void Run();
 private:
-	// デバッグ用の入力
+	// -デバッグ--------------------
+	std::unique_ptr<ParticleManager> pMng;
 	float moveSpeed = 5.0f;
 	float x = 0;
 	float y = 0;
@@ -23,6 +27,8 @@ private:
 	void DebugMoveX();
 	void DebugMoveY();
 	void DeBugJump();
+	//-------------------------
+
 	// Applicationのみ所有するように
 	std::unique_ptr<SceneManager> sceneMng;
 	std::unique_ptr<FileManager> fileMng;

@@ -23,6 +23,6 @@ void SceneTitle::Update()
 
 void SceneTitle::Draw()
 {
-	DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0x0000aa, true);
+	DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0x000000, true);
 	DrawString(0, 20, "TITLE SCENE", 0xffffff);
 }
