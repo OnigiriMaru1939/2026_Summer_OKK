@@ -8,15 +8,14 @@ static constexpr int kTileHeight = 32;
 
 SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
 {
-
+	player = std::make_unique<Player>(fileMng);
+  player->SystemInit();
+  
 	stage_ = std::make_unique<Stage>(fileMng, kTileWidth, kTileHeight);
 
 	// タイルセットとマップデータを読み込む
 	stage_->LoadTileSet("Resource/MapChip/TileSet1.png");
 	stage_->LoadMapFromCSV("Resource/MapCSV/AGS2026MAP.csv");
-
-	player = std::make_unique<Player>();
-	player->SystemInit();
 }
 
 SceneGame::~SceneGame()
