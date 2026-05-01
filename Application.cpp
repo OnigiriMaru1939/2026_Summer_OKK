@@ -22,6 +22,11 @@ Application::Application()
 
 	fileMng = std::make_unique<FileManager>();
 	sceneMng = std::make_unique<SceneManager>(*fileMng);
+
+	// イベントの登録
+	InputManager::GetInstance().SetPressCallback(ActionID::MoveH, [this]() { DebugMoveX(); });
+	InputManager::GetInstance().SetPressCallback(ActionID::MoveV, [this]() { DebugMoveY(); });
+	InputManager::GetInstance().SetTriggerCallback(ActionID::Jump, [this]() { DeBugJump(); });
 }
 
 Application::~Application()
@@ -29,7 +34,9 @@ Application::~Application()
 	// デストラクト明示
 	sceneMng.reset();
 	fileMng.reset();
-
+	InputManager::GetInstance().ClearPressCallbacks();
+	InputManager::GetInstance().ClearTriggerCallbacks();
+	InputManager::GetInstance().ClearReleaseCallbacks();
 	DxLib_End();
 }
 
@@ -57,6 +64,21 @@ void Application::Run()
 	}
 }
 
+void Application::DebugMoveX()
+{
+	x += InputManager::GetInstance().GetActionValue(ActionID::MoveH) * moveSpeed;
+}
+
+void Application::DebugMoveY()
+{
+	y += InputManager::GetInstance().GetActionValue(ActionID::MoveV) * moveSpeed;
+}
+
+void Application::DeBugJump()
+{
+	color == 0xffffff ? color = 0x000000 : color = 0xffffff;
+}
+
 void Application::Update()
 {
 	InputManager::GetInstance().Update();
@@ -65,25 +87,9 @@ void Application::Update()
 
 void Application::Draw()
 {
-	static float x = 0;
-	static float y = 0;
-	float moveSpeed = 5.0f;
 	sceneMng->Draw();
+
 	InputManager::GetInstance().DrawDebug(0, 40);
-	if (InputManager::GetInstance().IsActionPressed(JUMP_ACTION))
-	{
-		DrawString(SCREEN_WID / 2, 60, "Jump Pressed", 0xffffff);
-	}
-	if (InputManager::GetInstance().IsActionPressed(MOVE_UD_ACTION))
-	{
-		DrawString(SCREEN_WID / 2, 80, "Move Down or Up Pressed", 0xffffff);
-	}
-	if (InputManager::GetInstance().IsActionPressed(MOVE_LR_ACTION))
-	{
-		DrawString(SCREEN_WID / 2, 100, "Move Left or Right Pressed", 0xffffff);
-	}
-	x += InputManager::GetInstance().GetActionValue(MOVE_LR_ACTION) * moveSpeed;
-	y += InputManager::GetInstance().GetActionValue(MOVE_UD_ACTION) * moveSpeed;
-	DrawBox(100 + (int)x, 100 + (int)y, 150 + (int)x, 150 + (int)y, 0xff0000, true);
+	DrawBox(100 + (int)x, 100 + (int)y, 150 + (int)x, 150 + (int)y, color, true);
 
 }

@@ -66,7 +66,7 @@ void Player::SodaShake()
 	if (sodaShakeGauge < 0) sodaShakeGauge = 0;
 
 	//左クリックすると炭酸残量ゲージを減らす
-	if (InputManager::GetInstance().IsMouseTriggered(MouseButton::Left))
+	if (InputManager::GetInstance().IsMouseTriggered(MouseButton::Mouse_Left))
 	{
 		//炭酸蓄積ゲージが0より大きい場合、炭酸蓄積ゲージを減らす
 		if (sodaShakeGauge > 0)

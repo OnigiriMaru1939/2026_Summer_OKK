@@ -158,6 +158,7 @@
     <ClCompile Include="SceneTitle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ActionID.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="FileSuper.h" />
