@@ -3,7 +3,7 @@
 class Fps
 {
 public:
-	static const int FPS = 60;	//設定したFPS
+	static const int FPS = 120;	//設定したFPS
 
 	Fps();
 	~Fps();

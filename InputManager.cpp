@@ -101,6 +101,13 @@ InputManager::InputManager()
 	mouseX = mouseY = prevMouseX = prevMouseY = 0;
 }
 
+InputManager::~InputManager()
+{
+	ClearTriggerCallbacks();
+	ClearPressCallbacks();
+	ClearReleaseCallbacks();
+}
+
 void InputManager::Update()
 {
 	// キー入力
@@ -168,6 +175,7 @@ void InputManager::Update()
 			}
 		}
 	}
+	DispatchCallbacks();
 }
 
 // キーボード入力
@@ -218,10 +226,10 @@ float InputManager::GetAxisValue(int padNo, PadAxis axis) const
 	int rawValue = 0;
 	switch (axis)
 	{
-		case PadAxis::L_X: rawValue = padLX[padNo]; break;
-		case PadAxis::L_Y: rawValue = padLY[padNo]; break;
-		case PadAxis::R_X: rawValue = padRX[padNo]; break;
-		case PadAxis::R_Y: rawValue = padRY[padNo]; break;
+		case PadAxis::Pad_L_X: rawValue = padLX[padNo]; break;
+		case PadAxis::Pad_L_Y: rawValue = padLY[padNo]; break;
+		case PadAxis::Pad_R_X: rawValue = padRX[padNo]; break;
+		case PadAxis::Pad_R_Y: rawValue = padRY[padNo]; break;
 	}
 
 	if (abs(rawValue) < DEADZONE) return 0.0f; // デッドゾーン内は0とみなす
@@ -231,7 +239,7 @@ float InputManager::GetAxisValue(int padNo, PadAxis axis) const
 }
 
 // アクションに対する入力値を取得する関数
-float InputManager::GetActionValue(const std::wstring& action, int padNo) const
+float InputManager::GetActionValue(ActionID action, int padNo) const
 {
 	const auto& mappings = KeyConfig::GetInstance().GetMappings(action);
 	if (mappings.empty()) return 0.0f; // アクションにマッピングがない場合は0を返す
@@ -264,7 +272,7 @@ float InputManager::GetActionValue(const std::wstring& action, int padNo) const
 }
 
 // アクションに対する入力状態を取得する関数
-bool InputManager::IsActionPressed(const std::wstring& action, int padNo) const
+bool InputManager::IsActionPressed(ActionID action, int padNo) const
 {
 	const auto& mappings = KeyConfig::GetInstance().GetMappings(action);
 	for (const auto& m : mappings)
@@ -291,7 +299,7 @@ bool InputManager::IsActionPressed(const std::wstring& action, int padNo) const
 	return false;
 }
 
-bool InputManager::IsActionTriggered(const std::wstring& action, int padNo) const
+bool InputManager::IsActionTriggered(ActionID action, int padNo) const
 {
 	const auto& mappings = KeyConfig::GetInstance().GetMappings(action);
 	for (const auto& m : mappings)
@@ -314,7 +322,7 @@ bool InputManager::IsActionTriggered(const std::wstring& action, int padNo) cons
 	return false;
 }
 
-bool InputManager::IsActionReleased(const std::wstring& action, int padNo) const
+bool InputManager::IsActionReleased(ActionID action, int padNo) const
 {
 	const auto& mappings = KeyConfig::GetInstance().GetMappings(action);
 	for (const auto& m : mappings)
@@ -337,6 +345,52 @@ bool InputManager::IsActionReleased(const std::wstring& action, int padNo) const
 	return false;
 }
 
+void InputManager::SetTriggerCallback(ActionID action, ActionCallback callback)
+{
+	triggerCallbacks[action] = callback;
+}
+
+void InputManager::ClearTriggerCallbacks()
+{
+	triggerCallbacks.clear();
+}
+
+void InputManager::SetPressCallback(ActionID action, ActionCallback callback)
+{
+	pressCallbacks[action] = callback;
+}
+
+void InputManager::ClearPressCallbacks()
+{
+	pressCallbacks.clear();
+}
+
+void InputManager::SetReleaseCallback(ActionID action, ActionCallback callback)
+{
+	releaseCallbacks[action] = callback;
+}
+
+void InputManager::ClearReleaseCallbacks()
+{
+	releaseCallbacks.clear();
+}
+
+void InputManager::DispatchCallbacks()
+{
+	for (const auto& [action, callback] : triggerCallbacks)
+	{
+		if (IsActionTriggered(action)) callback();
+	}
+	for (const auto& [action, callback] : pressCallbacks)
+	{
+		if (IsActionPressed(action)) callback();
+	}
+	for (const auto& [action, callback] : releaseCallbacks)
+	{
+		if (IsActionReleased(action)) callback();
+	}
+}
+
 bool InputManager::GetRawState(int padNo, PadButton btn)
 {
 	int dxNo = padNo + 1;
@@ -348,45 +402,45 @@ bool InputManager::GetRawState(int padNo, PadButton btn)
 
 	switch (btn)
 	{
-		case PadButton::Face_Left: // Xbox:X, PS:□
+		case PadButton::Pad_Face_Left: // Xbox:X, PS:□
 			if (type == DX_PADTYPE_DUAL_SENSE) return dState.Buttons[0] != 0;
 			return (dState.Buttons[2] != 0) || (xState.Buttons[XINPUT_BUTTON_X] != 0);
 
-		case PadButton::Face_Right: // Xbox:B, PS:〇
+		case PadButton::Pad_Face_Right: // Xbox:B, PS:〇
 			if (type == DX_PADTYPE_DUAL_SENSE) return dState.Buttons[2] != 0;
 			return (dState.Buttons[1] != 0) || (xState.Buttons[XINPUT_BUTTON_B] != 0);
 
-		case PadButton::Face_Top: // Xbox:Y, PS:△
+		case PadButton::Pad_Face_Top: // Xbox:Y, PS:△
 			return (dState.Buttons[3] != 0) || (xState.Buttons[XINPUT_BUTTON_Y] != 0);
 
-		case PadButton::Face_Down: // Xbox:A, PS:×
+		case PadButton::Pad_Face_Down: // Xbox:A, PS:×
 			if (type == DX_PADTYPE_DUAL_SENSE) return dState.Buttons[1] != 0;
 			return (dState.Buttons[0] != 0) || (xState.Buttons[XINPUT_BUTTON_A] != 0);
 
-		case PadButton::Left:
+		case PadButton::Pad_Left:
 			return (dState.POV[0] == 27000) || (xState.Buttons[XINPUT_BUTTON_DPAD_LEFT] != 0);
-		case PadButton::Right:
+		case PadButton::Pad_Right:
 			return (dState.POV[0] == 9000) || (xState.Buttons[XINPUT_BUTTON_DPAD_RIGHT] != 0);
-		case PadButton::Top:
+		case PadButton::Pad_Top:
 			return (dState.POV[0] == 0) || (xState.Buttons[XINPUT_BUTTON_DPAD_UP] != 0);
-		case PadButton::Down:
+		case PadButton::Pad_Down:
 			return (dState.POV[0] == 18000) || (xState.Buttons[XINPUT_BUTTON_DPAD_DOWN] != 0);
 
-		case PadButton::L_Shoulder: return (dState.Buttons[4] != 0) || (xState.Buttons[XINPUT_BUTTON_LEFT_SHOULDER] != 0);
-		case PadButton::R_Shoulder: return (dState.Buttons[5] != 0) || (xState.Buttons[XINPUT_BUTTON_RIGHT_SHOULDER] != 0);
+		case PadButton::Pad_L_Shoulder: return (dState.Buttons[4] != 0) || (xState.Buttons[XINPUT_BUTTON_LEFT_SHOULDER] != 0);
+		case PadButton::Pad_R_Shoulder: return (dState.Buttons[5] != 0) || (xState.Buttons[XINPUT_BUTTON_RIGHT_SHOULDER] != 0);
 
-		case PadButton::L_Trigger:
+		case PadButton::Pad_L_Trigger:
 			// XInputは0-255の値が来るので、30以上を「押し込み」と判定
 			if (type == DX_PADTYPE_XBOX_360 || type == DX_PADTYPE_XBOX_ONE) return xState.LeftTrigger > 30;
 			return (dState.Buttons[6] != 0);
-		case PadButton::R_Trigger:
+		case PadButton::Pad_R_Trigger:
 			if (type == DX_PADTYPE_XBOX_360 || type == DX_PADTYPE_XBOX_ONE) return xState.RightTrigger > 30;
 			return (dState.Buttons[7] != 0);
-		case PadButton::L_Thumb: return (dState.Buttons[8] != 0) || (xState.Buttons[XINPUT_BUTTON_LEFT_THUMB] != 0);
-		case PadButton::R_Thumb: return (dState.Buttons[9] != 0) || (xState.Buttons[XINPUT_BUTTON_RIGHT_THUMB] != 0);
-		case PadButton::Start:
+		case PadButton::Pad_L_Thumb: return (dState.Buttons[8] != 0) || (xState.Buttons[XINPUT_BUTTON_LEFT_THUMB] != 0);
+		case PadButton::Pad_R_Thumb: return (dState.Buttons[9] != 0) || (xState.Buttons[XINPUT_BUTTON_RIGHT_THUMB] != 0);
+		case PadButton::Xbox_Start:
 			return (dState.Buttons[10] != 0) || (xState.Buttons[XINPUT_BUTTON_START] != 0);
-		case PadButton::back:
+		case PadButton::Xbox_back:
 			return (dState.Buttons[11] != 0) || (xState.Buttons[XINPUT_BUTTON_BACK] != 0);
 		default: return false;
 	}

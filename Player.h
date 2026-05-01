@@ -10,7 +10,9 @@ class ImageFile;
 class Player
 {
 public:
-	static constexpr int SPEED = 15;				//プレイヤーの移動速度
+	static constexpr int PLAYER_WIDTH = 64;			//プレイヤーの横幅
+	static constexpr int PLAYER_HEIGHT = 64;		//プレイヤーの縦幅
+	static constexpr int SPEED = 15;					//プレイヤーの移動速度
 	static constexpr int PLAYER_SUM = 3;			//プレイヤーの残機数
 
 	Player(FileManager& fileMng);
