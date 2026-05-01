@@ -15,6 +15,9 @@ Player::~Player()
 
 bool Player::SystemInit()
 {
+	posX = 200.0f;
+	posY = 200.0f;
+
 	sodaGauge = 100.0f;
 	sodaGaugeMax = 100.0f;
 	sodaShakeGauge = 0.0f;
@@ -27,17 +30,40 @@ bool Player::SystemInit()
 
 void Player::Update()
 {
+	//Wキーを押すと上移動
+	if (InputManager::GetInstance().IsKeyPressed(17))
+	{
+		posY -= SPEED;
+	}
+	//Sキーを押すと下移動
+	if (InputManager::GetInstance().IsKeyPressed(31))
+	{
+		posY += SPEED;
+	}
+	//Aキーを押すと左移動
+	if (InputManager::GetInstance().IsKeyPressed(30))
+	{
+		posX -= SPEED;
+	}
+	//Dキーを押すと右移動
+	if (InputManager::GetInstance().IsKeyPressed(32))
+	{
+		posX += SPEED;
+	}
+
 	SodaGaugeCharge();
 	SodaShake();
 }
 
 void Player::Draw()
 {
+	DrawBox((int)posX, (int)posY, (int)posX + 100, (int)posY + 100, GetColor(255, 0, 0), true);
+
 	DrawBox(19, 101, 500, 69, GetColor(255, 0, 0), FALSE);											//炭酸残量ゲージの枠線
 	DrawBox(20, 100, 20 + (int)(sodaGauge * 4.8f), 70, GetColor(0, 255, 255), TRUE);				//炭酸残量ゲージの表示
 
 	DrawBox(19, 101+100, 500, 69+100, GetColor(255, 0, 0), FALSE);									//炭酸蓄積ゲージの枠線
-	DrawBox(20, 100+100, 20 + (int)(sodaShakeGauge * 4.8f), 70+100, GetColor(255, 0, 0), TRUE);		//炭酸蓄積ゲージの表示
+	DrawBox(20, 100+100, 20 + (int)(sodaShakeGauge * 4.8f), 70+100, GetColor(0, 0, 255), TRUE);		//炭酸蓄積ゲージの表示
 }
 
 //マウスを振ると炭酸ゲージが溜まる
@@ -45,23 +71,23 @@ void Player::SodaShake()
 {
 	int mouseX, mouseY;
 
-	// 現在のマウス座標取得
+	//現在のマウス座標取得
 	GetMousePoint(&mouseX, &mouseY);
 
-	// 移動量
+	//移動量
 	int dx = mouseX - prevMouseX;
 	int dy = mouseY - prevMouseY;
 
-	// 距離（振った強さ）
+	//距離
 	float dist = sqrtf(dx * dx + dy * dy);
 
-	// ゲージ加算（調整値は好みで）
+	// ゲージ加算
 	sodaShakeGauge += dist * 0.002f;
 
-	// 上限
+	//上限
 	if (sodaShakeGauge > sodaShakeGaugeMax) sodaShakeGauge = sodaShakeGaugeMax;
 
-	// 減衰（振らないと減る）
+	//減衰（振らないと減る）
 	sodaShakeGauge -= 0.2f;
 	if (sodaShakeGauge < 0) sodaShakeGauge = 0;
 
@@ -78,7 +104,7 @@ void Player::SodaShake()
 		}
 	}
 
-	// 保存
+	//保存
 	prevMouseX = mouseX;
 	prevMouseY = mouseY;
 }
