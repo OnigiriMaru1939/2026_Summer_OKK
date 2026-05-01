@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "SceneSuper.h"
 #include "Application.h"
+#include "Stage.h"
 
 class Player;
 
@@ -14,8 +15,8 @@ public:
 
 	void Update() override;
 	void Draw() override;
-
 private:
+	std::unique_ptr<Stage> stage_;
 	std::unique_ptr<Player> player;
 };
 

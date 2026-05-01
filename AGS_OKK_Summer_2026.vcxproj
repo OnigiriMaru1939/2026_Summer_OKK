@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="EnemyBase.cpp" />
     <ClCompile Include="Fps.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="KeyConfig.cpp" />
@@ -158,10 +159,12 @@
     <ClCompile Include="SceneResult.cpp" />
     <ClCompile Include="SceneStageSelect.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
+    <ClCompile Include="Stage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActionID.h" />
     <ClInclude Include="Application.h" />
+    <ClInclude Include="EnemyBase.h" />
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="FileSuper.h" />
     <ClInclude Include="Fps.h" />
@@ -179,6 +182,7 @@
     <ClInclude Include="SceneSuper.h" />
     <ClInclude Include="SceneTitle.h" />
     <ClInclude Include="SoundFile.h" />
+    <ClInclude Include="Stage.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
