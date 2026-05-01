@@ -34,13 +34,15 @@
     <ClCompile Include="Stage.cpp">
       <Filter>Scene\Game\Stage</Filter>
     </ClCompile>
-    <ClCompile Include="KeyConfig.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="ParticleManager.cpp">
       <Filter>Manager\Particle</Filter>
     </ClCompile>
     <ClCompile Include="ParticleEmitter.cpp">
       <Filter>Manager\Particle\Emitter</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyConfig.cpp">
+      <Filter>Manager\Input\KeyConfig</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -98,6 +100,9 @@
     <Filter Include="Manager\Particle\Emitter">
       <UniqueIdentifier>{e50b9584-6f15-46bd-9baf-2a354e0e2013}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Manager\Input\KeyConfig">
+      <UniqueIdentifier>{c9045f56-0bd2-4945-b19d-94432f49d2e5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -148,14 +153,18 @@
     <ClInclude Include="Stage.h">
       <Filter>Scene\Game\Stage</Filter>
     </ClInclude>
-    <ClInclude Include="KeyConfig.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="ActionID.h" />
     <ClInclude Include="ParticleManager.h">
       <Filter>Manager\Particle</Filter>
     </ClInclude>
     <ClInclude Include="ParticleEmitter.h">
       <Filter>Manager\Particle\Emitter</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionID.h">
+      <Filter>Manager\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyConfig.h">
+      <Filter>Manager\Input\KeyConfig</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

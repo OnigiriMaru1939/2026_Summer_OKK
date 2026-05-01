@@ -6,7 +6,7 @@
 
 KeyConfig::KeyConfig()
 {
-	// デフォルトのキー設定をここで定義してもいいかも
+	// デフォルトのキー設定をここで定義
 	//keyConfigMap_ = {
 	//	{ ActionID::MoveH,    { 
 	//		{InputType::Keyboard, KEY_INPUT_D, 1.0f},
