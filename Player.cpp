@@ -1,9 +1,11 @@
 ﻿#include "Player.h"
 #include "math.h"
 #include "InputManager.h"
+#include "FileManager.h"
+#include "ImageFile.h"
 #include <DxLib.h>
 
-Player::Player()
+Player::Player(FileManager& fileMng) : fileManager(fileMng)
 {
 
 }
@@ -13,6 +15,7 @@ Player::~Player()
 
 }
 
+//初期化
 bool Player::SystemInit()
 {
 	posX = 200.0f;
@@ -23,23 +26,42 @@ bool Player::SystemInit()
 	sodaShakeGauge = 0.0f;
 	sodaShakeGaugeMax = 100.0f;
 	aliveFlag = true;
+	jumpFlag = false;
+	angle = 0.0f;
+
+	gravity = 0.5f;
+	velocityY = 0.0f;
+
 	GetMousePoint(&prevMouseX, &prevMouseY);
+
+	return true;
+}
+
+//画像読み込み
+bool Player::SetImage(const std::string& path)
+{
+	auto img = fileManager.LoadImageFM(path);
+	if (!img)
+	{
+		image_.reset();
+		width_ = height_ = 0;
+		return false;
+	}
+
+	image_ = img;
+
+	width_ = image_->GetWidth();
+	height_ = image_->GetHeight();
 
 	return true;
 }
 
 void Player::Update()
 {
-	//Wキーを押すと上移動
-	if (InputManager::GetInstance().IsKeyPressed(17))
-	{
-		posY -= SPEED;
-	}
-	//Sキーを押すと下移動
-	if (InputManager::GetInstance().IsKeyPressed(31))
-	{
-		posY += SPEED;
-	}
+	AddGravity();
+	Jump();
+	Rotate();
+
 	//Aキーを押すと左移動
 	if (InputManager::GetInstance().IsKeyPressed(30))
 	{
@@ -57,6 +79,16 @@ void Player::Update()
 
 void Player::Draw()
 {
+	//プレイヤーが死んでいる又は画像が読み込まれていないときは表示しない
+	//if (!aliveFlag || !image_) return;
+	
+	if (image_)
+	{
+		int handle = image_->GetHandle();
+		DrawGraph((int)posX, (int)posY, handle, true);
+	}
+
+	//デバック用で赤い四角のプレイヤー表示
 	DrawBox((int)posX, (int)posY, (int)posX + 100, (int)posY + 100, GetColor(255, 0, 0), true);
 
 	DrawBox(19, 101, 500, 69, GetColor(255, 0, 0), FALSE);											//炭酸残量ゲージの枠線
@@ -115,4 +147,45 @@ void Player::SodaGaugeCharge()
 	sodaGauge += 0.1f;
 	//上限リミッター
 	if (sodaGauge > 100.0f) sodaGauge = 100.0f;
+}
+
+//重力処理
+void Player::AddGravity()
+{
+	velocityY += gravity;	//重力を速度に加算
+	posY += velocityY;		//速度を位置に加算
+	// 地面判定（仮）
+	if (posY > 500)
+	{
+		posY = 500;
+		velocityY = 0;
+		jumpFlag = false; 
+	}
+}
+
+//ジャンプ処理
+void Player::Jump()
+{
+	//SPACEキーを押すとジャンプ
+	if (InputManager::GetInstance().IsKeyTriggered(57) && !jumpFlag)
+	{
+		velocityY = -12.0f;				// ジャンプの初速度
+		jumpFlag = true;
+	}
+}
+
+//プレイヤー回転処理
+void Player::Rotate()
+{
+	float sensitivity = 0.01f; //感度
+
+	int dx = InputManager::GetInstance().GetMouseDX();
+
+	angle += dx * sensitivity;
+}
+
+//炭酸攻撃処理
+void Player::SodaAttack()
+{
+
 }
