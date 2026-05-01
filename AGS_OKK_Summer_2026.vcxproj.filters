@@ -31,6 +31,9 @@
     <ClCompile Include="EnemyBase.cpp">
       <Filter>Enemy</Filter>
     </ClCompile>
+    <ClCompile Include="Stage.cpp">
+      <Filter>Scene\Game\Stage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Application">
@@ -78,6 +81,9 @@
     <Filter Include="Enemy">
       <UniqueIdentifier>{377f2cb1-d365-4166-a8a9-21bd91a4ab4a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene\Game\Stage">
+      <UniqueIdentifier>{30071b52-b19c-4ab4-959a-ee836c3925c9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -124,6 +130,9 @@
     </ClInclude>
     <ClInclude Include="EnemyBase.h">
       <Filter>Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Stage.h">
+      <Filter>Scene\Game\Stage</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
