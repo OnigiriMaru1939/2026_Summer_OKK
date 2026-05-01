@@ -149,7 +149,11 @@
     <ClCompile Include="EnemyBase.cpp" />
     <ClCompile Include="Fps.cpp" />
     <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="KeyConfig.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ParticleEmitter.cpp" />
+    <ClCompile Include="ParticleManager.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="SceneGame.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SceneResult.cpp" />
@@ -158,6 +162,7 @@
     <ClCompile Include="Stage.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ActionID.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="EnemyBase.h" />
     <ClInclude Include="FileManager.h" />
@@ -165,6 +170,10 @@
     <ClInclude Include="Fps.h" />
     <ClInclude Include="ImageFile.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="KeyConfig.h" />
+    <ClInclude Include="ParticleEmitter.h" />
+    <ClInclude Include="ParticleManager.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="SceneGame.h" />
     <ClInclude Include="SceneManager.h" />

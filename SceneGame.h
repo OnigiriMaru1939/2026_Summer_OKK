@@ -3,6 +3,8 @@
 #include "Application.h"
 #include "Stage.h"
 
+class Player;
+
 class SceneGame :
     public SceneSuper
 {
@@ -15,5 +17,6 @@ public:
 	void Draw() override;
 private:
 	std::unique_ptr<Stage> stage_;
+	std::unique_ptr<Player> player;
 };
 

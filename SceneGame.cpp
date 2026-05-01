@@ -1,5 +1,6 @@
 ﻿#include "SceneGame.h"
 #include "InputManager.h"
+#include "Player.h"
 
 // タイルサイズ
 static constexpr int kTileWidth = 32;
@@ -14,6 +15,8 @@ SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
 	stage_->LoadTileSet("Resource/MapChip/TileSet1.png");
 	stage_->LoadMapFromCSV("Resource/MapCSV/AGS2026MAP.csv");
 
+	player = std::make_unique<Player>();
+	player->SystemInit();
 }
 
 SceneGame::~SceneGame()
@@ -23,6 +26,8 @@ SceneGame::~SceneGame()
 
 void SceneGame::Update()
 {
+	player->Update();
+
 	if (InputManager::GetInstance().IsKeyTriggered(KEY_INPUT_RETURN))
 	{
 		SetNextScene(SceneID::RESULT);
@@ -40,4 +45,5 @@ void SceneGame::Draw()
 	if (stage_) stage_->Draw();
 
 	DrawString(0, 20, "GAME SCENE", 0xffffff);
+	player->Draw();
 }

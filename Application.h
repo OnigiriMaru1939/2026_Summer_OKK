@@ -1,8 +1,12 @@
 ﻿#pragma once
 #include <memory>
+#include "ActionID.h"
 class SceneManager;
 class FileManager;
 
+// -デバッグ------------------
+class ParticleManager;
+// --------------------------
 class Application
 {
 public:
@@ -14,6 +18,17 @@ public:
 
 	void Run();
 private:
+	// -デバッグ--------------------
+	std::unique_ptr<ParticleManager> pMng;
+	float moveSpeed = 5.0f;
+	float x = 0;
+	float y = 0;
+	int color = 0xffffff;
+	void DebugMoveX();
+	void DebugMoveY();
+	void DeBugJump();
+	//-------------------------
+
 	// Applicationのみ所有するように
 	std::unique_ptr<SceneManager> sceneMng;
 	std::unique_ptr<FileManager> fileMng;
