@@ -1,7 +1,10 @@
 ﻿#pragma once
 #include <string>
+#include <functional>
+#include <map>
+#include "ActionID.h"
 
-enum class PadAxis { L_X, L_Y, R_X, R_Y};
+enum class PadAxis { Pad_L_X, Pad_L_Y, Pad_R_X, Pad_R_Y};
 // ゲームコントローラーの認識番号
 // DxLib定数、DX_INPUT_PAD1等に対応
 enum class JOYPAD_NO
@@ -32,30 +35,30 @@ enum class JOYPAD_TYPE
 // マウスボタンの種類
 enum class MouseButton
 {
-	Left = 0,
-	Right,
-	Middle
+	Mouse_Left = 0,
+	Mouse_Right,
+	Mouse_Middle
 };
 
 // コントローラーのボタンの種類
 enum class PadButton
 {
-	Face_Left = 0,
-	Face_Right,
-	Face_Top,
-	Face_Down,
-	Left,
-	Right,
-	Top,
-	Down,
-	L_Shoulder,
-	R_Shoulder,
-	L_Trigger,
-	R_Trigger,
-	L_Thumb,
-	R_Thumb,
-	Start,// Xbox:Start
-	back, // Xbox:Back
+	Pad_Face_Left = 0,
+	Pad_Face_Right,
+	Pad_Face_Top,
+	Pad_Face_Down,
+	Pad_Left,
+	Pad_Right,
+	Pad_Top,
+	Pad_Down,
+	Pad_L_Shoulder,
+	Pad_R_Shoulder,
+	Pad_L_Trigger,
+	Pad_R_Trigger,
+	Pad_L_Thumb,
+	Pad_R_Thumb,
+	Xbox_Start,// Xbox:Start
+	Xbox_back, // Xbox:Back
 	Max
 };
 
@@ -63,16 +66,15 @@ class InputManager
 {
 private:
 	InputManager();
+	~InputManager();
 	static constexpr int KEY_COUNT = 256;
 	static constexpr int MOUSE_BUTTON_COUNT = 3;
 	static constexpr int MAX_JOYPADS = 4;
-	static constexpr int DEADZONE = 200; // スティックのデッドゾーン
+	static constexpr int DEADZONE = 50; // スティックのデッドゾーン
 	static constexpr float STICK_MAX = 1000.0f; // スティックの最大値
 	static constexpr float AXIS_THRESHOLD = 0.5f; // 軸入力を「押された」とみなす閾値
 
 public:
-	~InputManager() = default;
-
 	// シングルトン
 	static InputManager& GetInstance()
 	{
@@ -88,7 +90,7 @@ public:
 	bool IsKeyTriggered(int keyCode) const;
 	bool IsKeyReleased(int keyCode) const;
 
-	// マウス
+	// マウス入力
 	bool IsMousePressed(MouseButton button) const;
 	bool IsMouseTriggered(MouseButton button) const;
 	bool IsMouseReleased(MouseButton button) const;
@@ -109,13 +111,32 @@ public:
 	float GetAxisValue(int padNo, PadAxis axis) const;
 
 	// アクションに対する入力状態を取得する関数
-	float GetActionValue(const std::wstring& action, int padNo = 0) const;
-	bool IsActionPressed(const std::wstring& action, int padNo = 0) const;
-	bool IsActionTriggered(const std::wstring& action, int padNo = 0) const;
-	bool IsActionReleased(const std::wstring& action, int padNo = 0) const;
+	float GetActionValue(ActionID action, int padNo = 0) const;
+	bool IsActionPressed(ActionID action, int padNo = 0) const;
+	bool IsActionTriggered(ActionID action, int padNo = 0) const;
+	bool IsActionReleased(ActionID action, int padNo = 0) const;
+
+	// アクションIDに対する入力状態を取得する関数
+	using ActionCallback = std::function<void()>;
+
+	// アクションに対するコールバックの登録
+	void SetTriggerCallback(ActionID action, ActionCallback callback);
+	void SetPressCallback(ActionID action, ActionCallback callback);
+	void SetReleaseCallback(ActionID action, ActionCallback callback);
+	// 登録されたコールバックのクリア
+	void ClearTriggerCallbacks();
+	void ClearPressCallbacks();
+	void ClearReleaseCallbacks();
+	// 登録されたコールバックを呼び出す関数
+	void DispatchCallbacks();
+	// コントローラーごとのボタンマッピングを解決するための関数
+	// std::wstring GetActionName(ActionID action) const;
 
 	const char* GetPadName(int type) const;
 private:
+	std::map<ActionID, ActionCallback> triggerCallbacks;
+	std::map<ActionID, ActionCallback> pressCallbacks;
+	std::map<ActionID, ActionCallback> releaseCallbacks;
 	// キー入力
 	int key[KEY_COUNT] = {};
 	int prevKey[KEY_COUNT] = {};

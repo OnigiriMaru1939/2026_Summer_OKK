@@ -30,6 +30,12 @@
     </ClCompile>
     <ClCompile Include="KeyConfig.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="ParticleManager.cpp">
+      <Filter>Manager\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleEmitter.cpp">
+      <Filter>Manager\Particle\Emitter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Application">
@@ -73,6 +79,12 @@
     </Filter>
     <Filter Include="Manager\File\Resource">
       <UniqueIdentifier>{96243fae-f9df-4779-9516-691284f0032c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager\Particle">
+      <UniqueIdentifier>{5f878923-4227-4cdf-aaff-fd7806b845f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager\Particle\Emitter">
+      <UniqueIdentifier>{e50b9584-6f15-46bd-9baf-2a354e0e2013}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -120,5 +132,12 @@
     </ClInclude>
     <ClInclude Include="KeyConfig.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="ActionID.h" />
+    <ClInclude Include="ParticleManager.h">
+      <Filter>Manager\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleEmitter.h">
+      <Filter>Manager\Particle\Emitter</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
