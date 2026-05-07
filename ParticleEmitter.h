@@ -7,7 +7,7 @@ struct ParticleInstance;
 class ParticleEmitter
 {
 public:
-	ParticleEmitter(const ParticleConfig* cfg);
+	ParticleEmitter(const ParticleConfig* cfg, float x, float y);
 	~ParticleEmitter();
 	void Update();
 	void Draw();
@@ -17,6 +17,8 @@ private:
 
 	const ParticleConfig* config;
 	std::vector<ParticleInstance> particles;
+	float base_x;
+	float base_y;
 	float emitCounter = 0.0f;
 	int lastUsedIndex = 0;
 

@@ -92,7 +92,7 @@ void ParticleManager::RegisterConfig(const std::string& jsonPath)
 				{
 					cfg.shapeIDList.push_back(item);
 
-					std::string path = "resources/particles/" + item + ".png";
+					std::string path = "Resource/Particles/" + item + ".png";
 					cfg.imageResouces[item] = _fileMng.LoadImageFM(path);
 				}
 			}
@@ -154,9 +154,7 @@ void ParticleManager::PlayParticle(const std::string& configName, float x, float
 {
 	if (configLibrary.find(configName) == configLibrary.end()) return;
 
-	auto& cfg = configLibrary[configName];
-	cfg.x = x;
-	cfg.y = y;
+	const auto& cfg = configLibrary[configName];
 
-	emitters.push_back(std::make_shared<ParticleEmitter>(&cfg));
+	emitters.push_back(std::make_shared<ParticleEmitter>(&cfg, x, y));
 }

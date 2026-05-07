@@ -1,7 +1,10 @@
 ﻿#include "ParticleEmitter.h"
 #include "ParticleManager.h"
 
-ParticleEmitter::ParticleEmitter(const ParticleConfig* cfg) : config(cfg)
+ParticleEmitter::ParticleEmitter(const ParticleConfig* cfg, float x, float y) 
+	: config(cfg),
+	base_x(x),
+	base_y(y)
 {
 	emitCounter = 0.0f;
 	particles.resize(1000);
@@ -65,8 +68,8 @@ void ParticleEmitter::ActivateParticle()
 
 	// パラメータ初期化
 	// 位置
-	p.x = config->x + getVar() * config->vX;
-	p.y = config->y + getVar() * config->vY;
+	p.x = base_x + getVar() * config->vX;
+	p.y = base_y + getVar() * config->vY;
 
 	// 方向・速度
 	float angle = (config->initDir + getVar() * config->vInitDir) * (DX_PI_F / 180.0f);

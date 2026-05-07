@@ -5,7 +5,7 @@
 #include "FileManager.h"
 #include "Fps.h"
 
-constexpr auto DEBUG_PARTICLE_PATH = "resources/particleJsonData/waterParameter.json";
+constexpr auto DEBUG_PARTICLE_PATH = "Resource/ParticleJsonData/parametera.json";
 
 // デバッグ---------------------
 #include "ParticleManager.h"
@@ -25,7 +25,7 @@ Application::Application()
 //#endif
 
 	DxLib_Init();
-	//SetMouseDispFlag(true);
+	SetMouseDispFlag(true);
 	fileMng = std::make_unique<FileManager>();
 	sceneMng = std::make_unique<SceneManager>(*fileMng);
 	// デバッグ----------------------------------------------------
