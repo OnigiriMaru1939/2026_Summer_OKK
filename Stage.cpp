@@ -1,6 +1,7 @@
 ﻿#include "Stage.h"
 #include "FileManager.h"
 #include "ImageFile.h"
+#include "Application.h"
 #include <DxLib.h>
 #ifdef max
 #undef max
@@ -111,6 +112,17 @@ void Stage::Draw() const
 	if (tileW_ <= 0 || tileH_ <= 0) return;
 	int tilesPerRow = std::max(1, tilesetW / tileW_);
 
+	// ステージ全体のサイズ
+	int stageWidth = cols_ * tileW_;
+	int stageHeight = rows_ * tileH_;
+
+	int offsetX = (Application::SCREEN_WID - stageWidth) / 2;
+	int offsetY = (Application::SCREEN_HIG - stageHeight) / 2;
+
+	// ステージが画面より大きい場合は 0 に固定（左上合わせ）
+	if (offsetX < 0) offsetX = 0;
+	if (offsetY < 0) offsetY = 0;
+
 	for (int r = 0; r < rows_; ++r)
 	{
 		for (int c = 0; c < cols_; ++c)
@@ -123,11 +135,11 @@ void Stage::Draw() const
 
 			int sx = (ti % tilesPerRow) * tileW_;
 			int sy = (ti / tilesPerRow) * tileH_;
-			int dx = c * tileW_;
-			int dy = r * tileH_;
+			int dx = offsetX + (c * tileW_);
+			int dy = offsetY + (r * tileH_);
 			// DrawRectGraph の第8引数は透過フラグ
 			DrawRectGraph(dx, dy,
-						  sx, sy, sx + tileW_ - 1, sy + tileH_ - 1,
+						  sx, sy, tileW_, tileH_,
 						  handle,
 						  TRUE, FALSE);
 		}
