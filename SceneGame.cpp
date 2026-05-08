@@ -9,7 +9,8 @@ static constexpr int kTileHeight = 32;
 SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
 {
 	player = std::make_unique<Player>(fileMng);
-  player->SystemInit();
+    player->SystemInit();
+	player->SetImage("Resource/Image/Monster.png");
   
 	stage_ = std::make_unique<Stage>(fileMng, kTileWidth, kTileHeight);
 
@@ -25,13 +26,14 @@ SceneGame::~SceneGame()
 
 void SceneGame::Update()
 {
-	player->Update();
-
 	if (InputManager::GetInstance().IsKeyTriggered(KEY_INPUT_RETURN))
 	{
 		SetNextScene(SceneID::RESULT);
 		isEnd = true;
 	}
+
+	player->Update();
+
 	// Stageの更新
 	if (stage_) stage_->Update();
 }

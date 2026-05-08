@@ -50,7 +50,9 @@ private:
 	float sodaShakeGaugeMax;	//炭酸蓄積ゲージの最大値
 	bool aliveFlag;				//生存フラグ
 	bool jumpFlag;				//ジャンプフラグ
+	bool sodaAttackFlag;		//炭酸攻撃フラグ
 	float gravity;				//重力
+	float velocityX;			//X軸の速度
 	float velocityY;			//Y軸の速度
 	float angle;				//回転角度
 };
