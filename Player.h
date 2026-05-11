@@ -6,6 +6,7 @@
 
 class FileManager;
 class ImageFile;
+class ParticleManager;
 
 class Player
 {
@@ -25,6 +26,7 @@ public:
 	void AddGravity();				//重力処理
 	void SodaMove();				//炭酸移動処理
 	void SpaceJump();				//スペースジャンプ処理
+	void ClickSodaJump();           //クリックジャンプ処理
 	void Rotate();					//回転処理
 	void SodaAttack();				//炭酸攻撃処理
 	void Damage(float damage);		//ダメージ処理
@@ -49,6 +51,7 @@ private:
 	bool GetAliveFlag() const { return aliveFlag; }			//生存フラグを取得
 	bool GetJumpFlag() const { return jumpFlag; }			//ジャンプフラグを取得
 
+	std::unique_ptr<ParticleManager> pMng;
 	FileManager& fileManager;			//ファイルマネージャー
 	std::shared_ptr<ImageFile> image_;	//プレイヤーの画像
 

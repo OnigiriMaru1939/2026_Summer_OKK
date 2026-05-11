@@ -111,7 +111,7 @@ void ParticleManager::UpdateAll()
 
 		// もし「一定時間で消えるエミッター」にするなら、ここで判定して削除
 		// 現状は無限ループ設定に近いため、必要に応じて emitter 側に寿命を持たせる
-		if (/* emitter->IsDead() */ false)
+		if ((*it)->IsDead())
 		{
 			it = emitters.erase(it);
 		}
