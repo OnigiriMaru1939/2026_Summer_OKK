@@ -51,5 +51,43 @@ void SceneGame::Draw()
 	if (stage_) stage_->Draw();
 
 	DrawString(0, 20, "GAME SCENE", 0xffffff);
+	//プレイヤーを描画
 	player->Draw();
+
+	//ゲージの描画
+	DrawGauge(20, 50, 500, 40, player->playerHp, player->playerHpMax, GetColor(0, 255, 0));						//プレイヤーのHPゲージ
+	DrawGauge(20, 120, 500, 40, player->sodaShakeGauge, player->sodaShakeGaugeMax, GetColor(0, 0, 255));		//炭酸蓄積ゲージ
+}
+
+//ゲージの描画
+void SceneGame::DrawGauge(
+	int x,
+	int y,
+	int width,
+	int height,
+	float value,
+	float maxValue,
+	int color)
+{
+	//ゲージの枠
+	DrawBox(x - 1,
+			y - 1,
+			x + width + 1,
+			y + height + 1,
+			GetColor(255, 0, 0),
+			FALSE
+	);
+
+	// ゲージ割合
+	int barWidth = (int)((value / maxValue) * width);
+
+	// 中身
+	DrawBox(
+		x,
+		y,
+		x + barWidth,
+		y + height,
+		color,
+		TRUE
+	);
 }

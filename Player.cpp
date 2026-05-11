@@ -18,20 +18,27 @@ Player::~Player()
 //初期化
 bool Player::SystemInit()
 {
+	//位置と物理の初期化
 	posX = 200.0f;
 	posY = 200.0f;
+	gravity = 0.5f;
+	velocityX = 0.0f;
+	velocityY = 0.0f;
 
+	//体力を初期化
+	playerHpMax = 100.0f;
+	playerHp = playerHpMax;
+
+	//ゲージ等の初期化
 	sodaGauge = 100.0f;
 	sodaGaugeMax = 100.0f;
 	sodaShakeGauge = 0.0f;
 	sodaShakeGaugeMax = 100.0f;
+
+	//フラグの初期化
 	aliveFlag = true;
 	jumpFlag = false;
 	angle = 0.0f;
-
-	gravity = 0.5f;
-	velocityX = 0.0f;
-	velocityY = 0.0f;
 
 	GetMousePoint(&prevMouseX, &prevMouseY);
 
@@ -73,7 +80,7 @@ void Player::Update()
 void Player::Draw()
 {
 	//プレイヤーが死んでいる又は画像が読み込まれていないときは表示しない
-	//if (!aliveFlag || !image_) return;
+	if (!aliveFlag || !image_) return;
 	
 	if (image_)
 	{
@@ -91,12 +98,15 @@ void Player::Draw()
 
 	//デバック用で赤い四角のプレイヤー表示
 	//DrawBox((int)posX, (int)posY, (int)posX + 100, (int)posY + 100, GetColor(255, 0, 0), true);
+	
+	//DrawBox(19, 69, 500, 101, GetColor(255, 0, 0), FALSE);
+	//DrawBox(20, 100, 20 + (int)(playerHp * 4.8f), 70, GetColor(0, 255, 0), TRUE);
 
-	DrawBox(19, 69, 500, 101, GetColor(255, 0, 0), FALSE);											//炭酸残量ゲージの枠線
-	DrawBox(20, 100, 20 + (int)(sodaGauge * 4.8f), 70, GetColor(0, 255, 255), TRUE);				//炭酸残量ゲージの表示
+	//DrawBox(19, 69, 500, 101, GetColor(255, 0, 0), FALSE);											//炭酸残量ゲージの枠線
+	//DrawBox(20, 100, 20 + (int)(sodaGauge * 4.8f), 70, GetColor(0, 255, 255), TRUE);					//炭酸残量ゲージの表示
 
-	DrawBox(19, 69+100, 500, 101+100, GetColor(255, 0, 0), FALSE);									//炭酸蓄積ゲージの枠線
-	DrawBox(20, 100+100, 20 + (int)(sodaShakeGauge * 4.8f), 70+100, GetColor(0, 0, 255), TRUE);		//炭酸蓄積ゲージの表示
+	//DrawBox(19, 69+100, 500, 101+100, GetColor(255, 0, 0), FALSE);									//炭酸蓄積ゲージの枠線
+	//DrawBox(20, 100+100, 20 + (int)(sodaShakeGauge * 4.8f), 70+100, GetColor(0, 0, 255), TRUE);		//炭酸蓄積ゲージの表示
 }
 
 //マウスを振ると炭酸ゲージが溜まる
@@ -134,9 +144,6 @@ void Player::SodaShake()
 		{
 			//炭酸蓄積ゲージの割合を炭酸攻撃の威力に変換
 			sodaPower = (sodaShakeGauge / sodaShakeGaugeMax) * 20.0f;
-
-			SodaAttack();
-
 			sodaGauge -= 20.0f;
 			sodaShakeGauge = 0;
 			//下限リミッター
@@ -162,7 +169,7 @@ void Player::AddGravity()
 {
 	velocityY += gravity;	//重力を速度に加算
 	posX += velocityX;		//速度を位置に加算
-	posY += velocityY;		//速度を位置に加算
+	posY += velocityY;		
 
 	velocityX *= 0.98f;	//空気抵抗（X軸の速度を減衰）
 
@@ -180,7 +187,7 @@ void Player::AddGravity()
 void Player::SodaMove()
 {
 	//炭酸を吹き出したときにジャンプ・移動する処理
-	if (sodaAttackFlag)
+	if (GetAttakFlag())
 	{
 		//プレイヤーが向いている方向とは逆に移動する
 		velocityX = cos(angle - DX_PI_F / 2) * sodaPower;
@@ -193,7 +200,7 @@ void Player::SodaMove()
 void Player::SpaceJump()
 {
 	//二段ジャンプを防止
-	if (jumpFlag) return;
+	if (GetJumpFlag()) return;
 
 	float jumpPower = 12.0f;
 
@@ -225,4 +232,15 @@ void Player::Rotate()
 void Player::SodaAttack()
 {
 	sodaAttackFlag = true;
+}
+
+//ダメージ処理
+void Player::Damage(float damage)
+{
+	playerHp -= damage;
+	if (playerHp < 0)
+	{
+		playerHp = 0;
+		aliveFlag = false; //プレイヤーが死んだ
+	}
 }
