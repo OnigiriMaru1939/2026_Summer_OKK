@@ -7,3 +7,5 @@ MoveV, Keyboard, KEY_INPUT_S, 1.0
 MoveV, GamepadAxis, Pad_L_Y, 1.0
 Jump, Keyboard, KEY_INPUT_SPACE, 1.0
 Jump, GamepadButton, Pad_Face_Down, 1.0
+Rotate, Keyboard, KEY_INPUT_D, 1.0
+Rotate, Keyboard, KEY_INPUT_A, -1.0

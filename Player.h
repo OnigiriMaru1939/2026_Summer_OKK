@@ -24,7 +24,8 @@ public:
 	void SodaShake();			//マウスを振ると炭酸蓄積ゲージが溜まる
 	void SodaGaugeCharge();		//炭酸残量ゲージの自然回復
 	void AddGravity();			//重力処理
-	void Jump();				//ジャンプ処理
+	void SodaMove();			//炭酸移動処理
+	void SpaceJump();			//スペースジャンプ処理
 	void Rotate();				//回転処理
 	void SodaAttack();			//炭酸攻撃処理
 
@@ -48,6 +49,7 @@ private:
 	float sodaGaugeMax;			//炭酸残量ゲージの最大値
 	float sodaShakeGauge;		//炭酸蓄積ゲージ
 	float sodaShakeGaugeMax;	//炭酸蓄積ゲージの最大値
+	float sodaPower;			//炭酸攻撃の威力
 	bool aliveFlag;				//生存フラグ
 	bool jumpFlag;				//ジャンプフラグ
 	bool sodaAttackFlag;		//炭酸攻撃フラグ
