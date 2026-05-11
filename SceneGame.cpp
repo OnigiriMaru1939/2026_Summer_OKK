@@ -17,9 +17,6 @@ SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
 	// タイルセットとマップデータを読み込む
 	stage_->LoadTileSet("Resource/MapChip/TileSet1.png");
 	stage_->LoadMapFromCSV("Resource/MapCSV/AGS2026MAP.csv");
-
-	InputManager::GetInstance().SetTriggerCallback(ActionID::Jump, [this]() { player->SpaceJump(); });
-	InputManager::GetInstance().SetPressCallback(ActionID::Rotate, [this]() { player->Rotate(); });
 }
 
 SceneGame::~SceneGame()

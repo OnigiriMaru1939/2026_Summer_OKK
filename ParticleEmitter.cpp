@@ -7,6 +7,7 @@ ParticleEmitter::ParticleEmitter(const ParticleConfig* cfg, float x, float y)
 	base_y(y)
 {
 	emitCounter = 0.0f;
+	emitterLife = 30.0f;
 	particles.resize(1000);
 }
 
@@ -16,20 +17,28 @@ ParticleEmitter::~ParticleEmitter()
 
 void ParticleEmitter::Update()
 {
-	// フレームごとの発生カウンタを計算
-	float emitParFrame = static_cast<float>(config->emitFrequecy / 60.0f);
-	emitCounter += emitParFrame;
-
-	// 計算値から生成
-	while (emitCounter >= 1.0f)
+	if (emitterLife > 0)
 	{
-		ActivateParticle();
-		emitCounter -= 1.0f;
+		emitterLife -= 1.0f;
 	}
+	// フレームごとの発生カウンタを計算
+	float emitParFrame = static_cast<float>(config->emitFrequecy) / 60.0f;
+	if (emitterLife > 0)
+	{
+		emitCounter += emitParFrame;
 
+		// 計算値から生成
+		while (emitCounter >= 1.0f)
+		{
+			ActivateParticle();
+			emitCounter -= 1.0f;
+		}
+	}
+	bool anyActive = false;
 	for (auto& p : particles)
 	{
 		if (!p.active) continue;
+		anyActive = true; // 一つでも生きていればフラグを立てる
 
 		// (速度 + 重力) * 摩擦
 		p.vx = (p.vx + p.ax) * (1.0f - p.friction);
@@ -47,6 +56,11 @@ void ParticleEmitter::Update()
 		float t = 1.0f - (p.currentLife / p.maxLife);
 		p.scale = p.startScale + (p.finishScale - p.startScale) * t;
 		p.alpha = p.startAlpha + (p.finishAlpha - p.startAlpha) * t;
+	}
+
+	if (!anyActive)
+	{
+		isDead = true;
 	}
 }
 
@@ -135,7 +149,7 @@ std::vector<float> ParticleEmitter::GetColorHSL(float H, float S, float L)
 	if (S < 0.0f) { S = 0.0f; }
 	else if (S >= 1.0f) { S = 1.0f; }
 	// Lを 0.0 ～ 1,0 の範囲に収める
-	if (L < 0.0f) { L = 1.0f; }
+	if (L < 0.0f) { L = 0.0f; }
 	else if (L >= 1.0f) { L = 1.0f; }
 
 	float r = 0, g = 0, b = 0;

@@ -35,6 +35,8 @@ bool KeyConfig::StringToActionID(const std::wstring& str, ActionID& actionId) co
 	if (str == L"MoveH") { actionId = ActionID::MoveH;  return true; }
 	if (str == L"MoveV") { actionId = ActionID::MoveV;  return true; }
 	if (str == L"Jump") { actionId = ActionID::Jump;   return true; }
+	if (str == L"SJump") { actionId = ActionID::SJump;   return true; }
+	if (str == L"Shot") { actionId = ActionID::Shot;   return true; }
 	if (str == L"Rotate") { actionId = ActionID::Rotate; return true; }
 	if (str == L"Decide") { actionId = ActionID::Decide; return true; }
 	if (str == L"Cancel") { actionId = ActionID::Cancel; return true; }
@@ -143,7 +145,7 @@ bool KeyConfig::LoadFromFile(const std::wstring& filename)
 			{
 				KeyMapping mapping;
 				mapping.code = StringToKeyCode(codeStr); // KEY＿INPUT_SPACEなどのキーコードを数値に変更
-
+				printfDx("%s\n", codeStr.c_str());
 				try
 				{
 					mapping.scale = std::stof(scaleStr);
