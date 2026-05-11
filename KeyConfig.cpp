@@ -35,6 +35,7 @@ bool KeyConfig::StringToActionID(const std::wstring& str, ActionID& actionId) co
 	if (str == L"MoveH") { actionId = ActionID::MoveH;  return true; }
 	if (str == L"MoveV") { actionId = ActionID::MoveV;  return true; }
 	if (str == L"Jump") { actionId = ActionID::Jump;   return true; }
+	if (str == L"Rotate") { actionId = ActionID::Rotate; return true; }
 	if (str == L"Decide") { actionId = ActionID::Decide; return true; }
 	if (str == L"Cancel") { actionId = ActionID::Cancel; return true; }
 	if (str == L"Exit") { actionId = ActionID::Exit;   return true; }

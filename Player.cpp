@@ -64,8 +64,7 @@ bool Player::SetImage(const std::string& path)
 void Player::Update()
 {
 	AddGravity();
-	Rotate();
-	Jump();
+	SodaMove();
 	
 	SodaGaugeCharge();
 	SodaShake();
@@ -78,7 +77,7 @@ void Player::Draw()
 	
 	if (image_)
 	{
-		//プレイヤー画像を描画
+		//プレイヤー画像を描画(回転可)
 		int handle = image_->GetHandle();
 		DrawRotaGraph(
 			(int)(posX + width_ / 2),
@@ -133,6 +132,11 @@ void Player::SodaShake()
 		//炭酸蓄積ゲージが0より大きい場合、炭酸蓄積ゲージを減らす
 		if (sodaShakeGauge > 0)
 		{
+			//炭酸蓄積ゲージの割合を炭酸攻撃の威力に変換
+			sodaPower = (sodaShakeGauge / sodaShakeGaugeMax) * 20.0f;
+
+			SodaAttack();
+
 			sodaGauge -= 20.0f;
 			sodaShakeGauge = 0;
 			//下限リミッター
@@ -173,43 +177,48 @@ void Player::AddGravity()
 }
 
 //ジャンプ処理・移動処理
-void Player::Jump()
+void Player::SodaMove()
 {
-	//SPACEキーを押すとジャンプ
-	if (InputManager::GetInstance().IsKeyTriggered(57) && !jumpFlag)
-	{
-		float jumpPower = 12.0f;
-
-		//プレイヤーの向いている方向にジャンプ
-		//DX_PI_F / 2はジャンプ方向を90度補正するための値
-		velocityX += cos(angle - DX_PI_F / 2) * jumpPower;
-		velocityY += sin(angle - DX_PI_F / 2) * jumpPower;
-
-		jumpFlag = true;
-	}
-
 	//炭酸を吹き出したときにジャンプ・移動する処理
-	float sodaPower = 0.0f;
 	if (sodaAttackFlag)
 	{
-		//炭酸蓄積ゲージの割合によって移動量を変える
-		sodaPower = 15.0f;
-		
 		//プレイヤーが向いている方向とは逆に移動する
-		velocityX -= cos(angle - DX_PI_F / 2) * sodaPower;
-		velocityY -= sin(angle - DX_PI_F / 2) * sodaPower;
+		velocityX = cos(angle - DX_PI_F / 2) * sodaPower;
+		velocityY = sin(angle - DX_PI_F / 2) * sodaPower;
+
 		sodaAttackFlag = false; //攻撃フラグをリセット
 	}
+}
+
+void Player::SpaceJump()
+{
+	//二段ジャンプを防止
+	if (jumpFlag) return;
+
+	float jumpPower = 12.0f;
+
+	//プレイヤーの向いている方向にジャンプ
+	//DX_PI_F / 2はジャンプ方向を90度補正するための値
+	velocityX = cos(angle - DX_PI_F / 2) * jumpPower;
+	velocityY = sin(angle - DX_PI_F / 2) * jumpPower;
+
+	jumpFlag = true;
 }
 
 //プレイヤー回転処理
 void Player::Rotate()
 {
-	float sensitivity = 0.005f; //感度
+	float rotateSpeed = 0.05f;
 
-	int dx = InputManager::GetInstance().GetMouseDX();
-
-	angle += dx * sensitivity;
+	if (InputManager::GetInstance().IsKeyPressed(KEY_INPUT_D))
+	{
+		angle += rotateSpeed;
+	}
+	if(InputManager::GetInstance().IsKeyPressed(KEY_INPUT_A))
+	{
+		angle -= rotateSpeed;
+	}
+	
 }
 
 //炭酸攻撃処理

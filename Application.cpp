@@ -80,12 +80,14 @@ void Application::Update()
 	sceneMng->Update();
 
 	// デバッグ
+	/*
 	if (InputManager::GetInstance().IsMouseTriggered(MouseButton::Mouse_Left))
 	{
 		int mx, my;
 		GetMousePoint(&mx, &my);
 		pMng->PlayParticle(DEBUG_PARTICLE_PATH, (float)mx, (float)my);
 	}
+	*/
 	pMng->UpdateAll();
 }
 
