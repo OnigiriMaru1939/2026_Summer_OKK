@@ -25,6 +25,9 @@ public:
 
 	// あたり判定
 	bool IsSolidAt(int col, int row) const; 
+
+	bool CheckCollision(float x, float y, float width, float height) const;
+
 	// ワールド座標（ピクセル）
 	bool IsSolidWorld(float x, float y) const;
 

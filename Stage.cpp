@@ -1,6 +1,7 @@
 ﻿#include "Stage.h"
 #include "FileManager.h"
 #include "ImageFile.h"
+#include "Application.h"
 #include <DxLib.h>
 #ifdef max
 #undef max
@@ -111,6 +112,17 @@ void Stage::Draw() const
 	if (tileW_ <= 0 || tileH_ <= 0) return;
 	int tilesPerRow = std::max(1, tilesetW / tileW_);
 
+	// ステージ全体のサイズ
+	int stageWidth = cols_ * tileW_;
+	int stageHeight = rows_ * tileH_;
+
+	int offsetX = (Application::SCREEN_WID - stageWidth) / 2;
+	int offsetY = (Application::SCREEN_HIG - stageHeight) / 2;
+
+	// ステージが画面より大きい場合は 0 に固定（左上合わせ）
+	if (offsetX < 0) offsetX = 0;
+	if (offsetY < 0) offsetY = 0;
+
 	for (int r = 0; r < rows_; ++r)
 	{
 		for (int c = 0; c < cols_; ++c)
@@ -123,11 +135,11 @@ void Stage::Draw() const
 
 			int sx = (ti % tilesPerRow) * tileW_;
 			int sy = (ti / tilesPerRow) * tileH_;
-			int dx = c * tileW_;
-			int dy = r * tileH_;
-			// DrawRectGraph の第8引数は透過フラグ
+			int dx = offsetX + (c * tileW_);
+			int dy = offsetY + (r * tileH_);
+			// 描画
 			DrawRectGraph(dx, dy,
-						  sx, sy, sx + tileW_ - 1, sy + tileH_ - 1,
+						  sx, sy, tileW_, tileH_,
 						  handle,
 						  TRUE, FALSE);
 		}
@@ -136,10 +148,31 @@ void Stage::Draw() const
 
 bool Stage::IsSolidAt(int col, int row) const
 {
+	// 範囲外は空タイル扱い
 	if (col < 0 || row < 0 || col >= cols_ || row >= rows_) return false;
 	int v = tiles_[row * cols_ + col];
-	// シンプルに 0 を空、0 以外を衝突あり とする
+
 	return v != 0;
+}
+
+// 矩形範囲（左、上、右、下）に壁があるかチェック
+bool Stage::CheckCollision(float left, float top, float right, float bottom) const
+{
+	// 座標をタイルインデックスに変換
+	int minCol = static_cast<int>(left) / tileW_;
+	int maxCol = static_cast<int>(right) / tileW_;
+	int minRow = static_cast<int>(top) / tileH_;
+	int maxRow = static_cast<int>(bottom) / tileH_;
+
+	// 範囲内のタイルをすべてループで回す
+	for (int r = minRow; r <= maxRow; ++r)
+	{
+		for (int c = minCol; c <= maxCol; ++c)
+		{
+			if (IsSolidAt(c, r)) return true;
+		}
+	}
+	return false;
 }
 
 bool Stage::IsSolidWorld(float x, float y) const
