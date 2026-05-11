@@ -1,10 +1,13 @@
 ﻿#include "SceneGame.h"
 #include "InputManager.h"
 #include "Player.h"
+#include "Stage.h"
+#include "FileManager.h"
+#include "StageConfig.h"
+#include "StageConfigTablle.h"
 
-// タイルサイズ
-static constexpr int kTileWidth = 32;
-static constexpr int kTileHeight = 32;
+// 静的変数の定義
+int SceneGame::selectedStageIndex_ = 1;
 
 SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
 {
@@ -12,11 +15,13 @@ SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
     player->SystemInit();
 	player->SetImage("Resource/Image/Monster.png");
   
-	stage_ = std::make_unique<Stage>(fileMng, kTileWidth, kTileHeight);
+	stage_ = std::make_unique<Stage>(fileMng);
 
-	// タイルセットとマップデータを読み込む
-	stage_->LoadTileSet("Resource/MapChip/TileSet1.png");
-	stage_->LoadMapFromCSV("Resource/MapCSV/AGS2026MAP.csv");
+	// ステージ固有のセットアップを実行
+	const auto& stageConfigs = GetStageConfigs();
+	const StageConfig& config = stageConfigs[selectedStageIndex_ - 1];
+	stage_->Load(config.mapPath);
+	config.setUpStage(*this);
 
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Jump, [this]() { player->SpaceJump(); });
 	InputManager::GetInstance().SetPressCallback(ActionID::Rotate, [this]() { player->Rotate(); });
