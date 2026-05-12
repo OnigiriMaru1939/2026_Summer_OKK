@@ -19,7 +19,7 @@ public:
 	void Run();
 private:
 	// -デバッグ--------------------
-	std::unique_ptr<ParticleManager> pMng;
+	//std::unique_ptr<ParticleManager> pMng;
 	float moveSpeed = 5.0f;
 	float x = 0;
 	float y = 0;

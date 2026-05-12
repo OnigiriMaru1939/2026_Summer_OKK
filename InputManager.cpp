@@ -193,15 +193,15 @@ bool InputManager::IsKeyReleased(int keyCode) const
 }
 
 // マウス入力
-bool InputManager::IsMousePressed(MouseButton button) const
+bool InputManager::IsMousePressed(int button) const
 {
 	return IsInputPressed(mouseButton[(int)button]);
 }
-bool InputManager::IsMouseTriggered(MouseButton button) const
+bool InputManager::IsMouseTriggered(int button) const
 {
 	return IsInputTriggered(mouseButton[(int)button], prevMouseButton[(int)button]);
 }
-bool InputManager::IsMouseReleased(MouseButton button) const
+bool InputManager::IsMouseReleased(int button) const
 {
 	return IsInputReleased(mouseButton[(int)button], prevMouseButton[(int)button]);
 }
@@ -261,7 +261,7 @@ float InputManager::GetActionValue(ActionID action, int padNo) const
 				val = GetAxisValue(padNo, (PadAxis)m.code);
 				break;
 			case InputType::Mouse:
-				val = IsMousePressed((MouseButton)m.code) ? 1.0f : 0.0f;
+				val = IsMousePressed(m.code) ? 1.0f : 0.0f;
 				break;
 		}
 		total += val * m.scale; // スケールをかけて加算
@@ -292,7 +292,7 @@ bool InputManager::IsActionPressed(ActionID action, int padNo) const
 				break;
 			}
 			case InputType::Mouse:
-				if (IsMousePressed((MouseButton)m.code)) return true;
+				if (IsMousePressed(m.code)) return true;
 				break;
 		}
 	}
@@ -315,7 +315,7 @@ bool InputManager::IsActionTriggered(ActionID action, int padNo) const
 			case InputType::GamepadAxis:
 				break; // 連続値のため、実装しない
 			case InputType::Mouse:
-				if (IsMouseTriggered((MouseButton)m.code)) return true;
+				if (IsMouseTriggered(m.code)) return true;
 				break;
 		}
 	}
@@ -338,7 +338,7 @@ bool InputManager::IsActionReleased(ActionID action, int padNo) const
 			case InputType::GamepadAxis:
 				break; // 連続値のため、実装しない
 			case InputType::Mouse:
-				if (IsMouseReleased((MouseButton)m.code)) return true;
+				if (IsMouseReleased(m.code)) return true;
 				break;
 		}
 	}

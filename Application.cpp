@@ -5,10 +5,10 @@
 #include "FileManager.h"
 #include "Fps.h"
 
-constexpr auto DEBUG_PARTICLE_PATH = "Resource/ParticleJsonData/parametera.json";
+//constexpr auto DEBUG_PARTICLE_PATH = "Resource/ParticleJsonData/parametera.json";
 
 // デバッグ---------------------
-#include "ParticleManager.h"
+//#include "ParticleManager.h"
 // ----------------------------
 
 Application::Application()
@@ -29,8 +29,8 @@ Application::Application()
 	fileMng = std::make_unique<FileManager>();
 	sceneMng = std::make_unique<SceneManager>(*fileMng);
 	// デバッグ----------------------------------------------------
-	pMng = std::make_unique<ParticleManager>(*fileMng);
-	pMng->RegisterConfig(DEBUG_PARTICLE_PATH);
+	//pMng = std::make_unique<ParticleManager>(*fileMng);
+	//pMng->RegisterConfig(DEBUG_PARTICLE_PATH);
 	//------------------------------------------------------------
 
 	// イベントの登録
@@ -88,7 +88,7 @@ void Application::Update()
 		pMng->PlayParticle(DEBUG_PARTICLE_PATH, (float)mx, (float)my);
 	}
 	*/
-	pMng->UpdateAll();
+	//pMng->UpdateAll();
 }
 
 void Application::Draw()
@@ -98,7 +98,7 @@ void Application::Draw()
 	InputManager::GetInstance().DrawDebug(0, 40);
 	DrawBox(100 + (int)x, 100 + (int)y, 150 + (int)x, 150 + (int)y, color, true);
 
-	pMng->DrawAll();
+	//pMng->DrawAll();
 
 }
 
