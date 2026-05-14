@@ -3,182 +3,298 @@
 #include "ImageFile.h"
 #include "Application.h"
 #include <DxLib.h>
-#ifdef max
-#undef max
-#endif
 #include <fstream>
 #include <sstream>
 #include <algorithm>
 
 
-Stage::Stage(FileManager& fileMng, int TileWidth, int TileHeight)
-	: fileManager_(fileMng)
-	, tileW_(TileWidth)
-	, tileH_(TileHeight)
+Stage::Stage(FileManager& fileMng):fileMng_(fileMng)
 {
+	scrollX = 0;
+	scrollY = 0;
+
+	mapWidth = 0;
+	mapHeight = 0;
+
+	chipImg_ = fileMng_.LoadImageFM("Resource/MapChip/Mapchip_def.png"); //後でファイル読み込む
+
+	chipInfo_.resize(CHIP_HEIGHT * CHIP_WIDTH + 1);
+
+	chipInfo_[0] = { false };
+	chipInfo_[1] = { true };
+	chipInfo_[2] = { true };
+	chipInfo_[3] = { true };
+	chipInfo_[4] = { true };
+	chipInfo_[5] = { true };
+	chipInfo_[6] = { true };
+	chipInfo_[7] = { true };
+	chipInfo_[8] = { true };
+	chipInfo_[9] = { true };
+	chipInfo_[10] = { true };
+	chipInfo_[11] = { true };
+	chipInfo_[12] = { true };
+	chipInfo_[13] = { true };
+	chipInfo_[14] = { true };
+	chipInfo_[15] = { true };
 }
 
 Stage::~Stage()
 {
 }
 
-bool Stage::LoadTileSet(const std::string& path)
-{
-	tileset_ = fileManager_.LoadImageFM(path);
-	return tileset_ != nullptr;
-}
+//bool Stage::LoadTileSet(const std::string& path)
+//{
+//	tileset_ = fileManager_.LoadImageFM(path);
+//	return tileset_ != nullptr;
+//}
 
-bool Stage::LoadMapFromCSV(const std::string& path)
+bool Stage::Load(const std::string& path)
 {
 	std::ifstream ifs(path);
 	if (!ifs.is_open()) return false;
 
-	std::vector<int> data;
-	std::string line;
-	int detectedCols = 0;
-	int detectedRows = 0;
+	tileMap.clear();
 
+	std::string line;
 	while (std::getline(ifs, line))
 	{
-		if (line.empty()) continue;
-		std::istringstream ss(line);
-		std::string cell;
-		int colCount = 0;
-		while (std::getline(ss, cell, ','))
+		if (line.find("\"width\"") != std::string::npos)
 		{
-			// 空文字は 0 にする
-			try
+			sscanf_s(line.c_str(), "%*[^0-9]%d", &mapWidth);
+		}
+		if (line.find("\"height\"") != std::string::npos)
+		{
+			sscanf_s(line.c_str(), " %*[^0-9]%d", &mapHeight);
+		}
+		// tilesizeはこちらのソリューションで決定
+		//if (line.find("\"tile_size\"") != std::string::npos)
+		//{
+		//	sscanf_s(line.c_str(), " %*[^0-9]%d", &tileSize);
+		//}
+
+		// タイル配列
+		if (line.find("[") != std::string::npos &&
+			line.find("]") != std::string::npos &&
+			line.find(",") != std::string::npos)
+		{
+			// 二次元配列にpushする用の配列
+			std::vector<int> row;
+			// 行のコピー取得
+			char buf[512];
+			strcpy_s(buf, line.c_str());
+
+			char* ctx = nullptr;
+			// 行の分解
+			char* token = strtok_s(buf, "[], ", &ctx);
+			while (token)
 			{
-				int v = 0;
-				if (!cell.empty())
+				int v;
+				if (sscanf_s(token, "%d", &v) == 1)
 				{
-					v = std::stoi(cell);
+					row.push_back(v);
 				}
-				data.push_back(v);
+				token = strtok_s(nullptr, "[], ", &ctx);
 			}
-			catch (...)
+			if (!row.empty())
 			{
-				data.push_back(0);
+				tileMap.push_back(row);
 			}
-			++colCount;
-		}
-		detectedCols = std::max(detectedCols, colCount);
-		++detectedRows;
-	}
-
-	if (detectedCols == 0 || detectedRows == 0) return false;
-
-	// 行ごとに列数が揃っていない場合は 0 を埋める
-	std::vector<int> normalized;
-	normalized.reserve(detectedCols * detectedRows);
-	for (int r = 0; r < detectedRows; ++r)
-	{
-		for (int c = 0; c < detectedCols; ++c)
-		{
-			int idx = r * detectedCols + c;
-			if (idx < static_cast<int>(data.size()))
-				normalized.push_back(data[idx]);
-			else
-				normalized.push_back(0);
 		}
 	}
-
-	SetMap(normalized, detectedCols, detectedRows);
 	return true;
 }
 
-void Stage::SetMap(const std::vector<int>& tiles, int cols, int rows)
-{
-	cols_ = cols;
-	rows_ = rows;
-	tiles_ = tiles;
-	// サイズチェック
-	if (static_cast<int>(tiles_.size()) != cols_ * rows_)
-	{
-		tiles_.resize(cols_ * rows_, 0);
-	}
-}
+
+//void Stage::SetMap(const std::vector<int>& tiles, int cols, int rows)
+//{
+//	cols_ = cols;
+//	rows_ = rows;
+//	tiles_ = tiles;
+//	// サイズチェック
+//	if (static_cast<int>(tiles_.size()) != cols_ * rows_)
+//	{
+//		tiles_.resize(cols_ * rows_, 0);
+//	}
+//}
 
 void Stage::Update()
 {
 }
 
 
-void Stage::Draw() const
+void Stage::Draw()
 {
-	if (!tileset_) return;
-	int handle = tileset_->GetHandle();
-	int tilesetW = tileset_->GetWidth();
-	if (tileW_ <= 0 || tileH_ <= 0) return;
-	int tilesPerRow = std::max(1, tilesetW / tileW_);
+	int x, y;
 
-	// ステージ全体のサイズ
-	int stageWidth = cols_ * tileW_;
-	int stageHeight = rows_ * tileH_;
+	// マップデータの参照位置
+	int startX = static_cast<int>(scrollX / CHIP_SIZE);
+	int startY = static_cast<int>(scrollY / CHIP_SIZE);
 
-	int offsetX = (Application::SCREEN_WID - stageWidth) / 2;
-	int offsetY = (Application::SCREEN_HIG - stageHeight) / 2;
+	int offsetX = scrollX % CHIP_SIZE;
+	int offsetY = scrollY % CHIP_SIZE;
+	int drawCols = Application::SCREEN_WID / CHIP_SIZE + 2;
+	int drawRows = Application::SCREEN_HIG / CHIP_SIZE + 2;
 
-	// ステージが画面より大きい場合は 0 に固定（左上合わせ）
-	if (offsetX < 0) offsetX = 0;
-	if (offsetY < 0) offsetY = 0;
-
-	for (int r = 0; r < rows_; ++r)
+	for (int y = 0; y < drawRows; y++)
 	{
-		for (int c = 0; c < cols_; ++c)
+		for (int x = 0; x < drawCols; x++)
 		{
-			int t = tiles_[r * cols_ + c];
-			if (t <= 0) continue; // 0 を空タイル扱い 
-			int ti = t; // タイルインデックス
-			// タイルインデックスが 1 始まりなら -1 する 
-		
+			int mapX = startX + x;
+			int mapY = startY + y;
 
-			int sx = (ti % tilesPerRow) * tileW_;
-			int sy = (ti / tilesPerRow) * tileH_;
-			int dx = offsetX + (c * tileW_);
-			int dy = offsetY + (r * tileH_);
-			// 描画
-			DrawRectGraph(dx, dy,
-						  sx, sy, tileW_, tileH_,
-						  handle,
-						  TRUE, FALSE);
+			if (mapX < 0 || mapY < 0 ||
+				mapX >= mapWidth || mapY >= mapHeight)
+				continue;
+
+			int chipId = tileMap[mapY][mapX];
+			if (chipId == 0) continue;
+
+			DrawRectGraph(x * CHIP_SIZE - offsetX, y * CHIP_SIZE - scrollY % CHIP_SIZE,
+						  (chipId % CHIP_WIDTH) * CHIP_SIZE, (chipId / CHIP_WIDTH) * CHIP_SIZE, CHIP_SIZE, CHIP_SIZE, chipImg_->GetHandle(), true);
+
+
 		}
 	}
+
+	//if (!tileset_) return;
+	//int handle = tileset_->GetHandle();
+	//int tilesetW = tileset_->GetWidth();
+	//if (tileW_ <= 0 || tileH_ <= 0) return;
+	//int tilesPerRow = std::max(1, tilesetW / tileW_);
+
+	//// ステージ全体のサイズ
+	//int stageWidth = cols_ * tileW_;
+	//int stageHeight = rows_ * tileH_;
+
+	//int offsetX = (Application::SCREEN_WID - stageWidth) / 2;
+	//int offsetY = (Application::SCREEN_HIG - stageHeight) / 2;
+
+	//// ステージが画面より大きい場合は 0 に固定（左上合わせ）
+	//if (offsetX < 0) offsetX = 0;
+	//if (offsetY < 0) offsetY = 0;
+
+	//for (int r = 0; r < rows_; ++r)
+	//{
+	//	for (int c = 0; c < cols_; ++c)
+	//	{
+	//		int t = tiles_[r * cols_ + c];
+	//		if (t <= 0) continue; // 0 を空タイル扱い 
+	//		int ti = t; // タイルインデックス
+	//		// タイルインデックスが 1 始まりなら -1 する 
+	//	
+
+	//		int sx = (ti % tilesPerRow) * tileW_;
+	//		int sy = (ti / tilesPerRow) * tileH_;
+	//		int dx = offsetX + (c * tileW_);
+	//		int dy = offsetY + (r * tileH_);
+	//		// 描画
+	//		DrawRectGraph(dx, dy,
+	//					  sx, sy, tileW_, tileH_,
+	//					  handle,
+	//					  TRUE, FALSE);
+	//	}
+	//}
 }
 
-bool Stage::IsSolidAt(int col, int row) const
-{
-	// 範囲外は空タイル扱い
-	if (col < 0 || row < 0 || col >= cols_ || row >= rows_) return false;
-	int v = tiles_[row * cols_ + col];
+//bool Stage::IsSolidAt(int col, int row) const
+//{
+//	// 範囲外は空タイル扱い
+//	if (col < 0 || row < 0 || col >= cols_ || row >= rows_) return false;
+//	int v = tiles_[row * cols_ + col];
+//
+//	return v != 0;
+//}
 
-	return v != 0;
+bool Stage::CheckWall(int worldX, int worldY) const
+{
+	int cx = worldX / CHIP_SIZE;
+	int cy = worldY / CHIP_SIZE;
+
+	if (cx < 0 || cx >= mapWidth || cy < 0 || cy >= mapHeight)
+	{
+		return true;
+	}
+
+	int chip = tileMap[cy][cx];
+	return chipInfo_[chip].isWall;
+}
+
+void Stage::SetScrollX(int s)
+{
+	scrollX = s;
+}
+
+void Stage::SetScrollY(int s)
+{
+	scrollY = s;
+}
+
+int Stage::GetScrollX()
+{
+	return scrollX;
+}
+
+int Stage::GetScrollY()
+{
+	return scrollY;
+}
+
+int Stage::GetMaxScrollX()
+{
+	return mapWidth * CHIP_SIZE - Application::SCREEN_WID;
+}
+
+int Stage::GetMaxScrollY()
+{
+	return mapHeight * CHIP_SIZE - Application::SCREEN_HIG;
+}
+
+// マップチップを設定
+void Stage::SetChip(int chipX, int chipY, int chipId)
+{
+	if (chipX < 0 || chipX >= mapWidth || chipY < 0 || chipY >= mapHeight)
+	{
+		return; // 範囲外
+	}
+
+	tileMap[chipY][chipX] = chipId;
+}
+
+// マップチップを取得
+int Stage::GetChip(int chipX, int chipY) const
+{
+	if (chipX < 0 || chipX >= mapWidth || chipY < 0 || chipY >= mapHeight)
+	{
+		return 0; // 範囲外
+	}
+
+	return tileMap[chipY][chipX];
 }
 
 // 矩形範囲（左、上、右、下）に壁があるかチェック
-bool Stage::CheckCollision(float left, float top, float right, float bottom) const
-{
-	// 座標をタイルインデックスに変換
-	int minCol = static_cast<int>(left) / tileW_;
-	int maxCol = static_cast<int>(right) / tileW_;
-	int minRow = static_cast<int>(top) / tileH_;
-	int maxRow = static_cast<int>(bottom) / tileH_;
+//bool Stage::CheckCollision(float left, float top, float right, float bottom) const
+//{
+//	//// 座標をタイルインデックスに変換
+//	//int minCol = static_cast<int>(left) / tileW_;
+//	//int maxCol = static_cast<int>(right) / tileW_;
+//	//int minRow = static_cast<int>(top) / tileH_;
+//	//int maxRow = static_cast<int>(bottom) / tileH_;
+//
+//	//// 範囲内のタイルをすべてループで回す
+//	//for (int r = minRow; r <= maxRow; ++r)
+//	//{
+//	//	for (int c = minCol; c <= maxCol; ++c)
+//	//	{
+//	//		if (IsSolidAt(c, r)) return true;
+//	//	}
+//	//}
+//	//return false;
+//}
 
-	// 範囲内のタイルをすべてループで回す
-	for (int r = minRow; r <= maxRow; ++r)
-	{
-		for (int c = minCol; c <= maxCol; ++c)
-		{
-			if (IsSolidAt(c, r)) return true;
-		}
-	}
-	return false;
-}
-
-bool Stage::IsSolidWorld(float x, float y) const
-{
-	if (tileW_ <= 0 || tileH_ <= 0) return false;
-	int col = static_cast<int>(x) / tileW_;
-	int row = static_cast<int>(y) / tileH_;
-	return IsSolidAt(col, row);
-}
+//bool Stage::IsSolidWorld(float x, float y) const
+//{
+//	if (tileW_ <= 0 || tileH_ <= 0) return false;
+//	int col = static_cast<int>(x) / tileW_;
+//	int row = static_cast<int>(y) / tileH_;
+//	return IsSolidAt(col, row);
+//}

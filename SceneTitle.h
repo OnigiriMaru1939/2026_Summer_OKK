@@ -16,5 +16,6 @@ public:
 	void Draw() override;
 private:
 	std::shared_ptr<ImageFile> test;
+	std::shared_ptr<ImageFile> testLogo;
 };
 

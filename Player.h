@@ -6,6 +6,7 @@
 
 class FileManager;
 class ImageFile;
+class ParticleManager;
 
 class Player
 {
@@ -20,15 +21,16 @@ public:
 	bool SetImage(const std::string& path);			//画像のセット
 	void Update();
 	void Draw();
-	void SodaShake();						//マウスを振ると炭酸蓄積ゲージが溜まる
-	void SodaGaugeCharge();					//炭酸残量ゲージの自然回復
-	void AddGravity();						//重力処理
-	void SodaMove();						//炭酸移動処理
-	void SpaceJump();						//スペースジャンプ処理
-	void Rotate();							//回転処理
-	void SodaAttack(float sodaPower);		//炭酸攻撃処理
-	void Damage(float damage);				//ダメージ処理
-
+	void SodaShake();				//マウスを振ると炭酸蓄積ゲージが溜まる
+	void SodaGaugeCharge();			//炭酸残量ゲージの自然回復
+	void AddGravity();				//重力処理
+	void SodaMove();				//炭酸移動処理
+	void SpaceJump();				//スペースジャンプ処理
+	void ClickSodaJump();           //クリックジャンプ処理
+	void Rotate();					//回転処理
+	void SodaAttack();				//炭酸攻撃処理
+	void Damage(float damage);		//ダメージ処理
+  
 	int prevMouseX;				//前回のマウスX座標
 	int prevMouseY;				//前回のマウスY座標
 
@@ -49,6 +51,7 @@ private:
 	bool GetAliveFlag() const { return aliveFlag; }			//生存フラグを取得
 	bool GetJumpFlag() const { return jumpFlag; }			//ジャンプフラグを取得
 
+	std::unique_ptr<ParticleManager> pMng;
 	FileManager& fileManager;			//ファイルマネージャー
 	std::shared_ptr<ImageFile> image_;	//プレイヤーの画像
 

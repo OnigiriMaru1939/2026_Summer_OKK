@@ -1,15 +1,46 @@
 ﻿#pragma once
+
 #include <vector>
 #include <string>
 #include <memory>
+#include"Application.h"
+#include <DxLib.h>
 
 class FileManager;
 class ImageFile;
 class Stage
 {
 public:
-	Stage(FileManager& fileMng, int TileWidth, int TileHeight);
+	static constexpr int CHIP_SIZE = 40;
+	static constexpr int CHIP_WIDTH = 4;
+	static constexpr int CHIP_HEIGHT = 4;
+	static constexpr int SCROLL_SPEED = 6;
+
+	Stage(FileManager& fileMng);
 	~Stage();
+	bool Load(const std::string& path);
+	void Update();
+	void Draw();
+
+	bool CheckWall(int cx, int cy) const;
+
+	void SetScrollX(int s);
+	void SetScrollY(int s);
+	int GetScrollX();
+	int GetScrollY();
+	int GetMaxScrollX();
+	int GetMaxScrollY();
+
+	// マップチップを設定・取得（LightWallGimmick用）
+	void SetChip(int chipX, int chipY, int chipId);
+	int GetChip(int chipX, int chipY) const;
+
+	// ワールド座標をチップ座標に変換
+	int WorldToChipX(int worldX) const { return worldX / CHIP_SIZE; }
+	int WorldToChipY(int worldY) const { return worldY / CHIP_SIZE; }
+
+
+/*
 	// タイルセット画像を読み込む
 	bool LoadTileSet(const std::string& path);
 
@@ -35,11 +66,26 @@ public:
 	int GetRows() const { return rows_; }
 	int GetTileWidth() const { return tileW_; }
 	int GetTileHeight() const { return tileH_; }
-
+	*/
 private:
-	FileManager& fileManager_;
-	std::shared_ptr<ImageFile> tileset_;
+	struct ChipInfo
+	{
+		bool isWall;
+	};
 
+	std::vector<ChipInfo> chipInfo_;
+	int scrollX;
+	int scrollY;
+
+	int mapWidth;
+	int mapHeight;
+
+	std::shared_ptr<ImageFile> chipImg_;
+	std::vector<std::vector<int>>tileMap;
+
+	FileManager& fileMng_;
+
+	/*
 	int tileW_;
 	int tileH_;
 
@@ -47,5 +93,6 @@ private:
 	int rows_ = 0;
 	// tiles_[row * cols_ + col] = タイルインデックス（0 を空に使う）
 	std::vector<int> tiles_;
+	*/
 };
 

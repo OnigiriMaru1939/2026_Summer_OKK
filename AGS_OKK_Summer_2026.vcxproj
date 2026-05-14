@@ -160,6 +160,7 @@
     <ClCompile Include="SceneStageSelect.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
     <ClCompile Include="Stage.cpp" />
+    <ClCompile Include="StageConfigTablle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActionID.h" />
@@ -183,6 +184,8 @@
     <ClInclude Include="SceneTitle.h" />
     <ClInclude Include="SoundFile.h" />
     <ClInclude Include="Stage.h" />
+    <ClInclude Include="StageConfig.h" />
+    <ClInclude Include="StageConfigTablle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

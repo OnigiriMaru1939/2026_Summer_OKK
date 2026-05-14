@@ -91,9 +91,9 @@ public:
 	bool IsKeyReleased(int keyCode) const;
 
 	// マウス入力
-	bool IsMousePressed(MouseButton button) const;
-	bool IsMouseTriggered(MouseButton button) const;
-	bool IsMouseReleased(MouseButton button) const;
+	bool IsMousePressed(int button) const;
+	bool IsMouseTriggered(int button) const;
+	bool IsMouseReleased(int button) const;
 	int GetMouseX() const { return mouseX; }
 	int GetMouseY() const { return mouseY; }
 	int GetMouseDX() const { return mouseX - prevMouseX; }

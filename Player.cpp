@@ -3,11 +3,19 @@
 #include "InputManager.h"
 #include "FileManager.h"
 #include "ImageFile.h"
+#include "ParticleManager.h"
 #include <DxLib.h>
+#include <memory>
 
+constexpr auto WATER_PARTICLE_PATH = "Resource/ParticleJsonData/waterParameter.json";
 Player::Player(FileManager& fileMng) : fileManager(fileMng)
 {
+	pMng = std::make_unique<ParticleManager>(fileMng);
+	pMng->RegisterConfig(WATER_PARTICLE_PATH);
 
+	InputManager::GetInstance().SetTriggerCallback(ActionID::Jump, [this]() { SpaceJump(); });
+	InputManager::GetInstance().SetTriggerCallback(ActionID::SJump, [this]() { ClickSodaJump(); });
+	InputManager::GetInstance().SetPressCallback(ActionID::Rotate, [this]() { Rotate(); });
 }
 
 Player::~Player()
@@ -75,36 +83,39 @@ void Player::Update()
 	
 	SodaGaugeCharge();
 	SodaShake();
+	pMng->UpdateAll();
 }
 
 void Player::Draw()
 {
 	//プレイヤーが死んでいる又は画像が読み込まれていないときは表示しない
 	if (!aliveFlag || !image_) return;
-	
+
+	pMng->DrawAll();
+
 	if (image_)
 	{
 		//プレイヤー画像を描画(回転可)
 		int handle = image_->GetHandle();
 		DrawRotaGraph(
-			(int)(posX + width_ / 2),
-			(int)(posY + height_ / 2),
+			(int)posX,
+			(int)posY,
 			2.0,
 			angle,
 			handle,
 			TRUE
 		);
 	}
-
+	DrawCircle(posX, posY, 3, 0X0000ff);
 	//デバック用で赤い四角のプレイヤー表示
 	//DrawBox((int)posX, (int)posY, (int)posX + 100, (int)posY + 100, GetColor(255, 0, 0), true);
-	
+	//
 	//DrawBox(19, 69, 500, 101, GetColor(255, 0, 0), FALSE);
 	//DrawBox(20, 100, 20 + (int)(playerHp * 4.8f), 70, GetColor(0, 255, 0), TRUE);
-
+	//
 	//DrawBox(19, 69, 500, 101, GetColor(255, 0, 0), FALSE);											//炭酸残量ゲージの枠線
 	//DrawBox(20, 100, 20 + (int)(sodaGauge * 4.8f), 70, GetColor(0, 255, 255), TRUE);					//炭酸残量ゲージの表示
-
+	//
 	//DrawBox(19, 69+100, 500, 101+100, GetColor(255, 0, 0), FALSE);									//炭酸蓄積ゲージの枠線
 	//DrawBox(20, 100+100, 20 + (int)(sodaShakeGauge * 4.8f), 70+100, GetColor(0, 0, 255), TRUE);		//炭酸蓄積ゲージの表示
 }
@@ -133,25 +144,6 @@ void Player::SodaShake()
 	//減衰（振らないと減る）
 	sodaShakeGauge -= 0.2f;
 	if (sodaShakeGauge < 0) sodaShakeGauge = 0;
-
-	//左クリックすると炭酸攻撃をする
-	if (InputManager::GetInstance().IsMouseTriggered(MouseButton::Mouse_Left))
-	{
-		//炭酸蓄積ゲージが0より大きい場合、炭酸蓄積ゲージをリセット
-		if (sodaShakeGauge > 0)
-		{
-			//炭酸蓄積ゲージの割合を炭酸攻撃の威力に変換
-			sodaPower = (sodaShakeGauge / sodaShakeGaugeMax) * 20.0f;
-
-			//炭酸攻撃処理
-			SodaAttack(sodaPower);
-
-			sodaGauge -= 20.0f;
-			sodaShakeGauge = 0;
-			//下限リミッター
-			if (sodaGauge < 0) sodaGauge = 0;
-		}
-	}
 
 	//保存
 	prevMouseX = mouseX;
@@ -248,4 +240,21 @@ void Player::Damage(float damage)
 		playerHp = 0;
 		aliveFlag = false; //プレイヤーが死んだ
 	}
+}
+
+void Player::ClickSodaJump()
+{
+	//炭酸攻撃処理
+	SodaAttack();
+	//炭酸蓄積ゲージが0より大きい場合、炭酸蓄積ゲージを減らす
+	if (sodaShakeGauge > 0)
+	{
+		//炭酸蓄積ゲージの割合を炭酸攻撃の威力に変換
+		sodaPower = (sodaShakeGauge / sodaShakeGaugeMax) * 20.0f;
+		sodaGauge -= 20.0f;
+		sodaShakeGauge = 0;
+		//下限リミッター
+		if (sodaGauge < 0) sodaGauge = 0;
+	}
+	pMng->PlayParticle(WATER_PARTICLE_PATH, posX, posY);
 }

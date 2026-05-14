@@ -44,6 +44,9 @@
     <ClCompile Include="KeyConfig.cpp">
       <Filter>Manager\Input\KeyConfig</Filter>
     </ClCompile>
+    <ClCompile Include="StageConfigTablle.cpp">
+      <Filter>Scene\Game\Stage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Application">
@@ -165,6 +168,12 @@
     </ClInclude>
     <ClInclude Include="KeyConfig.h">
       <Filter>Manager\Input\KeyConfig</Filter>
+    </ClInclude>
+    <ClInclude Include="StageConfig.h">
+      <Filter>Scene\Game\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="StageConfigTablle.h">
+      <Filter>Scene\Game\Stage</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
