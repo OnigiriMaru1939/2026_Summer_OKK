@@ -135,7 +135,7 @@ void Player::SodaShake()
 	//距離
 	float dist = sqrtf(dx * dx + dy * dy);
 
-	// ゲージ加算
+	//ゲージ加算
 	sodaShakeGauge += dist * 0.002f;
 
 	//上限
@@ -184,8 +184,8 @@ void Player::SodaMove()
 	if (GetAttakFlag())
 	{
 		//プレイヤーが向いている方向とは逆に移動する
-		velocityX = cos(angle - DX_PI_F / 2) * sodaPower;
-		velocityY = sin(angle - DX_PI_F / 2) * sodaPower;
+		velocityX += cos(angle - DX_PI_F / 2) * sodaPower;
+		velocityY += sin(angle - DX_PI_F / 2) * sodaPower;
 
 		sodaAttackFlag = false; //攻撃フラグをリセット
 	}
@@ -200,8 +200,8 @@ void Player::SpaceJump()
 
 	//プレイヤーの向いている方向にジャンプ
 	//DX_PI_F / 2はジャンプ方向を90度補正するための値
-	velocityX = cos(angle - DX_PI_F / 2) * jumpPower;
-	velocityY = sin(angle - DX_PI_F / 2) * jumpPower;
+	velocityX += cos(angle - DX_PI_F / 2) * jumpPower;
+	velocityY += sin(angle - DX_PI_F / 2) * jumpPower;
 
 	jumpFlag = true;
 }
@@ -211,10 +211,12 @@ void Player::Rotate()
 {
 	float rotateSpeed = 0.05f;
 
+	//右回転
 	if (InputManager::GetInstance().IsKeyPressed(KEY_INPUT_D))
 	{
 		angle += rotateSpeed;
 	}
+	//左回転
 	if(InputManager::GetInstance().IsKeyPressed(KEY_INPUT_A))
 	{
 		angle -= rotateSpeed;
@@ -223,9 +225,10 @@ void Player::Rotate()
 }
 
 //炭酸攻撃処理
-void Player::SodaAttack()
+void Player::SodaAttack(float sodaPower)
 {
 	sodaAttackFlag = true;
+	AttckDamage = sodaPower;
 }
 
 //ダメージ処理

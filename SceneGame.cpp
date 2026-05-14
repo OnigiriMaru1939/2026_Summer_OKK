@@ -11,9 +11,9 @@ int SceneGame::selectedStageIndex_ = 1;
 
 SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
 {
-	player = std::make_unique<Player>(fileMng);
-    player->SystemInit();
-	player->SetImage("Resource/Image/Monster.png");
+	player_ = std::make_unique<Player>(fileMng);
+    player_->SystemInit();
+	player_->SetImage("Resource/Image/Moster.png");
   
 	stage_ = std::make_unique<Stage>(fileMng);
 
@@ -23,8 +23,8 @@ SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
 	stage_->Load(config.mapPath);
 	config.setUpStage(*this);
 
-	InputManager::GetInstance().SetTriggerCallback(ActionID::Jump, [this]() { player->SpaceJump(); });
-	InputManager::GetInstance().SetPressCallback(ActionID::Rotate, [this]() { player->Rotate(); });
+	InputManager::GetInstance().SetTriggerCallback(ActionID::Jump, [this]() { player_->SpaceJump(); });
+	InputManager::GetInstance().SetPressCallback(ActionID::Rotate, [this]() { player_->Rotate(); });
 }
 
 SceneGame::~SceneGame()
@@ -42,7 +42,7 @@ void SceneGame::Update()
 		isEnd = true;
 	}
 
-	player->Update();
+	player_->Update();
 
 	// Stageの更新
 	if (stage_) stage_->Update();
@@ -57,11 +57,11 @@ void SceneGame::Draw()
 
 	DrawString(0, 20, "GAME SCENE", 0xffffff);
 	//プレイヤーを描画
-	player->Draw();
+	player_->Draw();
 
 	//ゲージの描画
-	DrawGauge(20, 50, 500, 40, player->playerHp, player->playerHpMax, GetColor(0, 255, 0));						//プレイヤーのHPゲージ
-	DrawGauge(20, 120, 500, 40, player->sodaShakeGauge, player->sodaShakeGaugeMax, GetColor(0, 0, 255));		//炭酸蓄積ゲージ
+	DrawGauge(20, 50, 500, 40, player_->playerHp, player_->playerHpMax, GetColor(0, 255, 0));						//プレイヤーのHPゲージ
+	DrawGauge(20, 120, 500, 40, player_->sodaShakeGauge, player_->sodaShakeGaugeMax, GetColor(0, 0, 255));		//炭酸蓄積ゲージ
 }
 
 //ゲージの描画
@@ -83,10 +83,10 @@ void SceneGame::DrawGauge(
 			FALSE
 	);
 
-	// ゲージ割合
+	//ゲージ割合
 	int barWidth = (int)((value / maxValue) * width);
 
-	// 中身
+	//中身
 	DrawBox(
 		x,
 		y,

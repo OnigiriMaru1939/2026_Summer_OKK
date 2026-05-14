@@ -28,6 +28,6 @@ private:
 	static int selectedStageIndex_;
 
 	std::unique_ptr<Stage> stage_;
-	std::unique_ptr<Player> player;
+	std::unique_ptr<Player> player_;
 };
 

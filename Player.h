@@ -30,7 +30,7 @@ public:
 	void Rotate();					//回転処理
 	void SodaAttack();				//炭酸攻撃処理
 	void Damage(float damage);		//ダメージ処理
-
+  
 	int prevMouseX;				//前回のマウスX座標
 	int prevMouseY;				//前回のマウスY座標
 
@@ -67,4 +67,5 @@ private:
 	float velocityX;			//X軸の速度
 	float velocityY;			//Y軸の速度
 	float angle;				//回転角度
+	float AttckDamage;			//攻撃のダメージ
 };
