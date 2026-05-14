@@ -20,14 +20,14 @@ public:
 	bool SetImage(const std::string& path);			//画像のセット
 	void Update();
 	void Draw();
-	void SodaShake();				//マウスを振ると炭酸蓄積ゲージが溜まる
-	void SodaGaugeCharge();			//炭酸残量ゲージの自然回復
-	void AddGravity();				//重力処理
-	void SodaMove();				//炭酸移動処理
-	void SpaceJump();				//スペースジャンプ処理
-	void Rotate();					//回転処理
-	void SodaAttack();				//炭酸攻撃処理
-	void Damage(float damage);		//ダメージ処理
+	void SodaShake();						//マウスを振ると炭酸蓄積ゲージが溜まる
+	void SodaGaugeCharge();					//炭酸残量ゲージの自然回復
+	void AddGravity();						//重力処理
+	void SodaMove();						//炭酸移動処理
+	void SpaceJump();						//スペースジャンプ処理
+	void Rotate();							//回転処理
+	void SodaAttack(float sodaPower);		//炭酸攻撃処理
+	void Damage(float damage);				//ダメージ処理
 
 	int prevMouseX;				//前回のマウスX座標
 	int prevMouseY;				//前回のマウスY座標
@@ -64,4 +64,5 @@ private:
 	float velocityX;			//X軸の速度
 	float velocityY;			//Y軸の速度
 	float angle;				//回転角度
+	float AttckDamage;			//攻撃のダメージ
 };

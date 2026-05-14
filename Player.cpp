@@ -124,7 +124,7 @@ void Player::SodaShake()
 	//距離
 	float dist = sqrtf(dx * dx + dy * dy);
 
-	// ゲージ加算
+	//ゲージ加算
 	sodaShakeGauge += dist * 0.002f;
 
 	//上限
@@ -134,16 +134,18 @@ void Player::SodaShake()
 	sodaShakeGauge -= 0.2f;
 	if (sodaShakeGauge < 0) sodaShakeGauge = 0;
 
-	//左クリックすると炭酸残量ゲージを減らす
+	//左クリックすると炭酸攻撃をする
 	if (InputManager::GetInstance().IsMouseTriggered(MouseButton::Mouse_Left))
 	{
-		//炭酸攻撃処理
-		SodaAttack();
-		//炭酸蓄積ゲージが0より大きい場合、炭酸蓄積ゲージを減らす
+		//炭酸蓄積ゲージが0より大きい場合、炭酸蓄積ゲージをリセット
 		if (sodaShakeGauge > 0)
 		{
 			//炭酸蓄積ゲージの割合を炭酸攻撃の威力に変換
 			sodaPower = (sodaShakeGauge / sodaShakeGaugeMax) * 20.0f;
+
+			//炭酸攻撃処理
+			SodaAttack(sodaPower);
+
 			sodaGauge -= 20.0f;
 			sodaShakeGauge = 0;
 			//下限リミッター
@@ -190,8 +192,8 @@ void Player::SodaMove()
 	if (GetAttakFlag())
 	{
 		//プレイヤーが向いている方向とは逆に移動する
-		velocityX = cos(angle - DX_PI_F / 2) * sodaPower;
-		velocityY = sin(angle - DX_PI_F / 2) * sodaPower;
+		velocityX += cos(angle - DX_PI_F / 2) * sodaPower;
+		velocityY += sin(angle - DX_PI_F / 2) * sodaPower;
 
 		sodaAttackFlag = false; //攻撃フラグをリセット
 	}
@@ -206,8 +208,8 @@ void Player::SpaceJump()
 
 	//プレイヤーの向いている方向にジャンプ
 	//DX_PI_F / 2はジャンプ方向を90度補正するための値
-	velocityX = cos(angle - DX_PI_F / 2) * jumpPower;
-	velocityY = sin(angle - DX_PI_F / 2) * jumpPower;
+	velocityX += cos(angle - DX_PI_F / 2) * jumpPower;
+	velocityY += sin(angle - DX_PI_F / 2) * jumpPower;
 
 	jumpFlag = true;
 }
@@ -217,10 +219,12 @@ void Player::Rotate()
 {
 	float rotateSpeed = 0.05f;
 
+	//右回転
 	if (InputManager::GetInstance().IsKeyPressed(KEY_INPUT_D))
 	{
 		angle += rotateSpeed;
 	}
+	//左回転
 	if(InputManager::GetInstance().IsKeyPressed(KEY_INPUT_A))
 	{
 		angle -= rotateSpeed;
@@ -229,9 +233,10 @@ void Player::Rotate()
 }
 
 //炭酸攻撃処理
-void Player::SodaAttack()
+void Player::SodaAttack(float sodaPower)
 {
 	sodaAttackFlag = true;
+	AttckDamage = sodaPower;
 }
 
 //ダメージ処理
