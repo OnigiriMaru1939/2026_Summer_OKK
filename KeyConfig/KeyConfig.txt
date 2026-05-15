@@ -9,4 +9,8 @@ Jump, Keyboard, KEY_INPUT_SPACE, 1.0
 Jump, GamepadButton, Pad_Face_Down, 1.0
 Rotate, Keyboard, KEY_INPUT_D, 1.0
 Rotate, Keyboard, KEY_INPUT_A, -1.0
+Rotate, GamepadAxis, Pad_L_X, 1.0 
 SJump, Mouse, Mouse_Left, 1.0
+SJump, GamepadButton, Pad_L_Trigger, 1.0
+Shake, GamepadAxis, Pad_R_X, 1.0
+Shake, GamepadAxis, Pad_R_Y, 1.0

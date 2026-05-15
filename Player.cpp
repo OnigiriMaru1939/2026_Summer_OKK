@@ -18,7 +18,9 @@ Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage
 
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Jump, [this]() { SpaceJump(); });
 	InputManager::GetInstance().SetTriggerCallback(ActionID::SJump, [this]() { ClickSodaJump(); });
+	InputManager::GetInstance().SetTriggerCallback(ActionID::Shake, [this]() { SodaShake(); });
 	InputManager::GetInstance().SetPressCallback(ActionID::Rotate, [this]() { Rotate(); });
+
 }
 
 Player::~Player()
@@ -35,6 +37,7 @@ bool Player::SystemInit()
 	gravity = 0.5f;
 	velocityX = 0.0f;
 	velocityY = 0.0f;
+	shakeMove = 0.0f;
 
 	//体力を初期化
 	playerHpMax = 100.0f;
@@ -51,8 +54,6 @@ bool Player::SystemInit()
 	aliveFlag = true;
 	jumpFlag = false;
 	angle = 0.0f;
-
-	GetMousePoint(&prevMouseX, &prevMouseY);
 
 	return true;
 }
@@ -169,34 +170,51 @@ void Player::Draw()
 	//DrawBox(20, 100+100, 20 + (int)(sodaShakeGauge * 4.8f), 70+100, GetColor(0, 0, 255), TRUE);		//炭酸蓄積ゲージの表示
 }
 
-//マウスを振ると炭酸ゲージが溜まる
+//マウスを振ったり、スティックを動かすと炭酸ゲージが溜まる
 void Player::SodaShake()
 {
-	int mouseX, mouseY;
+	//一旦保留
+	/*
+	//マウスを振るときの処理
+	if ()
+	{
+		//マウスの移動量を取得
+		int dx = InputManager::GetInstance().GetMouseDX();
+		int dy = InputManager::GetInstance().GetMouseDY();
 
-	//現在のマウス座標取得
-	GetMousePoint(&mouseX, &mouseY);
+		//マウスの座標距離
+		float mousedist = sqrtf(dx * dx + dy * dy);
+		shakeMove = mousedist;
+	}
+	//ゲームパッドのスティックを動かすときの処理
+	else
+	{
+		//ゲームパッドのRスティックの移動量を取得
+		int px = InputManager::GetInstance().GetPadStickRX(0);
+		int py = InputManager::GetInstance().GetPadStickRY(0);
 
-	//移動量
-	int dx = mouseX - prevMouseX;
-	int dy = mouseY - prevMouseY;
+		//スティックの座標距離
+		float stickdist = sqrtf(px * px + py * py);
+		shakeMove = stickdist;
+	}
+	*/
+	//マウスの移動量を取得
+	int dx = InputManager::GetInstance().GetMouseDX();
+	int dy = InputManager::GetInstance().GetMouseDY();
 
-	//距離
-	float dist = sqrtf(dx * dx + dy * dy);
+	//マウスの座標距離
+	float mousedist = sqrtf(dx * dx + dy * dy);
+	shakeMove = mousedist;
 
 	//ゲージ加算
-	sodaShakeGauge += dist * 0.02f;
+	sodaShakeGauge += shakeMove * 0.005f;
 
 	//上限
 	if (sodaShakeGauge > sodaShakeGaugeMax) sodaShakeGauge = sodaShakeGaugeMax;
 
-	//減衰（振らないと減る）
+	//減衰
 	sodaShakeGauge -= 0.2f;
 	if (sodaShakeGauge < 0) sodaShakeGauge = 0;
-
-	//保存
-	prevMouseX = mouseX;
-	prevMouseY = mouseY;
 }
 
 //炭酸残量ゲージを自動回復
@@ -287,19 +305,10 @@ void Player::SpaceJump()
 //プレイヤー回転処理
 void Player::Rotate()
 {
+	//回転速度
 	float rotateSpeed = 0.05f;
 
-	//右回転
-	if (InputManager::GetInstance().IsKeyPressed(KEY_INPUT_D))
-	{
-		angle += rotateSpeed;
-	}
-	//左回転
-	if(InputManager::GetInstance().IsKeyPressed(KEY_INPUT_A))
-	{
-		angle -= rotateSpeed;
-	}
-	
+	angle += InputManager::GetInstance().GetActionValue(ActionID::Rotate) * rotateSpeed;
 }
 
 bool Player::WillCollide(int newX, int newY)
@@ -343,6 +352,7 @@ void Player::Damage(float damage)
 void Player::ClickSodaJump()
 {
 	sodaRatio = sodaShakeGauge / sodaGaugeMax;
+  
 	//炭酸蓄積ゲージが0より大きい場合、炭酸蓄積ゲージを減らす
 	if (sodaShakeGauge > 0)
 	{
