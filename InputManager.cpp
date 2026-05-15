@@ -148,13 +148,22 @@ void InputManager::Update()
 		GetJoypadDirectInputState(dxNo, &dState);
 		GetJoypadXInputState(dxNo, &xState);
 
-		padLX[no] = dState.X;
-		padLY[no] = dState.Y;
+		if (type == DX_PADTYPE_XBOX_360 || type == DX_PADTYPE_XBOX_ONE)
+		{
+			padLX[no] = xState.ThumbLX;
+			padLY[no] = xState.ThumbLY;
+		}
+		else
+		{
+			padLX[no] = dState.X;
+			padLY[no] = dState.Y;
+		}
+
 		// XboxコントローラーはRx/Ryが右スティック
 		if (type == DX_PADTYPE_XBOX_360 || type == DX_PADTYPE_XBOX_ONE)
 		{
-			padRX[no] = dState.Rx;
-			padRY[no] = dState.Ry;
+			padRX[no] = xState.ThumbRX;
+			padRY[no] = xState.ThumbRY;
 		}
 		else
 		{

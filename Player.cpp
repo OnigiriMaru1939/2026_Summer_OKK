@@ -136,7 +136,7 @@ void Player::SodaShake()
 	float dist = sqrtf(dx * dx + dy * dy);
 
 	//ゲージ加算
-	sodaShakeGauge += dist * 0.002f;
+	sodaShakeGauge += dist * 0.02f;
 
 	//上限
 	if (sodaShakeGauge > sodaShakeGaugeMax) sodaShakeGauge = sodaShakeGaugeMax;
@@ -244,12 +244,12 @@ void Player::Damage(float damage)
 
 void Player::ClickSodaJump()
 {
-
+	sodaRatio = sodaShakeGauge / sodaGaugeMax;
 	//炭酸蓄積ゲージが0より大きい場合、炭酸蓄積ゲージを減らす
 	if (sodaShakeGauge > 0)
 	{
 		//炭酸蓄積ゲージの割合を炭酸攻撃の威力に変換
-		sodaPower = (sodaShakeGauge / sodaShakeGaugeMax) * 20.0f;
+		sodaPower = sodaRatio * 20.0f;
 		//炭酸攻撃処理
 		SodaAttack(sodaPower);
 		sodaGauge -= 20.0f;
@@ -257,5 +257,15 @@ void Player::ClickSodaJump()
 		//下限リミッター
 		if (sodaGauge < 0) sodaGauge = 0;
 	}
-	pMng->PlayParticle(WATER_PARTICLE_PATH, posX, posY);
+	//ParticleConfig::acceleration = 0;
+	const ParticleConfig* masterCfg = pMng->GetConfig(WATER_PARTICLE_PATH);
+	if (masterCfg)
+	{
+		// ParticleConfig構造体のコピー
+		ParticleConfig customCfg = *masterCfg;
+
+		customCfg.startScale *= sodaRatio;
+		customCfg.initSpeed *= sodaRatio;
+		pMng->PlayParticle(customCfg, posX, posY);
+	}
 }

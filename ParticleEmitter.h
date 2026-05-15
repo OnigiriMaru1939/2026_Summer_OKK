@@ -1,13 +1,13 @@
 ﻿#pragma once
 #include <vector>
+#include "ParticleManager.h"
 
-struct ParticleConfig;
 struct ParticleInstance;
 
 class ParticleEmitter
 {
 public:
-	ParticleEmitter(const ParticleConfig* cfg, float x, float y);
+	ParticleEmitter(const ParticleConfig& cfg, float x, float y);
 	~ParticleEmitter();
 
 	void Update();
@@ -18,7 +18,7 @@ public:
 private:
 	void ActivateParticle(); // 粒子を一つ生成
 
-	const ParticleConfig* config;
+	ParticleConfig config; // 実体で保持
 	std::vector<ParticleInstance> particles;
 	float base_x;
 	float base_y;
