@@ -11,13 +11,13 @@ int SceneGame::selectedStageIndex_ = 1;
 
 SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
 {
-	player_ = std::make_unique<Player>(fileMng);
-    player_->SystemInit();
-	player_->SetImage("Resource/Image/Moster.png");
-  
-	stage_ = std::make_unique<Stage>(fileMng);
 
-	// ステージ固有のセットアップを実行
+	stage_ = std::make_unique<Stage>(fileMng);
+	player = std::make_unique<Player>(fileMng, stage_.get());
+  player->SystemInit();
+	player->SetImage("Resource/Image/Monster.png");
+
+  // ステージ固有のセットアップを実行
 	const auto& stageConfigs = GetStageConfigs();
 	const StageConfig& config = stageConfigs[selectedStageIndex_ - 1];
 	stage_->Load(config.mapPath);

@@ -8,7 +8,7 @@
 #include <memory>
 
 constexpr auto WATER_PARTICLE_PATH = "Resource/ParticleJsonData/waterParameter.json";
-Player::Player(FileManager& fileMng) : fileManager(fileMng)
+Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage_(stage)
 {
 	pMng = std::make_unique<ParticleManager>(fileMng);
 	pMng->RegisterConfig(WATER_PARTICLE_PATH);
@@ -166,19 +166,19 @@ void Player::SodaGaugeCharge()
 void Player::AddGravity()
 {
 	velocityY += gravity;	//重力を速度に加算
-	posX += velocityX;		//速度を位置に加算
-	posY += velocityY;		
+	//posX += velocityX;		//速度を位置に加算
+	//posY += velocityY;
 
 	velocityX *= 0.98f;	//空気抵抗（X軸の速度を減衰）
 
 	// 地面判定（仮）
-	if (posY > 500)
-	{
-		posY = 500;
-		velocityX = 0;
-		velocityY = 0;
-		jumpFlag = false; 
-	}
+	//if (posY > 500)
+	//{
+	//	posY = 500;
+	//	velocityX = 0;
+	//	velocityY = 0;
+	//	jumpFlag = false; 
+	//}
 }
 
 //ジャンプ処理・移動処理
@@ -193,6 +193,35 @@ void Player::SodaMove()
 
 		sodaAttackFlag = false; //攻撃フラグをリセット
 	}
+
+	int signX = (velocityX > 0) ? 1 : ((velocityX < 0) ? -1 : 0);
+	int loopX = abs(velocityX);
+	while (loopX > 0)
+	{
+		if (WillCollide(posX + signX, posY))
+		{
+			velocityX = 0;
+			break;
+		}
+		posX += signX;
+		loopX--;
+	}
+
+	int signY = (velocityY > 0) ? 1 : ((velocityY < 0) ? -1 : 0);
+	int loopY = abs(velocityY);
+	while (loopY > 0)
+	{
+		if (WillCollide(posX, signY + posY))
+		{
+			velocityX = 0;
+			velocityY = 0;
+			jumpFlag = false;
+			break;
+		}
+		posY += signY;
+		loopY--;
+	}
+
 }
 
 void Player::SpaceJump()
@@ -226,6 +255,26 @@ void Player::Rotate()
 		angle -= rotateSpeed;
 	}
 	
+}
+
+bool Player::WillCollide(int newX, int newY)
+{
+	int left = newX - width_ / 2;
+	int top = newY - height_ / 2;
+	int right = newX + width_ / 2;
+	int bottom = newY + height_ / 2;
+
+	// 八か所の座標で壁をチェック（マップチップの壁 + LightWallGimmickの壁チップ）
+	if (stage_->CheckWall(left, top)) return true;
+	if (stage_->CheckWall((left + right) / 2 - 1, top)) return true;
+	if (stage_->CheckWall(right - 1, top)) return true;
+	if (stage_->CheckWall(left, (top + bottom) / 2 - 1)) return true;
+	if (stage_->CheckWall(left, bottom - 1)) return true;
+	if (stage_->CheckWall((left + right) / 2 - 1, bottom - 1)) return true;
+	if (stage_->CheckWall(right - 1, bottom - 1)) return true;
+	if (stage_->CheckWall(right - 1, (top + bottom) / 2 - 1)) return true;
+
+	return false;
 }
 
 //炭酸攻撃処理
