@@ -186,7 +186,7 @@ std::vector<float> ParticleEmitter::GetColorHSL(float H, float S, float L)
 	return { to255(r), to255(g), to255(b) };
 }
 
-void ParticleEmitter::Draw()
+void ParticleEmitter::Draw(int scrollX, int scrollY)
 {
 	// ブレンドモード設定(true:加算合成 false:通常)
 	int blendMode = config.blendMode ? DX_BLENDMODE_ADD : DX_BLENDMODE_ALPHA;
@@ -201,7 +201,7 @@ void ParticleEmitter::Draw()
 
 		SetDrawBright((int)p.color[0], (int)p.color[1], (int)p.color[2]);
 
-		DrawRotaGraphF(p.x, p.y, static_cast<double>(p.scale), 0.0, p.imageHandle, true);
+		DrawRotaGraphF(p.x - scrollX, p.y - scrollY, static_cast<double>(p.scale), 0.0, p.imageHandle, true);
 	}
 	SetDrawBright(255, 255, 255);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);

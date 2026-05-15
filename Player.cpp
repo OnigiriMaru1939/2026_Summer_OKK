@@ -20,7 +20,7 @@ Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage
 	InputManager::GetInstance().SetTriggerCallback(ActionID::SJump, [this]() { ClickSodaJump(); });
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Shake, [this]() { SodaShake(); });
 	InputManager::GetInstance().SetPressCallback(ActionID::Rotate, [this]() { Rotate(); });
-
+	InputManager::GetInstance().SetAxisCallback(ActionID::Shake, [this]() { SodaShake(); });
 }
 
 Player::~Player()
@@ -87,7 +87,10 @@ void Player::Update()
 	SodaMove();
 	
 	SodaGaugeCharge();
-	SodaShake();
+	/*SodaShake();*/
+	//減衰（振らないと減る）
+	sodaShakeGauge -= 0.2f;
+	if (sodaShakeGauge < 0) sodaShakeGauge = 0;
 	pMng->UpdateAll();
 
 	//プレイヤー画面スクロール処理
@@ -131,7 +134,7 @@ void Player::Draw()
 	//プレイヤーが死んでいる又は画像が読み込まれていないときは表示しない
 	if (!aliveFlag || !image_) return;
 
-	pMng->DrawAll();
+	pMng->DrawAll(stage_->GetScrollX(), stage_->GetScrollY());
 
 	if (image_)
 	{
@@ -198,23 +201,15 @@ void Player::SodaShake()
 		shakeMove = stickdist;
 	}
 	*/
-	//マウスの移動量を取得
-	int dx = InputManager::GetInstance().GetMouseDX();
-	int dy = InputManager::GetInstance().GetMouseDY();
-
-	//マウスの座標距離
-	float mousedist = sqrtf(dx * dx + dy * dy);
-	shakeMove = mousedist;
+  	//距離
+	float dist = InputManager::GetInstance().GetActionAxis(ActionID::Shake);
+	shakeMove = dist;
 
 	//ゲージ加算
 	sodaShakeGauge += shakeMove * 0.005f;
 
 	//上限
 	if (sodaShakeGauge > sodaShakeGaugeMax) sodaShakeGauge = sodaShakeGaugeMax;
-
-	//減衰
-	sodaShakeGauge -= 0.2f;
-	if (sodaShakeGauge < 0) sodaShakeGauge = 0;
 }
 
 //炭酸残量ゲージを自動回復
@@ -307,8 +302,7 @@ void Player::Rotate()
 {
 	//回転速度
 	float rotateSpeed = 0.05f;
-
-	angle += InputManager::GetInstance().GetActionValue(ActionID::Rotate) * rotateSpeed;
+	angle += rotateSpeed * InputManager::GetInstance().GetActionValue(ActionID::Rotate);
 }
 
 bool Player::WillCollide(int newX, int newY)

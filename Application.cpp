@@ -32,11 +32,6 @@ Application::Application()
 	//pMng = std::make_unique<ParticleManager>(*fileMng);
 	//pMng->RegisterConfig(DEBUG_PARTICLE_PATH);
 	//------------------------------------------------------------
-
-	// イベントの登録
-	InputManager::GetInstance().SetPressCallback(ActionID::MoveH, [this]() { DebugMoveX(); });
-	InputManager::GetInstance().SetPressCallback(ActionID::MoveV, [this]() { DebugMoveY(); });
-	InputManager::GetInstance().SetTriggerCallback(ActionID::Jump, [this]() { DeBugJump(); });
 }
 
 Application::~Application()
@@ -44,6 +39,7 @@ Application::~Application()
 	// デストラクト明示
 	sceneMng.reset();
 	fileMng.reset();
+	InputManager::GetInstance().ClearAxisCallbacks();
 	InputManager::GetInstance().ClearPressCallbacks();
 	InputManager::GetInstance().ClearTriggerCallbacks();
 	InputManager::GetInstance().ClearReleaseCallbacks();
@@ -97,7 +93,6 @@ void Application::Draw()
 
 	InputManager::GetInstance().DrawDebug(0, 40);
 	DrawBox(100 + (int)x, 100 + (int)y, 150 + (int)x, 150 + (int)y, color, true);
-
 	//pMng->DrawAll();
 
 }
@@ -105,6 +100,7 @@ void Application::Draw()
 void Application::DebugMoveX()
 {
 	x += InputManager::GetInstance().GetActionValue(ActionID::MoveH) * moveSpeed;
+	x += InputManager::GetInstance().GetActionAxis(ActionID::MoveHAxis) * moveSpeed;
 }
 
 void Application::DebugMoveY()

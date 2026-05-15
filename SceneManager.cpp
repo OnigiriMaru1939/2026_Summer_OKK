@@ -38,6 +38,11 @@ void SceneManager::Draw()
 
 void SceneManager::ChangeScene(SceneSuper::SceneID nextSceneID)
 {
+	InputManager::GetInstance().ClearAxisCallbacks();
+	InputManager::GetInstance().ClearPressCallbacks();
+	InputManager::GetInstance().ClearTriggerCallbacks();
+	InputManager::GetInstance().ClearReleaseCallbacks();
+
 	switch (nextSceneID)
 	{
 		case SceneSuper::SceneID::TITLE:

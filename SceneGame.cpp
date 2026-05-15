@@ -22,26 +22,21 @@ SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
 	const StageConfig& config = stageConfigs[selectedStageIndex_ - 1];
 	stage_->Load(config.mapPath);
 	config.setUpStage(*this);
-
-	InputManager::GetInstance().SetTriggerCallback(ActionID::Jump, [this]() { player_->SpaceJump(); });
-	InputManager::GetInstance().SetPressCallback(ActionID::Rotate, [this]() { player_->Rotate(); });
+	InputManager::GetInstance().SetTriggerCallback(ActionID::Decide, 
+												   [this]()
+												   {
+													   SetNextScene(SceneID::RESULT);
+													   isEnd = true;
+												   });
 }
 
 SceneGame::~SceneGame()
 {
-	InputManager::GetInstance().ClearPressCallbacks();
-	InputManager::GetInstance().ClearTriggerCallbacks();
-	InputManager::GetInstance().ClearReleaseCallbacks();
+
 }
 
 void SceneGame::Update()
 {
-	if (InputManager::GetInstance().IsKeyTriggered(KEY_INPUT_RETURN))
-	{
-		SetNextScene(SceneID::RESULT);
-		isEnd = true;
-	}
-
 	player_->Update();
 
 	// Stageの更新

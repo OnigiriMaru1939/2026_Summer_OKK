@@ -72,7 +72,7 @@ public:
 	void RegisterConfig(const std::string& jsonPath);
 
 	void UpdateAll();
-	void DrawAll();
+	void DrawAll(int scrollX, int scrollY);
 
 	std::string GetValue(const std::string& source, const std::string& key);
 

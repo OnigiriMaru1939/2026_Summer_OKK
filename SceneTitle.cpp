@@ -7,6 +7,12 @@ SceneTitle::SceneTitle(FileManager& fileMng) : SceneSuper(fileMng)
 	_bgImg = fileMng_.LoadImageFM("Resource/Image/Title_bg_NoLogo.png");
 	_TitleLogoImg = fileMng_.LoadImageFM("Resource/Image/Title_Logo.png");
 	_TitleStartImg = fileMng_.LoadImageFM("Resource/Image/Title_Start.png");
+	InputManager::GetInstance().SetTriggerCallback(ActionID::Decide,
+												   [this]()
+												   {
+													   SetNextScene(SceneID::STAGE_SELECT);
+													   isEnd = true;
+												   });
 }
 
 SceneTitle::~SceneTitle()
@@ -16,11 +22,6 @@ SceneTitle::~SceneTitle()
 
 void SceneTitle::Update()
 {
-	if (InputManager::GetInstance().IsKeyTriggered(KEY_INPUT_RETURN))
-	{
-		SetNextScene(SceneID::STAGE_SELECT);
-		isEnd = true;
-	}
 }
 
 void SceneTitle::Draw()

@@ -9,7 +9,8 @@ enum class InputType
 	Keyboard,
 	GamepadButton,
 	GamepadAxis,
-	Mouse
+	Mouse,
+	MouseAxis
 };
 
 struct KeyMapping
