@@ -40,6 +40,7 @@ bool KeyConfig::StringToActionID(const std::wstring& str, ActionID& actionId) co
 	if (str == L"SJump") { actionId = ActionID::SJump;   return true; } // 炭酸の発射によるジャンプ
 	if (str == L"Shake") { actionId = ActionID::Shake;   return true; } // 炭酸のシェイク動作
 	if (str == L"Rotate") { actionId = ActionID::Rotate; return true; }
+	if (str == L"Shake") { actionId = ActionID::Shake; return true; }
 	if (str == L"Decide") { actionId = ActionID::Decide; return true; }
 	if (str == L"Cancel") { actionId = ActionID::Cancel; return true; }
 	if (str == L"Exit") { actionId = ActionID::Exit;   return true; }
@@ -56,7 +57,7 @@ int KeyConfig::StringToKeyCode(const std::wstring& str) const
 		{ L"KEY_INPUT_LEFT",   KEY_INPUT_LEFT },
 		{ L"KEY_INPUT_RIGHT",  KEY_INPUT_RIGHT },
 		{ L"KEY_INPUT_UP",     KEY_INPUT_UP },
-		{ L"KEY_INPUT_DOWN",    KEY_INPUT_DOWN },
+		{ L"KEY_INPUT_DOWN",   KEY_INPUT_DOWN },
 		{ L"KEY_INPUT_A",      KEY_INPUT_A },
 		{ L"KEY_INPUT_D",      KEY_INPUT_D },
 		{ L"KEY_INPUT_W",      KEY_INPUT_W },
