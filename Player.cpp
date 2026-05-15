@@ -1,4 +1,5 @@
-﻿#include "Player.h"
+﻿#define NOMINMAX
+#include "Player.h"
 #include "math.h"
 #include "InputManager.h"
 #include "FileManager.h"
@@ -6,6 +7,8 @@
 #include "ParticleManager.h"
 #include <DxLib.h>
 #include <memory>
+#include <algorithm>
+
 
 constexpr auto WATER_PARTICLE_PATH = "Resource/ParticleJsonData/waterParameter.json";
 Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage_(stage)
@@ -85,6 +88,41 @@ void Player::Update()
 	SodaGaugeCharge();
 	SodaShake();
 	pMng->UpdateAll();
+
+	//プレイヤー画面スクロール処理
+	canvasX = posX - stage_->GetScrollX();
+	canvasY = posY - stage_->GetScrollY();
+	if (canvasX < Stage::CHIP_SIZE * 10)
+	{
+		stage_->SetScrollX(posX - Stage::CHIP_SIZE * 10);
+		if (stage_->GetScrollX() < 0)
+		{
+			stage_->SetScrollX(0);
+		}
+	}
+	if (canvasX > Stage::CHIP_SIZE * 38)
+	{
+		int newScrollX = posX - Stage::CHIP_SIZE * 38;
+		newScrollX = std::min(newScrollX, stage_->GetMaxScrollX());
+		stage_->SetScrollX(newScrollX);
+	}
+
+	if (canvasY < Stage::CHIP_SIZE * 5)
+	{
+		stage_->SetScrollY(posY - Stage::CHIP_SIZE * 5);
+		if (stage_->GetScrollY() < 0)
+		{
+			stage_->SetScrollY(0);
+		}
+	}
+
+	if (canvasY > Stage::CHIP_SIZE * 38)
+	{
+		int newScrollY = posY - Stage::CHIP_SIZE * 38;
+		newScrollY = std::min(newScrollY, stage_->GetMaxScrollY());
+		stage_->SetScrollY(newScrollY);
+	}
+	
 }
 
 void Player::Draw()
@@ -102,15 +140,22 @@ void Player::Draw()
 		//プレイヤー画像を描画(回転可)
 		int handle = image_->GetHandle();
 		DrawRotaGraph(
-			(int)posX + shakeOffsetX,
-			(int)posY + shakeOffsetY,
+			(int)canvasX + shakeOffsetX,
+			(int)canvasY + shakeOffsetY,
 			2.0,
 			angle,
 			handle,
 			TRUE
 		);
 	}
-	DrawCircle(posX, posY, 3, 0X0000ff);
+	//ゲージの描画
+	DrawGauge(20, 50, 500, 40, playerHp, playerHpMax, GetColor(0, 255, 0), 0);		//プレイヤーのHPゲージ
+	//炭酸蓄積ゲージが0以上の場合のみ描画
+	if (sodaShakeGauge > 0)
+	{
+		DrawGauge(canvasX - 100, canvasY - 50, 20, 100, sodaShakeGauge, sodaShakeGaugeMax, GetColor(0, 0, 255), 1);		//炭酸蓄積ゲージ
+	}
+	DrawCircle(canvasX, canvasY, 3, 0X0000ff);
 	//デバック用で赤い四角のプレイヤー表示
 	//DrawBox((int)posX, (int)posY, (int)posX + 100, (int)posY + 100, GetColor(255, 0, 0), true);
 	//
@@ -310,6 +355,7 @@ void Player::ClickSodaJump()
 		//下限リミッター
 		if (sodaGauge < 0) sodaGauge = 0;
 	}
+
 	//ParticleConfig::acceleration = 0;
 	const ParticleConfig* masterCfg = pMng->GetConfig(WATER_PARTICLE_PATH);
 	if (masterCfg)
@@ -330,4 +376,55 @@ void Player::PlayerShake()
 
 	shakeOffsetX = (GetRand(10) - 5) * playerShakePower;
 	shakeOffsetY = (GetRand(10) - 5) * playerShakePower;
+}
+
+//横ゲージの描画
+void Player::DrawGauge(
+	int x,
+	int y,
+	int width,
+	int height,
+	float value,
+	float maxValue,
+	int color,
+	int mode)			//mode 0:横ゲージ、1:縦ゲージ
+{
+	//ゲージの枠
+	DrawBox(x - 1,
+			y - 1,
+			x + width + 1,
+			y + height + 1,
+			GetColor(255, 0, 0),
+			FALSE
+	);
+
+	if (mode == 0)
+	{
+		//横ゲージ割合
+		int barWidth = (int)((value / maxValue) * width);
+
+		//中身
+		DrawBox(
+			x,
+			y,
+			x + barWidth,
+			y + height,
+			color,
+			TRUE
+		);
+	}
+	else if (mode == 1)
+	{
+		//縦ゲージ割合
+		int barHeight = (int)((value / maxValue) * height);
+		//中身
+		DrawBox(
+			x,
+			y + height - barHeight,
+			x + width,
+			y + height,
+			color,
+			TRUE
+		);
+	}
 }
