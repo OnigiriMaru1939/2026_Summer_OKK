@@ -42,6 +42,7 @@ bool Player::SystemInit()
 	sodaGaugeMax = 100.0f;
 	sodaShakeGauge = 0.0f;
 	sodaShakeGaugeMax = 100.0f;
+	playerShakePower = 0.0f;
 
 	//フラグの初期化
 	aliveFlag = true;
@@ -95,11 +96,14 @@ void Player::Draw()
 
 	if (image_)
 	{
+		//プレイヤーの振動処理
+		PlayerShake();
+
 		//プレイヤー画像を描画(回転可)
 		int handle = image_->GetHandle();
 		DrawRotaGraph(
-			(int)posX,
-			(int)posY,
+			(int)posX + shakeOffsetX,
+			(int)posY + shakeOffsetY,
 			2.0,
 			angle,
 			handle,
@@ -258,4 +262,13 @@ void Player::ClickSodaJump()
 		if (sodaGauge < 0) sodaGauge = 0;
 	}
 	pMng->PlayParticle(WATER_PARTICLE_PATH, posX, posY);
+}
+
+//プレイヤーの振動処理
+void Player::PlayerShake()
+{
+	playerShakePower = sodaShakeGauge / sodaShakeGaugeMax;
+
+	shakeOffsetX = (GetRand(10) - 5) * playerShakePower;
+	shakeOffsetY = (GetRand(10) - 5) * playerShakePower;
 }

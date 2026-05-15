@@ -22,8 +22,8 @@ public:
 				   int height,
 				   float value,
 				   float maxValue,
-				   int color);
-
+				   int color,
+				   int mode);
 private:
 	static int selectedStageIndex_;
 
