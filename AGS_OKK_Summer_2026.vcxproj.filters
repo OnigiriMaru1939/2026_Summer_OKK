@@ -34,7 +34,6 @@
     <ClCompile Include="Stage.cpp">
       <Filter>Scene\Game\Stage</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp" />
     <ClCompile Include="ParticleManager.cpp">
       <Filter>Manager\Particle</Filter>
     </ClCompile>
@@ -46,6 +45,9 @@
     </ClCompile>
     <ClCompile Include="StageConfigTablle.cpp">
       <Filter>Scene\Game\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -106,6 +108,9 @@
     <Filter Include="Manager\Input\KeyConfig">
       <UniqueIdentifier>{c9045f56-0bd2-4945-b19d-94432f49d2e5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Player">
+      <UniqueIdentifier>{e72ad11d-221b-422c-8cf8-2f56871e9acf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -156,7 +161,6 @@
     <ClInclude Include="Stage.h">
       <Filter>Scene\Game\Stage</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h" />
     <ClInclude Include="ParticleManager.h">
       <Filter>Manager\Particle</Filter>
     </ClInclude>
@@ -174,6 +178,9 @@
     </ClInclude>
     <ClInclude Include="StageConfigTablle.h">
       <Filter>Scene\Game\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Player</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

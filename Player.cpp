@@ -42,6 +42,7 @@ bool Player::SystemInit()
 	sodaGaugeMax = 100.0f;
 	sodaShakeGauge = 0.0f;
 	sodaShakeGaugeMax = 100.0f;
+	playerShakePower = 0.0f;
 
 	//フラグの初期化
 	aliveFlag = true;
@@ -95,11 +96,14 @@ void Player::Draw()
 
 	if (image_)
 	{
+		//プレイヤーの振動処理
+		PlayerShake();
+
 		//プレイヤー画像を描画(回転可)
 		int handle = image_->GetHandle();
 		DrawRotaGraph(
-			(int)posX,
-			(int)posY,
+			(int)posX + shakeOffsetX,
+			(int)posY + shakeOffsetY,
 			2.0,
 			angle,
 			handle,
@@ -135,7 +139,7 @@ void Player::SodaShake()
 	//距離
 	float dist = sqrtf(dx * dx + dy * dy);
 
-	// ゲージ加算
+	//ゲージ加算
 	sodaShakeGauge += dist * 0.002f;
 
 	//上限
@@ -184,8 +188,8 @@ void Player::SodaMove()
 	if (GetAttakFlag())
 	{
 		//プレイヤーが向いている方向とは逆に移動する
-		velocityX = cos(angle - DX_PI_F / 2) * sodaPower;
-		velocityY = sin(angle - DX_PI_F / 2) * sodaPower;
+		velocityX += cos(angle - DX_PI_F / 2) * sodaPower;
+		velocityY += sin(angle - DX_PI_F / 2) * sodaPower;
 
 		sodaAttackFlag = false; //攻撃フラグをリセット
 	}
@@ -229,8 +233,8 @@ void Player::SpaceJump()
 
 	//プレイヤーの向いている方向にジャンプ
 	//DX_PI_F / 2はジャンプ方向を90度補正するための値
-	velocityX = cos(angle - DX_PI_F / 2) * jumpPower;
-	velocityY = sin(angle - DX_PI_F / 2) * jumpPower;
+	velocityX += cos(angle - DX_PI_F / 2) * jumpPower;
+	velocityY += sin(angle - DX_PI_F / 2) * jumpPower;
 
 	jumpFlag = true;
 }
@@ -240,10 +244,12 @@ void Player::Rotate()
 {
 	float rotateSpeed = 0.05f;
 
+	//右回転
 	if (InputManager::GetInstance().IsKeyPressed(KEY_INPUT_D))
 	{
 		angle += rotateSpeed;
 	}
+	//左回転
 	if(InputManager::GetInstance().IsKeyPressed(KEY_INPUT_A))
 	{
 		angle -= rotateSpeed;
@@ -272,9 +278,10 @@ bool Player::WillCollide(int newX, int newY)
 }
 
 //炭酸攻撃処理
-void Player::SodaAttack()
+void Player::SodaAttack(int power)
 {
 	sodaAttackFlag = true;
+	AttckDamage = power;
 }
 
 //ダメージ処理
@@ -290,17 +297,27 @@ void Player::Damage(float damage)
 
 void Player::ClickSodaJump()
 {
-	//炭酸攻撃処理
-	SodaAttack();
+
 	//炭酸蓄積ゲージが0より大きい場合、炭酸蓄積ゲージを減らす
 	if (sodaShakeGauge > 0)
 	{
 		//炭酸蓄積ゲージの割合を炭酸攻撃の威力に変換
 		sodaPower = (sodaShakeGauge / sodaShakeGaugeMax) * 20.0f;
+		//炭酸攻撃処理
+		SodaAttack(sodaPower);
 		sodaGauge -= 20.0f;
 		sodaShakeGauge = 0;
 		//下限リミッター
 		if (sodaGauge < 0) sodaGauge = 0;
 	}
 	pMng->PlayParticle(WATER_PARTICLE_PATH, posX, posY);
+}
+
+//プレイヤーの振動処理
+void Player::PlayerShake()
+{
+	playerShakePower = sodaShakeGauge / sodaShakeGaugeMax;
+
+	shakeOffsetX = (GetRand(10) - 5) * playerShakePower;
+	shakeOffsetY = (GetRand(10) - 5) * playerShakePower;
 }

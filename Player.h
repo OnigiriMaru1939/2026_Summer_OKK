@@ -30,14 +30,17 @@ public:
 	void SpaceJump();				//スペースジャンプ処理
 	void ClickSodaJump();           //クリックジャンプ処理
 	void Rotate();					//回転処理
-	void SodaAttack();				//炭酸攻撃処理
+	void SodaAttack(int power);				//炭酸攻撃処理
 	void Damage(float damage);		//ダメージ処理
-
+	void PlayerShake();				//プレイヤーの振動処理
+  
 	int prevMouseX;				//前回のマウスX座標
 	int prevMouseY;				//前回のマウスY座標
 
 	float posX;					//プレイヤーのX座標
 	float posY;					//プレイヤーのY座標
+	float shakeOffsetX;			//振動時のX座標
+	float shakeOffsetY;			//振動時のY座標
 
 	float playerHp;				//プレイヤーのHP
 	float playerHpMax;			//プレイヤーのHPの最大値
@@ -47,11 +50,11 @@ public:
 	float sodaShakeGaugeMax;	//炭酸蓄積ゲージの最大値
 
 private:
-	int GetWidth() const;									//プレイヤーの画像の幅を取得
-	int GetHeight() const;									//プレイヤーの画像の高さを取得
-	bool GetAttakFlag() const { return sodaAttackFlag; }	//炭酸攻撃フラグを取得
-	bool GetAliveFlag() const { return aliveFlag; }			//生存フラグを取得
-	bool GetJumpFlag() const { return jumpFlag; }			//ジャンプフラグを取得
+	int GetWidth() const;											//プレイヤーの画像の幅を取得
+	int GetHeight() const;											//プレイヤーの画像の高さを取得
+	bool GetAttakFlag() const { return sodaAttackFlag; }			//炭酸攻撃フラグを取得
+	bool GetAliveFlag() const { return aliveFlag; }					//生存フラグを取得
+	bool GetJumpFlag() const { return jumpFlag; }					//ジャンプフラグを取得
 
 	std::unique_ptr<ParticleManager> pMng;
 	FileManager& fileManager;			//ファイルマネージャー
@@ -70,4 +73,6 @@ private:
 	float velocityX;			//X軸の速度
 	float velocityY;			//Y軸の速度
 	float angle;				//回転角度
+	float AttckDamage;			//攻撃のダメージ
+	float playerShakePower;		//プレイヤーの振動量
 };
