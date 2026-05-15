@@ -28,7 +28,7 @@ public:
 	void SpaceJump();				//スペースジャンプ処理
 	void ClickSodaJump();           //クリックジャンプ処理
 	void Rotate();					//回転処理
-	void SodaAttack();				//炭酸攻撃処理
+	void SodaAttack(int power);				//炭酸攻撃処理
 	void Damage(float damage);		//ダメージ処理
   
 	int prevMouseX;				//前回のマウスX座標
