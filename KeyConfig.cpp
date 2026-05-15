@@ -32,11 +32,13 @@ KeyConfig::~KeyConfig()
 
 bool KeyConfig::StringToActionID(const std::wstring& str, ActionID& actionId) const
 {
-	if (str == L"MoveH") { actionId = ActionID::MoveH;  return true; }
-	if (str == L"MoveV") { actionId = ActionID::MoveV;  return true; }
-	if (str == L"Jump") { actionId = ActionID::Jump;   return true; }
-	if (str == L"SJump") { actionId = ActionID::SJump;   return true; }
-	if (str == L"Shot") { actionId = ActionID::Shot;   return true; }
+	if (str == L"MoveH") { actionId = ActionID::MoveH;  return true; } // X軸移動
+	if (str == L"MoveHAxis") { actionId = ActionID::MoveHAxis;  return true; } // アナログ
+	if (str == L"MoveV") { actionId = ActionID::MoveV;  return true; } // Y軸移動
+	if (str == L"MoveVAxis") { actionId = ActionID::MoveVAxis;  return true; } // アナログ
+	if (str == L"Jump") { actionId = ActionID::Jump;   return true; } // 通常ジャンプ
+	if (str == L"SJump") { actionId = ActionID::SJump;   return true; } // 炭酸の発射によるジャンプ
+	if (str == L"Shake") { actionId = ActionID::Shake;   return true; } // 炭酸のシェイク動作
 	if (str == L"Rotate") { actionId = ActionID::Rotate; return true; }
 	if (str == L"Decide") { actionId = ActionID::Decide; return true; }
 	if (str == L"Cancel") { actionId = ActionID::Cancel; return true; }
@@ -63,6 +65,9 @@ int KeyConfig::StringToKeyCode(const std::wstring& str) const
 		{ L"Mouse_Left", (int)MouseButton::Mouse_Left},
 		{ L"Mouse_Right", (int)MouseButton::Mouse_Right},
 		{ L"Mouse_Middle", (int)MouseButton::Mouse_Middle},
+		{ L"Mouse_X", (int)MouseAxis::Mouse_X},
+		{ L"Mouse_Y", (int)MouseAxis::Mouse_Y},
+		{ L"Mouse_dist", (int)MouseAxis::Mouse_dist},
 		{ L"Pad_L_X", (int)PadAxis::Pad_L_X},
 		{ L"Pad_L_Y", (int)PadAxis::Pad_L_Y},
 		{ L"Pad_R_X", (int)PadAxis::Pad_R_X},
@@ -91,7 +96,7 @@ int KeyConfig::StringToKeyCode(const std::wstring& str) const
 	{
 		return it->second;
 	}
-
+	printfDx("Unknown Key: %S\n", str.c_str());
 	// もしテーブルになければ、従来の数値読み込みを試みる
 	try
 	{
@@ -154,10 +159,11 @@ bool KeyConfig::LoadFromFile(const std::wstring& filename)
 					mapping.scale = 1.0f;
 				}
 	
-				if (typeStr == L"Keyboard") mapping.inputType =		InputType::Keyboard;
-				else if (typeStr == L"GamepadButton") mapping.inputType =	InputType::GamepadButton;
-				else if (typeStr == L"GamepadAxis") mapping.inputType =		InputType::GamepadAxis;
-				else if (typeStr == L"Mouse") mapping.inputType =	InputType::Mouse;
+				if (typeStr == L"Keyboard") mapping.inputType = InputType::Keyboard;
+				else if (typeStr == L"GamepadButton") mapping.inputType = InputType::GamepadButton;
+				else if (typeStr == L"GamepadAxis") mapping.inputType = InputType::GamepadAxis;
+				else if (typeStr == L"Mouse") mapping.inputType = InputType::Mouse;
+				else if (typeStr == L"MouseAxis") mapping.inputType = InputType::MouseAxis;
 
 				keyConfigMap_[actionId].push_back(mapping);
 			}

@@ -214,23 +214,27 @@ bool InputManager::IsMouseReleased(int button) const
 {
 	return IsInputReleased(mouseButton[(int)button], prevMouseButton[(int)button]);
 }
-
-// コントローラー入力
-bool InputManager::IsPadPressed(int no, PadButton btn) const
+// アナログ値取得
+float InputManager::GetMouseAxisValue(MouseAxis axis) const
 {
-	return IsInputPressed(padButton[no][(int)btn]);
+	if (axis == MouseAxis::Mouse_X)
+	{
+		return (float)(mouseX - prevMouseX);
+	}
+	if (axis == MouseAxis::Mouse_Y)
+	{
+		return (float)(mouseY - prevMouseY);
+	}
+	if (axis == MouseAxis::Mouse_dist)
+	{
+		int dx = mouseX - prevMouseX;
+		int dy = mouseY - prevMouseY;
+		return sqrtf(dx * dx + dy * dy);
+	}
+	return 0.0f;
 }
-bool InputManager::IsPadTriggered(int no, PadButton btn) const
-{
-	return IsInputTriggered(padButton[no][(int)btn], prevPadButton[no][(int)btn]);
-}
-bool InputManager::IsPadReleased(int no, PadButton btn) const
-{
-	return IsInputReleased(padButton[no][(int)btn], prevPadButton[no][(int)btn]);
-}
-
 // スティックの値を-1.0f〜1.0fの範囲で取得する関数
-float InputManager::GetAxisValue(int padNo, PadAxis axis) const
+float InputManager::GetPadAxisValue(int padNo, PadAxis axis) const
 {
 	int rawValue = 0;
 	switch (axis)
@@ -246,17 +250,33 @@ float InputManager::GetAxisValue(int padNo, PadAxis axis) const
 	float normalized = (float)(abs(rawValue) - DEADZONE) / (STICK_MAX - DEADZONE);
 	return (rawValue > 0) ? normalized : -normalized;
 }
+// コントローラー入力
+bool InputManager::IsPadPressed(int no, PadButton btn) const
+{
+	return IsInputPressed(padButton[no][(int)btn]);
+}
+bool InputManager::IsPadTriggered(int no, PadButton btn) const
+{
+	return IsInputTriggered(padButton[no][(int)btn], prevPadButton[no][(int)btn]);
+}
+bool InputManager::IsPadReleased(int no, PadButton btn) const
+{
+	return IsInputReleased(padButton[no][(int)btn], prevPadButton[no][(int)btn]);
+}
+
 
 // アクションに対する入力値を取得する関数
+// ボタン
 float InputManager::GetActionValue(ActionID action, int padNo) const
 {
-	const auto& mappings = KeyConfig::GetInstance().GetMappings(action);
+	const std::vector<KeyMapping> mappings = KeyConfig::GetInstance().GetMappings(action);
 	if (mappings.empty()) return 0.0f; // アクションにマッピングがない場合は0を返す
-
+	//printfDx("Mappings size for Action %d: %d\n", (int)action, mappings.size());
 	float total = 0.0f;
 
 	for (const auto& m : mappings)
 	{
+		//printfDx("Type: %d, Code: %d\n", (int)m.inputType, m.code);
 		float val = 0.0f;
 		switch (m.inputType)
 		{
@@ -266,24 +286,43 @@ float InputManager::GetActionValue(ActionID action, int padNo) const
 			case InputType::GamepadButton:
 				val = IsPadPressed(padNo, (PadButton)m.code) ? 1.0f : 0.0f;
 				break;
-			case InputType::GamepadAxis:
-				val = GetAxisValue(padNo, (PadAxis)m.code);
-				break;
 			case InputType::Mouse:
 				val = IsMousePressed(m.code) ? 1.0f : 0.0f;
 				break;
 		}
 		total += val * m.scale; // スケールをかけて加算
 	}
-
 	// 複数の入力がある場合は合算するが、値が-1.0f〜1.0fの範囲を超えないようにクランプする
 	return (total > 1.0f) ? 1.0f : (total < -1.0f) ? -1.0f : total;
 }
+// Axis
+float InputManager::GetActionAxis(ActionID action, int padNo) const
+{
+	const std::vector<KeyMapping> mappings = KeyConfig::GetInstance().GetMappings(action);
+	if (mappings.empty()) return 0.0f; // アクションにマッピングがない場合は0を返す
+	float total = 0.0f;
 
+	for (const auto& m : mappings)
+	{
+		float val = 0.0f;
+		switch (m.inputType)
+		{
+			case InputType::GamepadAxis:
+				val = GetPadAxisValue(padNo, (PadAxis)m.code);
+				break;
+			case InputType::MouseAxis:
+				val = GetMouseAxisValue((MouseAxis)m.code);
+				break;
+		}
+		total += val * m.scale;
+	}
+	return total;
+}
 // アクションに対する入力状態を取得する関数
 bool InputManager::IsActionPressed(ActionID action, int padNo) const
 {
 	const auto& mappings = KeyConfig::GetInstance().GetMappings(action);
+	if (mappings.empty()) return false; // アクションにマッピングがない場合はfalseを返す
 	for (const auto& m : mappings)
 	{
 		switch (m.inputType)
@@ -294,12 +333,6 @@ bool InputManager::IsActionPressed(ActionID action, int padNo) const
 			case InputType::GamepadButton:
 				if (IsPadPressed(padNo, (PadButton)m.code)) return true;
 				break;
-			case InputType::GamepadAxis:
-			{
-				float axisVal = GetAxisValue(padNo, (PadAxis)m.code);
-				if (axisVal * m.scale > AXIS_THRESHOLD || axisVal * m.scale < -AXIS_THRESHOLD) return true;
-				break;
-			}
 			case InputType::Mouse:
 				if (IsMousePressed(m.code)) return true;
 				break;
@@ -307,10 +340,10 @@ bool InputManager::IsActionPressed(ActionID action, int padNo) const
 	}
 	return false;
 }
-
 bool InputManager::IsActionTriggered(ActionID action, int padNo) const
 {
 	const auto& mappings = KeyConfig::GetInstance().GetMappings(action);
+	if (mappings.empty()) return false; // アクションにマッピングがない場合はfalseを返す
 	for (const auto& m : mappings)
 	{
 		switch (m.inputType)
@@ -321,8 +354,6 @@ bool InputManager::IsActionTriggered(ActionID action, int padNo) const
 			case InputType::GamepadButton:
 				if (IsPadTriggered(padNo, (PadButton)m.code)) return true;
 				break;
-			case InputType::GamepadAxis:
-				break; // 連続値のため、実装しない
 			case InputType::Mouse:
 				if (IsMouseTriggered(m.code)) return true;
 				break;
@@ -330,10 +361,10 @@ bool InputManager::IsActionTriggered(ActionID action, int padNo) const
 	}
 	return false;
 }
-
 bool InputManager::IsActionReleased(ActionID action, int padNo) const
 {
 	const auto& mappings = KeyConfig::GetInstance().GetMappings(action);
+	if (mappings.empty()) return false; // アクションにマッピングがない場合はfalseを返す
 	for (const auto& m : mappings)
 	{
 		switch (m.inputType)
@@ -344,8 +375,6 @@ bool InputManager::IsActionReleased(ActionID action, int padNo) const
 			case InputType::GamepadButton:
 				if (IsPadReleased(padNo, (PadButton)m.code)) return true;
 				break;
-			case InputType::GamepadAxis:
-				break; // 連続値のため、実装しない
 			case InputType::Mouse:
 				if (IsMouseReleased(m.code)) return true;
 				break;
@@ -353,32 +382,36 @@ bool InputManager::IsActionReleased(ActionID action, int padNo) const
 	}
 	return false;
 }
-
+// アクションに対するコールバックの登録
+void InputManager::SetAxisCallback(ActionID action, ActionCallback callback)
+{
+	axisCallbacks[action] = callback;
+}
 void InputManager::SetTriggerCallback(ActionID action, ActionCallback callback)
 {
 	triggerCallbacks[action] = callback;
 }
-
-void InputManager::ClearTriggerCallbacks()
-{
-	triggerCallbacks.clear();
-}
-
 void InputManager::SetPressCallback(ActionID action, ActionCallback callback)
 {
 	pressCallbacks[action] = callback;
 }
-
-void InputManager::ClearPressCallbacks()
-{
-	pressCallbacks.clear();
-}
-
 void InputManager::SetReleaseCallback(ActionID action, ActionCallback callback)
 {
 	releaseCallbacks[action] = callback;
 }
-
+// 登録されたコールバックのクリア
+void InputManager::ClearAxisCallbacks()
+{
+	axisCallbacks.clear();
+}
+void InputManager::ClearTriggerCallbacks()
+{
+	triggerCallbacks.clear();
+}
+void InputManager::ClearPressCallbacks()
+{
+	pressCallbacks.clear();
+}
 void InputManager::ClearReleaseCallbacks()
 {
 	releaseCallbacks.clear();
@@ -386,6 +419,10 @@ void InputManager::ClearReleaseCallbacks()
 
 void InputManager::DispatchCallbacks()
 {
+	for (const auto& [action, callback] : axisCallbacks)
+	{
+		if (GetActionAxis(action)) callback();
+	}
 	for (const auto& [action, callback] : triggerCallbacks)
 	{
 		if (IsActionTriggered(action)) callback();

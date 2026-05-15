@@ -123,11 +123,11 @@ void ParticleManager::UpdateAll()
 	}
 }
 
-void ParticleManager::DrawAll()
+void ParticleManager::DrawAll(int scrollX, int scrollY)
 {
 	for (auto& emitter : emitters)
 	{
-		emitter->Draw();
+		emitter->Draw(scrollX, scrollY);
 	}
 }
 

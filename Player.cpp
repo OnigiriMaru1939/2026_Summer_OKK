@@ -19,6 +19,7 @@ Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Jump, [this]() { SpaceJump(); });
 	InputManager::GetInstance().SetTriggerCallback(ActionID::SJump, [this]() { ClickSodaJump(); });
 	InputManager::GetInstance().SetPressCallback(ActionID::Rotate, [this]() { Rotate(); });
+	InputManager::GetInstance().SetAxisCallback(ActionID::Shake, [this]() { SodaShake(); });
 }
 
 Player::~Player()
@@ -86,7 +87,10 @@ void Player::Update()
 	SodaMove();
 	
 	SodaGaugeCharge();
-	SodaShake();
+	/*SodaShake();*/
+	//減衰（振らないと減る）
+	sodaShakeGauge -= 0.2f;
+	if (sodaShakeGauge < 0) sodaShakeGauge = 0;
 	pMng->UpdateAll();
 
 	//プレイヤー画面スクロール処理
@@ -130,7 +134,7 @@ void Player::Draw()
 	//プレイヤーが死んでいる又は画像が読み込まれていないときは表示しない
 	if (!aliveFlag || !image_) return;
 
-	pMng->DrawAll();
+	pMng->DrawAll(stage_->GetScrollX(), stage_->GetScrollY());
 
 	if (image_)
 	{
@@ -172,31 +176,14 @@ void Player::Draw()
 //マウスを振ると炭酸ゲージが溜まる
 void Player::SodaShake()
 {
-	int mouseX, mouseY;
-
-	//現在のマウス座標取得
-	GetMousePoint(&mouseX, &mouseY);
-
-	//移動量
-	int dx = mouseX - prevMouseX;
-	int dy = mouseY - prevMouseY;
-
 	//距離
-	float dist = sqrtf(dx * dx + dy * dy);
+	float dist = InputManager::GetInstance().GetActionAxis(ActionID::Shake);
 
 	//ゲージ加算
 	sodaShakeGauge += dist * 0.02f;
 
 	//上限
 	if (sodaShakeGauge > sodaShakeGaugeMax) sodaShakeGauge = sodaShakeGaugeMax;
-
-	//減衰（振らないと減る）
-	sodaShakeGauge -= 0.2f;
-	if (sodaShakeGauge < 0) sodaShakeGauge = 0;
-
-	//保存
-	prevMouseX = mouseX;
-	prevMouseY = mouseY;
 }
 
 //炭酸残量ゲージを自動回復
@@ -288,18 +275,7 @@ void Player::SpaceJump()
 void Player::Rotate()
 {
 	float rotateSpeed = 0.05f;
-
-	//右回転
-	if (InputManager::GetInstance().IsKeyPressed(KEY_INPUT_D))
-	{
-		angle += rotateSpeed;
-	}
-	//左回転
-	if(InputManager::GetInstance().IsKeyPressed(KEY_INPUT_A))
-	{
-		angle -= rotateSpeed;
-	}
-	
+	angle += rotateSpeed * InputManager::GetInstance().GetActionValue(ActionID::Rotate);
 }
 
 bool Player::WillCollide(int newX, int newY)

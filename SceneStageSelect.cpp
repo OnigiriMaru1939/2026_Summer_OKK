@@ -3,6 +3,12 @@
 
 SceneStageSelect::SceneStageSelect(FileManager& fileMng) : SceneSuper(fileMng)
 {
+	InputManager::GetInstance().SetTriggerCallback(ActionID::Decide,
+												   [this]()
+												   {
+													   SetNextScene(SceneID::GAME);
+													   isEnd = true;
+												   });
 }
 
 SceneStageSelect::~SceneStageSelect()
@@ -12,11 +18,7 @@ SceneStageSelect::~SceneStageSelect()
 
 void SceneStageSelect::Update()
 {
-	if (InputManager::GetInstance().IsKeyTriggered(KEY_INPUT_RETURN))
-	{
-		SetNextScene(SceneID::GAME);
-		isEnd = true;
-	}
+
 }
 
 void SceneStageSelect::Draw()

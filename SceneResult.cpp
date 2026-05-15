@@ -3,7 +3,12 @@
 
 SceneResult::SceneResult(FileManager& fileMng) : SceneSuper(fileMng)
 {
-
+	InputManager::GetInstance().SetTriggerCallback(ActionID::Decide,
+												   [this]()
+												   {
+													   SetNextScene(SceneID::TITLE);
+													   isEnd = true;
+												   });
 }
 
 SceneResult::~SceneResult()
@@ -13,11 +18,7 @@ SceneResult::~SceneResult()
 
 void SceneResult::Update()
 {
-	if (InputManager::GetInstance().IsKeyTriggered(KEY_INPUT_RETURN))
-	{
-		SetNextScene(SceneID::TITLE);
-		isEnd = true;
-	}
+
 }
 
 void SceneResult::Draw()

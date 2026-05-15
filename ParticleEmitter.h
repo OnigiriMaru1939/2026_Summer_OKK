@@ -11,7 +11,7 @@ public:
 	~ParticleEmitter();
 
 	void Update();
-	void Draw();
+	void Draw(int scrollX, int scrollY);
 
 	bool IsDead() const { return isDead; }
 

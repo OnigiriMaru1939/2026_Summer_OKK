@@ -4,7 +4,8 @@
 #include <map>
 #include "ActionID.h"
 
-enum class PadAxis { Pad_L_X, Pad_L_Y, Pad_R_X, Pad_R_Y};
+enum class PadAxis { Pad_L_X, Pad_L_Y, Pad_R_X, Pad_R_Y };
+enum class MouseAxis { Mouse_X, Mouse_Y, Mouse_dist };
 // ゲームコントローラーの認識番号
 // DxLib定数、DX_INPUT_PAD1等に対応
 enum class JOYPAD_NO
@@ -37,7 +38,7 @@ enum class MouseButton
 {
 	Mouse_Left = 0,
 	Mouse_Right,
-	Mouse_Middle
+	Mouse_Middle,
 };
 
 // コントローラーのボタンの種類
@@ -85,55 +86,31 @@ public:
 	void Update();
 	void DrawDebug(int x, int y) const;
 
-	// キー入力
-	bool IsKeyPressed(int keyCode) const;
-	bool IsKeyTriggered(int keyCode) const;
-	bool IsKeyReleased(int keyCode) const;
-
-	// マウス入力
-	bool IsMousePressed(int button) const;
-	bool IsMouseTriggered(int button) const;
-	bool IsMouseReleased(int button) const;
+	// マウス現在座標取得
 	int GetMouseX() const { return mouseX; }
 	int GetMouseY() const { return mouseY; }
-	int GetMouseDX() const { return mouseX - prevMouseX; }
-	int GetMouseDY() const { return mouseY - prevMouseY; }
-
-	// パッド入力
-	bool IsPadPressed(int no, PadButton btn) const;
-	bool IsPadTriggered(int no, PadButton btn) const;
-	bool IsPadReleased(int no, PadButton btn) const;
-	// スティック値取得 (-1000 ~ 1000)
-	int GetPadStickLX(int padIndex) const { return padLX[padIndex]; }
-	int GetPadStickLY(int padIndex) const { return padLY[padIndex]; }
-	int GetPadStickRX(int padIndex) const { return padRX[padIndex]; }
-	int GetPadStickRY(int padIndex) const { return padRY[padIndex]; }
-	float GetAxisValue(int padNo, PadAxis axis) const;
 
 	// アクションに対する入力状態を取得する関数
 	float GetActionValue(ActionID action, int padNo = 0) const;
-	bool IsActionPressed(ActionID action, int padNo = 0) const;
-	bool IsActionTriggered(ActionID action, int padNo = 0) const;
-	bool IsActionReleased(ActionID action, int padNo = 0) const;
+	float GetActionAxis(ActionID action, int padNo = 0) const;
 
 	// アクションIDに対する入力状態を取得する関数
 	using ActionCallback = std::function<void()>;
 
 	// アクションに対するコールバックの登録
+	void SetAxisCallback(ActionID action, ActionCallback callback);
 	void SetTriggerCallback(ActionID action, ActionCallback callback);
 	void SetPressCallback(ActionID action, ActionCallback callback);
 	void SetReleaseCallback(ActionID action, ActionCallback callback);
 	// 登録されたコールバックのクリア
+	void ClearAxisCallbacks();
 	void ClearTriggerCallbacks();
 	void ClearPressCallbacks();
 	void ClearReleaseCallbacks();
-	// 登録されたコールバックを呼び出す関数
-	void DispatchCallbacks();
 	// コントローラーごとのボタンマッピングを解決するための関数
 	// std::wstring GetActionName(ActionID action) const;
-
-	const char* GetPadName(int type) const;
 private:
+	std::map<ActionID, ActionCallback> axisCallbacks;
 	std::map<ActionID, ActionCallback> triggerCallbacks;
 	std::map<ActionID, ActionCallback> pressCallbacks;
 	std::map<ActionID, ActionCallback> releaseCallbacks;
@@ -160,8 +137,33 @@ private:
 
 	// コントローラーごとのボタンマッピングを解決するための関数
 	bool GetRawState(int padNo, PadButton btn);
+	// コントローラーの種類取得
+	const char* GetPadName(int type) const;
+	// アナログ値取得
+	float GetMouseAxisValue(MouseAxis axis) const;
+	float GetPadAxisValue(int padNo, PadAxis axis) const;
 	// 入力状態の判定を行う共通関数
 	bool IsInputTriggered(int current, int previous) const { return current == 1; }
 	bool IsInputPressed(int current) const { return current > 0; }
 	bool IsInputReleased(int current, int previous) const { return current == 0 && previous > 0; }
+	// キー入力
+	bool IsKeyPressed(int keyCode) const;
+	bool IsKeyTriggered(int keyCode) const;
+	bool IsKeyReleased(int keyCode) const;
+
+	// マウス入力
+	bool IsMousePressed(int button) const;
+	bool IsMouseTriggered(int button) const;
+	bool IsMouseReleased(int button) const;
+	// パッド入力
+	bool IsPadPressed(int no, PadButton btn) const;
+	bool IsPadTriggered(int no, PadButton btn) const;
+	bool IsPadReleased(int no, PadButton btn) const;
+	// アクションに対する入力状態を取得する関数
+	bool IsActionPressed(ActionID action, int padNo = 0) const;
+	bool IsActionTriggered(ActionID action, int padNo = 0) const;
+	bool IsActionReleased(ActionID action, int padNo = 0) const;
+
+	// 登録されたコールバックを呼び出す関数
+	void DispatchCallbacks();
 };
