@@ -229,10 +229,10 @@ void Player::Rotate()
 }
 
 //炭酸攻撃処理
-void Player::SodaAttack()
+void Player::SodaAttack(int power)
 {
 	sodaAttackFlag = true;
-	
+	AttckDamage = power;
 }
 
 //ダメージ処理
@@ -248,13 +248,14 @@ void Player::Damage(float damage)
 
 void Player::ClickSodaJump()
 {
-	//炭酸攻撃処理
-	SodaAttack();
+
 	//炭酸蓄積ゲージが0より大きい場合、炭酸蓄積ゲージを減らす
 	if (sodaShakeGauge > 0)
 	{
 		//炭酸蓄積ゲージの割合を炭酸攻撃の威力に変換
 		sodaPower = (sodaShakeGauge / sodaShakeGaugeMax) * 20.0f;
+		//炭酸攻撃処理
+		SodaAttack(sodaPower);
 		sodaGauge -= 20.0f;
 		sodaShakeGauge = 0;
 		//下限リミッター
