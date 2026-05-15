@@ -1,9 +1,11 @@
 ﻿#pragma once
 
-
+#include <cmath>
 #include <memory>
 #include <string>
 #include "Stage.h"
+
+
 
 class FileManager;
 class ImageFile;
@@ -43,6 +45,7 @@ public:
 	float playerHpMax;			//プレイヤーのHPの最大値
 	float sodaGauge;			//炭酸残量ゲージ
 	float sodaGaugeMax;			//炭酸残量ゲージの最大値
+	float sodaRatio;            // 炭酸残量ゲージ
 	float sodaShakeGauge;		//炭酸蓄積ゲージ
 	float sodaShakeGaugeMax;	//炭酸蓄積ゲージの最大値
 
@@ -52,6 +55,15 @@ private:
 	bool GetAttakFlag() const { return sodaAttackFlag; }			//炭酸攻撃フラグを取得
 	bool GetAliveFlag() const { return aliveFlag; }					//生存フラグを取得
 	bool GetJumpFlag() const { return jumpFlag; }					//ジャンプフラグを取得
+	//ゲージの描画
+	void DrawGauge(int x,
+				   int y,
+				   int width,
+				   int height,
+				   float value,
+				   float maxValue,
+				   int color,
+				   int mode);
 
 	std::unique_ptr<ParticleManager> pMng;
 	FileManager& fileManager;			//ファイルマネージャー
@@ -60,7 +72,8 @@ private:
 
 	int width_;					//プレイヤーの画像の幅
 	int height_;				//プレイヤーの画像の高さ
-
+	int canvasX;				//プレイヤーの描画位置X
+	int canvasY;				//プレイヤーの描画位置Y
 	
 	float sodaPower;			//炭酸攻撃の威力
 	bool aliveFlag;				//生存フラグ

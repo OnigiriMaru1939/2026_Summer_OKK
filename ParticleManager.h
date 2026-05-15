@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "DxLib.h"
-#include "ParticleEmitter.h"
 #include "FileManager.h"
 #include "ImageFile.h"
 #include <vector>
@@ -61,6 +60,8 @@ struct ParticleInstance
 	int imageHandle;
 };
 
+class ParticleEmitter;
+
 class ParticleManager
 {
 public:
@@ -76,6 +77,8 @@ public:
 	std::string GetValue(const std::string& source, const std::string& key);
 
 	void PlayParticle(const std::string& configName, float x, float y);
+	void PlayParticle(const ParticleConfig& customConfig, float x, float y);
+	const ParticleConfig* GetConfig(const std::string& configName);
 private:
 	FileManager& _fileMng;
 

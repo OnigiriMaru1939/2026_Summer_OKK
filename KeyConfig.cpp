@@ -146,7 +146,6 @@ bool KeyConfig::LoadFromFile(const std::wstring& filename)
 			{
 				KeyMapping mapping;
 				mapping.code = StringToKeyCode(codeStr); // KEY＿INPUT_SPACEなどのキーコードを数値に変更
-				printfDx("%s\n", codeStr.c_str());
 				try
 				{
 					mapping.scale = std::stof(scaleStr);
@@ -165,6 +164,10 @@ bool KeyConfig::LoadFromFile(const std::wstring& filename)
 			}
 			// else: 未知のアクション名は無視
 		}
+		printfDx("%S, ", actionStr.c_str());
+		printfDx("%S, ", typeStr.c_str());
+		printfDx("%S, ", codeStr.c_str());
+		printfDx("%S\n", scaleStr.c_str());
 	}
 	return true;
 }
