@@ -8,6 +8,7 @@ enum class ActionID
 	SJump,
 	Shot,
 	Rotate,
+	Shake,
 	Decide,
 	Cancel,
 	Exit,

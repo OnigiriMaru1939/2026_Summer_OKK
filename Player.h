@@ -34,9 +34,6 @@ public:
 	void Damage(float damage);		//ダメージ処理
 	void PlayerShake();				//プレイヤーの振動処理
   
-	int prevMouseX;				//前回のマウスX座標
-	int prevMouseY;				//前回のマウスY座標
-
 	float posX;					//プレイヤーのX座標
 	float posY;					//プレイヤーのY座標
 	float shakeOffsetX;			//振動時のX座標
@@ -74,5 +71,6 @@ private:
 	float velocityY;			//Y軸の速度
 	float angle;				//回転角度
 	float AttckDamage;			//攻撃のダメージ
+	float shakeMove;			//振動の移動量
 	float playerShakePower;		//プレイヤーの振動量
 };
