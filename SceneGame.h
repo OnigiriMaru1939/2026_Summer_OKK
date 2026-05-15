@@ -15,15 +15,7 @@ public:
 
 	void Update() override;
 	void Draw() override;
-	//ゲージの描画
-	void DrawGauge(int x,
-				   int y,
-				   int width,
-				   int height,
-				   float value,
-				   float maxValue,
-				   int color,
-				   int mode);
+
 private:
 	static int selectedStageIndex_;
 
