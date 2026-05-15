@@ -1,7 +1,6 @@
 ﻿#include "ParticleEmitter.h"
-#include "ParticleManager.h"
 
-ParticleEmitter::ParticleEmitter(const ParticleConfig* cfg, float x, float y) 
+ParticleEmitter::ParticleEmitter(const ParticleConfig& cfg, float x, float y) 
 	: config(cfg),
 	base_x(x),
 	base_y(y)
@@ -22,7 +21,7 @@ void ParticleEmitter::Update()
 		emitterLife -= 1.0f;
 	}
 	// フレームごとの発生カウンタを計算
-	float emitParFrame = static_cast<float>(config->emitFrequecy) / 60.0f;
+	float emitParFrame = static_cast<float>(config.emitFrequecy) / 60.0f;
 	if (emitterLife > 0)
 	{
 		emitCounter += emitParFrame;
@@ -82,58 +81,58 @@ void ParticleEmitter::ActivateParticle()
 
 	// パラメータ初期化
 	// 位置
-	p.x = base_x + getVar() * config->vX;
-	p.y = base_y + getVar() * config->vY;
+	p.x = base_x + getVar() * config.vX;
+	p.y = base_y + getVar() * config.vY;
 
 	// 方向・速度
-	float angle = (config->initDir + getVar() * config->vInitDir) * (DX_PI_F / 180.0f);
-	float speed = config->initSpeed + getVar() * config->vInitSpeed;
+	float angle = (config.initDir + getVar() * config.vInitDir) * (DX_PI_F / 180.0f);
+	float speed = config.initSpeed + getVar() * config.vInitSpeed;
 	p.vx = cosf(angle) * speed;
 	p.vy = sinf(angle) * speed;
 
 	// 加速度
-	float accAngle = config->accelerationDir * (DX_PI_F / 180.0f);
-	float acc = config->acceleration;
+	float accAngle = config.accelerationDir * (DX_PI_F / 180.0f);
+	float acc = config.acceleration;
 	p.ax = cosf(accAngle) * acc;
 	p.ay = sinf(accAngle) * acc;
 
 	// 摩擦
-	p.friction = config->friction;
+	p.friction = config.friction;
 
 	// 寿命
-	p.maxLife = config->lifeSpan + getVar() * config->vLifeSpan;
+	p.maxLife = config.lifeSpan + getVar() * config.vLifeSpan;
 	if (p.maxLife <= 2.0f) p.maxLife = 2.0f;
 	p.currentLife = p.maxLife;
 
 	// スケール
-	p.startScale = config->startScale + getVar() * config->vStartScale;
-	p.finishScale = config->finishScale + getVar() * config->vFinishScale;
+	p.startScale = config.startScale + getVar() * config.vStartScale;
+	p.finishScale = config.finishScale + getVar() * config.vFinishScale;
 	p.scale = p.startScale;
 
 	// アルファ
-	p.startAlpha = config->startAlpha + getVar() * config->vStartAlpha;
-	p.finishAlpha = config->finishAlpha + getVar() * config->vFinishAlpha;
+	p.startAlpha = config.startAlpha + getVar() * config.vStartAlpha;
+	p.finishAlpha = config.finishAlpha + getVar() * config.vFinishAlpha;
 	p.alpha = p.startAlpha;
 
 	// 色
-	float h = config->startColor.hue + getVar() * config->startColor.vHue; // 基本0.0～360.0
-	float s = (config->startColor.saturation + getVar() * config->startColor.vSaturation) / 100; // 基本0.0～1.0
-	float l = (config->startColor.luminance + getVar() * config->startColor.vLuminance) / 100; // 基本0.0～1.0
+	float h = config.startColor.hue + getVar() * config.startColor.vHue; // 基本0.0～360.0
+	float s = (config.startColor.saturation + getVar() * config.startColor.vSaturation) / 100; // 基本0.0～1.0
+	float l = (config.startColor.luminance + getVar() * config.startColor.vLuminance) / 100; // 基本0.0～1.0
 	p.color = GetColorHSL(h, s, l); // HSLをRGBに変換
 
 	// ブレンドモードの設定
-	p.blendMode = config->blendMode;
+	p.blendMode = config.blendMode;
 
 	// アルファカーブの設定
-	p.alphaCurveType = config->alphaCurveType;
+	p.alphaCurveType = config.alphaCurveType;
 
 	// 画像のランダム選択
-	if (!config->shapeIDList.empty())
+	if (!config.shapeIDList.empty())
 	{
-		int index = GetRand(static_cast<int>(config->shapeIDList.size()) - 1);
-		std::string shapeID = config->shapeIDList[index];
+		int index = GetRand(static_cast<int>(config.shapeIDList.size()) - 1);
+		std::string shapeID = config.shapeIDList[index];
 
-		p.imageHandle = config->imageResouces.at(shapeID)->GetHandle();
+		p.imageHandle = config.imageResouces.at(shapeID)->GetHandle();
 	}
 }
 
@@ -190,7 +189,7 @@ std::vector<float> ParticleEmitter::GetColorHSL(float H, float S, float L)
 void ParticleEmitter::Draw()
 {
 	// ブレンドモード設定(true:加算合成 false:通常)
-	int blendMode = config->blendMode ? DX_BLENDMODE_ADD : DX_BLENDMODE_ALPHA;
+	int blendMode = config.blendMode ? DX_BLENDMODE_ADD : DX_BLENDMODE_ALPHA;
 
 	for (auto& p : particles)
 	{

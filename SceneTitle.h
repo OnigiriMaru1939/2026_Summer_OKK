@@ -7,6 +7,9 @@
 class SceneTitle :
     public SceneSuper
 {
+private:
+	static constexpr int LOGO_Y = 400;
+	static constexpr int START_Y = 880;
 public:
 	SceneTitle(FileManager& fileMng);
 
@@ -15,7 +18,8 @@ public:
 	void Update() override;
 	void Draw() override;
 private:
-	std::shared_ptr<ImageFile> test;
-	std::shared_ptr<ImageFile> testLogo;
+	std::shared_ptr<ImageFile> _bgImg;
+	std::shared_ptr<ImageFile> _TitleLogoImg;
+	std::shared_ptr<ImageFile> _TitleStartImg;
 };
 

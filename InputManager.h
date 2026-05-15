@@ -70,8 +70,8 @@ private:
 	static constexpr int KEY_COUNT = 256;
 	static constexpr int MOUSE_BUTTON_COUNT = 3;
 	static constexpr int MAX_JOYPADS = 4;
-	static constexpr int DEADZONE = 50; // スティックのデッドゾーン
-	static constexpr float STICK_MAX = 1000.0f; // スティックの最大値
+	static constexpr int DEADZONE = 200; // スティックのデッドゾーン
+	static constexpr float STICK_MAX = 32767.0f; // スティックの最大値
 	static constexpr float AXIS_THRESHOLD = 0.5f; // 軸入力を「押された」とみなす閾値
 
 public:
