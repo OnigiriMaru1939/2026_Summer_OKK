@@ -1,4 +1,5 @@
 ﻿#include "ParticleManager.h"
+#include "ParticleEmitter.h"
 
 #include <iostream>
 #include <fstream>
@@ -156,5 +157,17 @@ void ParticleManager::PlayParticle(const std::string& configName, float x, float
 
 	const auto& cfg = configLibrary[configName];
 
-	emitters.push_back(std::make_shared<ParticleEmitter>(&cfg, x, y));
+	emitters.push_back(std::make_shared<ParticleEmitter>(cfg, x, y));
+}
+
+void ParticleManager::PlayParticle(const ParticleConfig& customConfig, float x, float y)
+{
+	emitters.push_back(std::make_shared<ParticleEmitter>(customConfig, x, y));
+}
+
+const ParticleConfig* ParticleManager::GetConfig(const std::string& configName)
+{
+	auto it = configLibrary.find(configName);
+	if (it == configLibrary.end()) return nullptr; // ない場合NULLを返す
+	return &(it->second);
 }

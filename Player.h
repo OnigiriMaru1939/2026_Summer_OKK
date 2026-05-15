@@ -46,6 +46,7 @@ public:
 	float playerHpMax;			//プレイヤーのHPの最大値
 	float sodaGauge;			//炭酸残量ゲージ
 	float sodaGaugeMax;			//炭酸残量ゲージの最大値
+	float sodaRatio;            // 炭酸残量ゲージ
 	float sodaShakeGauge;		//炭酸蓄積ゲージ
 	float sodaShakeGaugeMax;	//炭酸蓄積ゲージの最大値
 

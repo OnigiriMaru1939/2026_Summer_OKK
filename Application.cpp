@@ -109,7 +109,7 @@ void Application::DebugMoveX()
 
 void Application::DebugMoveY()
 {
-	y += InputManager::GetInstance().GetActionValue(ActionID::MoveV) * moveSpeed;
+	y -= InputManager::GetInstance().GetActionValue(ActionID::MoveV) * moveSpeed;
 }
 
 void Application::DeBugJump()
