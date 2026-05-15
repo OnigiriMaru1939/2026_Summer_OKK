@@ -13,9 +13,9 @@ SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
 {
 
 	stage_ = std::make_unique<Stage>(fileMng);
-	player = std::make_unique<Player>(fileMng, stage_.get());
-  player->SystemInit();
-	player->SetImage("Resource/Image/Monster.png");
+	player_ = std::make_unique<Player>(fileMng, stage_.get());
+    player_->SystemInit();
+	player_->SetImage("Resource/Image/Monster.png");
 
   // ステージ固有のセットアップを実行
 	const auto& stageConfigs = GetStageConfigs();
