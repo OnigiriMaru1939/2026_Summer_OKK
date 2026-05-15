@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include "Stage.h"
 
 class FileManager;
 class ImageFile;
@@ -15,10 +16,11 @@ public:
 	static constexpr int PLAYER_HEIGHT = 64;		//プレイヤーの縦幅
 	static constexpr int SPEED = 15;				//プレイヤーの移動速度
 
-	Player(FileManager& fileMng);
+	Player(FileManager& fileMng, Stage* stage);
 	~Player();
 	bool SystemInit();								//初期化
 	bool SetImage(const std::string& path);			//画像のセット
+	bool WillCollide(int newX, int newY);			//プレイヤーのステージとの衝突判定
 	void Update();
 	void Draw();
 	void SodaShake();				//マウスを振ると炭酸蓄積ゲージが溜まる
@@ -54,6 +56,7 @@ private:
 	std::unique_ptr<ParticleManager> pMng;
 	FileManager& fileManager;			//ファイルマネージャー
 	std::shared_ptr<ImageFile> image_;	//プレイヤーの画像
+	Stage* stage_;					//ステージへのポインタ
 
 	int width_;					//プレイヤーの画像の幅
 	int height_;				//プレイヤーの画像の高さ
