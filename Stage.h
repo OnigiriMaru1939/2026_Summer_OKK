@@ -81,6 +81,7 @@ private:
 	int mapHeight;
 
 	std::shared_ptr<ImageFile> chipImg_;
+	std::shared_ptr<ImageFile> bgImg_;
 	std::vector<std::vector<int>>tileMap;
 
 	FileManager& fileMng_;
