@@ -32,7 +32,7 @@ public:
 	void SpaceJump();				//スペースジャンプ処理
 	void ClickSodaJump();           //クリックジャンプ処理
 	void Rotate();					//回転処理
-	void SodaAttack(int power);				//炭酸攻撃処理
+	void SodaAttack(int power);		//炭酸攻撃処理
 	void Damage(float damage);		//ダメージ処理
 	void PlayerShake();				//プレイヤーの振動処理
   
@@ -45,7 +45,7 @@ public:
 	float playerHpMax;			//プレイヤーのHPの最大値
 	float sodaGauge;			//炭酸残量ゲージ
 	float sodaGaugeMax;			//炭酸残量ゲージの最大値
-	float sodaRatio;            // 炭酸残量ゲージ
+	float sodaRatio;            //炭酸残量ゲージ
 	float sodaShakeGauge;		//炭酸蓄積ゲージ
 	float sodaShakeGaugeMax;	//炭酸蓄積ゲージの最大値
 
@@ -66,9 +66,9 @@ private:
 				   int mode);
 
 	std::unique_ptr<ParticleManager> pMng;
-	FileManager& fileManager;			//ファイルマネージャー
-	std::shared_ptr<ImageFile> image_;	//プレイヤーの画像
-	Stage* stage_;					//ステージへのポインタ
+	FileManager& fileManager;					//ファイルマネージャー
+	std::shared_ptr<ImageFile> image_;			//プレイヤーの画像
+	Stage* stage_;								//ステージへのポインタ
 
 	int width_;					//プレイヤーの画像の幅
 	int height_;				//プレイヤーの画像の高さ
@@ -83,6 +83,8 @@ private:
 	float velocityX;			//X軸の速度
 	float velocityY;			//Y軸の速度
 	float angle;				//回転角度
+	float rotateSpeed;			//回転速度
+	float jumpPower;			//ジャンプ力
 	float AttckDamage;			//攻撃のダメージ
 	float shakeMove;			//振動の移動量
 	float playerShakePower;		//プレイヤーの振動量

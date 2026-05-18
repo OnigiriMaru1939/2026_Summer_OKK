@@ -38,6 +38,9 @@ bool Player::SystemInit()
 	velocityX = 0.0f;
 	velocityY = 0.0f;
 	shakeMove = 0.0f;
+	angle = 0.0f;
+	rotateSpeed = 0.05f;
+	jumpPower = 12.0f;
 
 	//体力を初期化
 	playerHpMax = 100.0f;
@@ -53,7 +56,7 @@ bool Player::SystemInit()
 	//フラグの初期化
 	aliveFlag = true;
 	jumpFlag = false;
-	angle = 0.0f;
+	sodaAttackFlag = false;	
 
 	return true;
 }
@@ -79,6 +82,10 @@ bool Player::SetImage(const std::string& path)
 
 void Player::Update()
 {
+	if (CheckHitKey(KEY_INPUT_K))
+	{
+		Damage(10);
+	}
 	AddGravity();
 	SodaMove();
 	
@@ -127,6 +134,7 @@ void Player::Update()
 
 void Player::Draw()
 {
+	//DrawFormatString(1000, 1000, GetColor(255,0, 0), "HP %d", );
 	//プレイヤーが死んでいる又は画像が読み込まれていないときは表示しない
 	if (!aliveFlag || !image_) return;
 
@@ -283,8 +291,6 @@ void Player::SpaceJump()
 	//二段ジャンプを防止
 	if (GetJumpFlag()) return;
 
-	float jumpPower = 12.0f;
-
 	//プレイヤーの向いている方向にジャンプ
 	//DX_PI_F / 2はジャンプ方向を90度補正するための値
 	velocityX += cos(angle - DX_PI_F / 2) * jumpPower;
@@ -296,7 +302,6 @@ void Player::SpaceJump()
 void Player::Rotate()
 {
 	//回転速度
-	float rotateSpeed = 0.05f;
 	angle += rotateSpeed * InputManager::GetInstance().GetActionValue(ActionID::Rotate);
 	printfDx("angle: %f\n", angle);
 }
