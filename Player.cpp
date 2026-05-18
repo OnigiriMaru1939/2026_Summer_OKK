@@ -64,14 +64,10 @@ bool Player::SetImage(const std::string& path)
 	auto img = fileManager.LoadImageFM(path);
 	if (!img)
 	{
-		printfDx("画像読み込み失敗: %s\n", path.c_str());
-
 		image_.reset();
 		width_ = height_ = 0;
 		return false;
 	}
-
-	printfDx("画像読み込み成功\n");
 
 	image_ = img;
 
@@ -293,7 +289,6 @@ void Player::SpaceJump()
 	//DX_PI_F / 2はジャンプ方向を90度補正するための値
 	velocityX += cos(angle - DX_PI_F / 2) * jumpPower;
 	velocityY += sin(angle - DX_PI_F / 2) * jumpPower;
-
 	jumpFlag = true;
 }
 
@@ -303,6 +298,7 @@ void Player::Rotate()
 	//回転速度
 	float rotateSpeed = 0.05f;
 	angle += rotateSpeed * InputManager::GetInstance().GetActionValue(ActionID::Rotate);
+	printfDx("angle: %f\n", angle);
 }
 
 bool Player::WillCollide(int newX, int newY)
@@ -367,6 +363,10 @@ void Player::ClickSodaJump()
 		// ParticleConfig構造体のコピー
 		ParticleConfig customCfg = *masterCfg;
 
+		float plusAngle = angle * (180.0f / DX_PI_F);
+		while (plusAngle < 0) plusAngle += 360.0f;
+		while (plusAngle >= 360.0f) plusAngle -= 360.0f; // 0～360の範囲に収める
+		customCfg.initDir += plusAngle;
 		customCfg.startScale *= sodaRatio;
 		customCfg.initSpeed *= sodaRatio;
 		pMng->PlayParticle(customCfg, posX, posY);

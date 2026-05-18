@@ -1,4 +1,4 @@
-{
+﻿{
     "bgColor": "#00000",
     "width": 405,
     "height": 605,
@@ -7,7 +7,7 @@
     "startXVariance": 73,
     "startY": 303,
     "startYVariance": 43,
-    "initialDirection": 270,
+    "initialDirection": 90,
     "initialDirectionVariance": 172.5,
     "initialSpeed": 24.9,
     "initialSpeedVariance": 16.8,
