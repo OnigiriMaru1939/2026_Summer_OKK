@@ -134,7 +134,7 @@ void Player::Update()
 
 void Player::Draw()
 {
-	//DrawFormatString(1000, 1000, GetColor(255,0, 0), "HP %d", );
+	//DrawFormatString(1000, 1000, GetColor(255,0, 0), "HP %d", (int)playerHp);
 	//プレイヤーが死んでいる又は画像が読み込まれていないときは表示しない
 	if (!aliveFlag || !image_) return;
 
@@ -161,7 +161,7 @@ void Player::Draw()
 	//炭酸蓄積ゲージが0以上の場合のみ描画
 	if (sodaShakeGauge > 0)
 	{
-		DrawGauge(canvasX - 100, canvasY - 50, 20, 100, sodaShakeGauge, sodaShakeGaugeMax, GetColor(0, 0, 255), 1);		//炭酸蓄積ゲージ
+		DrawGauge(canvasX - 75, canvasY - 50, 20, 100, sodaShakeGauge, sodaShakeGaugeMax, GetColor(0, 0, 255), 1);		//炭酸蓄積ゲージ
 	}
 	DrawCircle(canvasX, canvasY, 3, 0X0000ff);
 	//デバック用で赤い四角のプレイヤー表示
@@ -337,7 +337,7 @@ void Player::SodaAttack(int power)
 void Player::Damage(float damage)
 {
 	playerHp -= damage;
-	if (playerHp < 0)
+	if (playerHp <= 0)
 	{
 		playerHp = 0;
 		aliveFlag = false; //プレイヤーが死んだ
