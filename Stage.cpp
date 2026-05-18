@@ -16,7 +16,11 @@ Stage::Stage(FileManager& fileMng):fileMng_(fileMng)
 	mapWidth = 0;
 	mapHeight = 0;
 
-	chipImg_ = fileMng_.LoadImageFM("Resource/MapChip/Mapchip_def.png"); //後でファイル読み込む
+	// マップチップ画像の読み込み
+	bgImg_ = fileMng_.LoadImageFM("Resource/Image/Stage1_Haikei.png"); 
+	// マップチップ画像の読み込み
+	chipImg_ = fileMng_.LoadImageFM("Resource/MapChip/Mapchip_def.png"); 
+	
 
 	chipInfo_.resize(CHIP_HEIGHT * CHIP_WIDTH + 1);
 
@@ -125,6 +129,8 @@ void Stage::Update()
 void Stage::Draw()
 {
 	int x, y;
+
+	DrawExtendGraph(0,0, Application::SCREEN_WID, Application::SCREEN_HIG, bgImg_->GetHandle(), true);
 
 	// マップデータの参照位置
 	int startX = static_cast<int>(scrollX / CHIP_SIZE);
