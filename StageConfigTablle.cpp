@@ -16,7 +16,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 		},
 		{
 			2,
-			"Resource/Map/json/stage_02.json",
+			"Resource/MapJson/stage_02.json",
 			[](SceneGame& scene)
 			{
 
@@ -25,7 +25,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 		},
 		{
 			3,
-			"Resource/Map/json/stage_03.json",
+			"Resource/MapJson/stage_03.json",
 			[](SceneGame& scene)
 			{
 			
@@ -34,7 +34,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 		},
 		{
 			4,
-			"Resource/Map/json/stage_04.json",
+			"Resource/MapJson/stage_04.json",
 			[](SceneGame& scene)
 			{
 
