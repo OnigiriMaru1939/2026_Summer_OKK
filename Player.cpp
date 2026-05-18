@@ -120,9 +120,9 @@ void Player::Update()
 		}
 	}
 
-	if (canvasY > Stage::CHIP_SIZE * 38)
+	if (canvasY > Stage::CHIP_SIZE * 22)
 	{
-		int newScrollY = posY - Stage::CHIP_SIZE * 38;
+		int newScrollY = posY - Stage::CHIP_SIZE * 22;
 		newScrollY = std::min(newScrollY, stage_->GetMaxScrollY());
 		stage_->SetScrollY(newScrollY);
 	}
