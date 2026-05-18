@@ -47,7 +47,7 @@ public:
 	float sodaGaugeMax;			//炭酸残量ゲージの最大値
 	float sodaRatio;            //炭酸残量ゲージ
 	float sodaShakeGauge;		//炭酸蓄積ゲージ
-	float sodaShakeGaugeMax;	//炭酸蓄積ゲージの最大値
+	static constexpr float SODA_SHAKE_GAUGE_MAX = 1000.0f;	//炭酸蓄積ゲージの最大値
 
 private:
 	int GetWidth() const;											//プレイヤーの画像の幅を取得
