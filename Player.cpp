@@ -19,13 +19,15 @@ Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Jump, [this]() { SpaceJump(); });
 	InputManager::GetInstance().SetTriggerCallback(ActionID::SJump, [this]() { ClickSodaJump(); });
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Shake, [this]() { SodaShake(); });
+	InputManager::GetInstance().SetAxisCallback(ActionID::Shake, [this]() { SodaShake(); });
 	InputManager::GetInstance().SetPressCallback(ActionID::Rotate, [this]() { Rotate(); });
+	InputManager::GetInstance().SetAxisCallback(ActionID::Rotate, [this]() { Rotate(); });
 	InputManager::GetInstance().SetAxisCallback(ActionID::Shake, [this]() { SodaShake(); });
 }
 
 Player::~Player()
 {
-
+	InputManager::GetInstance().StopVibration();
 }
 
 //初期化
@@ -47,10 +49,9 @@ bool Player::SystemInit()
 	playerHp = playerHpMax;
 
 	//ゲージ等の初期化
-	sodaGauge = 100.0f;
-	sodaGaugeMax = 100.0f;
+	sodaGauge = 1000.0f;
+	sodaGaugeMax = 1000.0f;
 	sodaShakeGauge = 0.0f;
-	sodaShakeGaugeMax = 100.0f;
 	playerShakePower = 0.0f;
 
 	//フラグの初期化
@@ -92,8 +93,16 @@ void Player::Update()
 	SodaGaugeCharge();
 	/*SodaShake();*/
 	//減衰（振らないと減る）
-	sodaShakeGauge -= 0.2f;
-	if (sodaShakeGauge < 0) sodaShakeGauge = 0;
+	sodaShakeGauge -= 10.0f;
+	if (sodaShakeGauge < 0.0f)
+	{
+		sodaShakeGauge = 0;
+		//InputManager::GetInstance().StopVibration();
+	}
+	else
+	{
+		//InputManager::GetInstance().StartVibration((int)(sodaShakeGauge));
+	}
 	pMng->UpdateAll();
 
 	//プレイヤー画面スクロール処理
@@ -129,7 +138,6 @@ void Player::Update()
 		newScrollY = std::min(newScrollY, stage_->GetMaxScrollY());
 		stage_->SetScrollY(newScrollY);
 	}
-	
 }
 
 void Player::Draw()
@@ -164,56 +172,20 @@ void Player::Draw()
 		DrawGauge(canvasX - 75, canvasY - 50, 20, 100, sodaShakeGauge, sodaShakeGaugeMax, GetColor(0, 0, 255), 1);		//炭酸蓄積ゲージ
 	}
 	DrawCircle(canvasX, canvasY, 3, 0X0000ff);
-	//デバック用で赤い四角のプレイヤー表示
-	//DrawBox((int)posX, (int)posY, (int)posX + 100, (int)posY + 100, GetColor(255, 0, 0), true);
-	//
-	//DrawBox(19, 69, 500, 101, GetColor(255, 0, 0), FALSE);
-	//DrawBox(20, 100, 20 + (int)(playerHp * 4.8f), 70, GetColor(0, 255, 0), TRUE);
-	//
-	//DrawBox(19, 69, 500, 101, GetColor(255, 0, 0), FALSE);											//炭酸残量ゲージの枠線
-	//DrawBox(20, 100, 20 + (int)(sodaGauge * 4.8f), 70, GetColor(0, 255, 255), TRUE);					//炭酸残量ゲージの表示
-	//
-	//DrawBox(19, 69+100, 500, 101+100, GetColor(255, 0, 0), FALSE);									//炭酸蓄積ゲージの枠線
-	//DrawBox(20, 100+100, 20 + (int)(sodaShakeGauge * 4.8f), 70+100, GetColor(0, 0, 255), TRUE);		//炭酸蓄積ゲージの表示
 }
 
 //マウスを振ったり、スティックを動かすと炭酸ゲージが溜まる
 void Player::SodaShake()
 {
-	//一旦保留
-	/*
-	//マウスを振るときの処理
-	if ()
-	{
-		//マウスの移動量を取得
-		int dx = InputManager::GetInstance().GetMouseDX();
-		int dy = InputManager::GetInstance().GetMouseDY();
-
-		//マウスの座標距離
-		float mousedist = sqrtf(dx * dx + dy * dy);
-		shakeMove = mousedist;
-	}
-	//ゲームパッドのスティックを動かすときの処理
-	else
-	{
-		//ゲームパッドのRスティックの移動量を取得
-		int px = InputManager::GetInstance().GetPadStickRX(0);
-		int py = InputManager::GetInstance().GetPadStickRY(0);
-
-		//スティックの座標距離
-		float stickdist = sqrtf(px * px + py * py);
-		shakeMove = stickdist;
-	}
-	*/
   	//距離
 	float dist = InputManager::GetInstance().GetActionAxis(ActionID::Shake);
 	shakeMove = dist;
 
 	//ゲージ加算
-	sodaShakeGauge += shakeMove * 0.005f;
+	sodaShakeGauge += shakeMove * 0.25f;
 
 	//上限
-	if (sodaShakeGauge > sodaShakeGaugeMax) sodaShakeGauge = sodaShakeGaugeMax;
+	if (sodaShakeGauge > SODA_SHAKE_GAUGE_MAX) sodaShakeGauge = SODA_SHAKE_GAUGE_MAX;
 }
 
 //炭酸残量ゲージを自動回復
@@ -302,7 +274,7 @@ void Player::SpaceJump()
 void Player::Rotate()
 {
 	//回転速度
-	angle += rotateSpeed * InputManager::GetInstance().GetActionValue(ActionID::Rotate);
+	angle += rotateSpeed * (InputManager::GetInstance().GetActionValue(ActionID::Rotate) + InputManager::GetInstance().GetActionAxis(ActionID::Rotate));
 	printfDx("angle: %f\n", angle);
 }
 
@@ -381,7 +353,7 @@ void Player::ClickSodaJump()
 //プレイヤーの振動処理
 void Player::PlayerShake()
 {
-	playerShakePower = sodaShakeGauge / sodaShakeGaugeMax;
+	playerShakePower = sodaShakeGauge / SODA_SHAKE_GAUGE_MAX;
 
 	shakeOffsetX = (GetRand(10) - 5) * playerShakePower;
 	shakeOffsetY = (GetRand(10) - 5) * playerShakePower;

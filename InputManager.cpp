@@ -141,6 +141,10 @@ void InputManager::Update()
 	// コントローラー
 	for (int no = 0; no < MAX_JOYPADS; no++)
 	{
+		prevPadLX[no] = padLX[no];
+		prevPadLY[no] = padLY[no];
+		prevPadRX[no] = padRX[no];
+		prevPadRY[no] = padRY[no];
 		int dxNo = no + 1; // DxLibのジョイパッド番号は1から始まる
 		int type = GetJoypadType(dxNo);
 		DINPUT_JOYSTATE dState;
@@ -214,7 +218,7 @@ bool InputManager::IsMouseReleased(int button) const
 {
 	return IsInputReleased(mouseButton[(int)button], prevMouseButton[(int)button]);
 }
-// アナログ値取得
+// アナログ値取得(0.0~1.0ではない)
 float InputManager::GetMouseAxisValue(MouseAxis axis) const
 {
 	if (axis == MouseAxis::Mouse_X)
@@ -225,7 +229,7 @@ float InputManager::GetMouseAxisValue(MouseAxis axis) const
 	{
 		return (float)(mouseY - prevMouseY);
 	}
-	if (axis == MouseAxis::Mouse_dist)
+	if (axis == MouseAxis::Mouse_Dist)
 	{
 		int dx = mouseX - prevMouseX;
 		int dy = mouseY - prevMouseY;
@@ -243,11 +247,25 @@ float InputManager::GetPadAxisValue(int padNo, PadAxis axis) const
 		case PadAxis::Pad_L_Y: rawValue = padLY[padNo]; break;
 		case PadAxis::Pad_R_X: rawValue = padRX[padNo]; break;
 		case PadAxis::Pad_R_Y: rawValue = padRY[padNo]; break;
+		case PadAxis::Pad_L_Dist:
+			{
+				int dx = padLX[padNo] - prevPadLX[padNo];
+				int dy = padLY[padNo] - prevPadLY[padNo];
+				rawValue = (int)sqrtf(dx * dx + dy * dy);
+				break;
+			}
+		case PadAxis::Pad_R_Dist:
+			{
+				int dx = padRX[padNo] - prevPadRX[padNo];
+				int dy = padRY[padNo] - prevPadRY[padNo];
+				rawValue = (int)sqrtf(dx * dx + dy * dy);
+				break;
+			}
 	}
 
 	if (abs(rawValue) < DEADZONE) return 0.0f; // デッドゾーン内は0とみなす
 
-	float normalized = (float)(abs(rawValue) - DEADZONE) / (STICK_MAX - DEADZONE);
+	float normalized = (float)(abs(rawValue) - DEADZONE) / (STICK_MAX - DEADZONE); // デッドゾーンを除いた範囲で正規化
 	return (rawValue > 0) ? normalized : -normalized;
 }
 // コントローラー入力
@@ -417,6 +435,26 @@ void InputManager::ClearReleaseCallbacks()
 	releaseCallbacks.clear();
 }
 
+void InputManager::ClearAllCallbacks()
+{
+	ClearAxisCallbacks();
+	ClearTriggerCallbacks();
+	ClearPressCallbacks();
+	ClearReleaseCallbacks();
+}
+
+void InputManager::StartVibration(int Power, int Time, int EffectIndex, int padNo)
+{
+	int inputNo = padNo + 1; // DxLibのジョイパッド番号は1から始まる
+	StartJoypadVibration(inputNo, Power, Time, EffectIndex);
+}
+
+void InputManager::StopVibration(int padNo)
+{
+	int inputNo = padNo + 1; // DxLibのジョイパッド番号は1から始まる
+	StopJoypadVibration(inputNo);
+}
+
 void InputManager::DispatchCallbacks()
 {
 	for (const auto& [action, callback] : axisCallbacks)
@@ -486,7 +524,7 @@ bool InputManager::GetRawState(int padNo, PadButton btn)
 		case PadButton::Pad_R_Thumb: return (dState.Buttons[9] != 0) || (xState.Buttons[XINPUT_BUTTON_RIGHT_THUMB] != 0);
 		case PadButton::Xbox_Start:
 			return (dState.Buttons[10] != 0) || (xState.Buttons[XINPUT_BUTTON_START] != 0);
-		case PadButton::Xbox_back:
+		case PadButton::Xbox_Back:
 			return (dState.Buttons[11] != 0) || (xState.Buttons[XINPUT_BUTTON_BACK] != 0);
 		default: return false;
 	}

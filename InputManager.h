@@ -4,9 +4,9 @@
 #include <map>
 #include "ActionID.h"
 
-enum class PadAxis { Pad_L_X, Pad_L_Y, Pad_R_X, Pad_R_Y };
-enum class MouseAxis { Mouse_X, Mouse_Y, Mouse_dist };
-// ゲームコントローラーの認識番号
+enum class PadAxis { Pad_L_X, Pad_L_Y, Pad_R_X, Pad_R_Y, Pad_L_Dist, Pad_R_Dist };
+enum class MouseAxis { Mouse_X, Mouse_Y, Mouse_Dist };
+// ゲームコントローラーの認識番
 // DxLib定数、DX_INPUT_PAD1等に対応
 enum class JOYPAD_NO
 {
@@ -59,7 +59,7 @@ enum class PadButton
 	Pad_L_Thumb,
 	Pad_R_Thumb,
 	Xbox_Start,// Xbox:Start
-	Xbox_back, // Xbox:Back
+	Xbox_Back, // Xbox:Back
 	Max
 };
 
@@ -107,8 +107,11 @@ public:
 	void ClearTriggerCallbacks();
 	void ClearPressCallbacks();
 	void ClearReleaseCallbacks();
+	void ClearAllCallbacks();
 	// コントローラーごとのボタンマッピングを解決するための関数
 	// std::wstring GetActionName(ActionID action) const;
+	void StartVibration(int Power, int Time = -1, int EffectIndex = -1, int padNo = 0);
+	void StopVibration(int padNo = 0);
 private:
 	std::map<ActionID, ActionCallback> axisCallbacks;
 	std::map<ActionID, ActionCallback> triggerCallbacks;
@@ -131,9 +134,13 @@ private:
 	int padButton[MAX_JOYPADS][(int)PadButton::Max] = {};
 	int prevPadButton[MAX_JOYPADS][(int)PadButton::Max] = {};
 	int padLX[MAX_JOYPADS] = {};
+	int prevPadLX[MAX_JOYPADS] = {};
 	int padLY[MAX_JOYPADS] = {};
+	int prevPadLY[MAX_JOYPADS] = {};
 	int padRX[MAX_JOYPADS] = {};
+	int prevPadRX[MAX_JOYPADS] = {};
 	int padRY[MAX_JOYPADS] = {};
+	int prevPadRY[MAX_JOYPADS] = {};
 
 	// コントローラーごとのボタンマッピングを解決するための関数
 	bool GetRawState(int padNo, PadButton btn);

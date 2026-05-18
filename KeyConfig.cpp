@@ -68,11 +68,13 @@ int KeyConfig::StringToKeyCode(const std::wstring& str) const
 		{ L"Mouse_Middle", (int)MouseButton::Mouse_Middle},
 		{ L"Mouse_X", (int)MouseAxis::Mouse_X},
 		{ L"Mouse_Y", (int)MouseAxis::Mouse_Y},
-		{ L"Mouse_dist", (int)MouseAxis::Mouse_dist},
+		{ L"Mouse_Dist", (int)MouseAxis::Mouse_Dist},
 		{ L"Pad_L_X", (int)PadAxis::Pad_L_X},
 		{ L"Pad_L_Y", (int)PadAxis::Pad_L_Y},
+		{ L"Pad_L_Dist", (int)PadAxis::Pad_L_Dist},
 		{ L"Pad_R_X", (int)PadAxis::Pad_R_X},
 		{ L"Pad_R_Y", (int)PadAxis::Pad_R_Y},
+		{ L"Pad_R_Dist", (int)PadAxis::Pad_R_Dist},
 		{ L"Pad_Face_Left", (int)PadButton::Pad_Face_Left},
 		{ L"Pad_Face_Right", (int)PadButton::Pad_Face_Right},
 		{ L"Pad_Face_Top", (int)PadButton::Pad_Face_Top},
@@ -88,7 +90,7 @@ int KeyConfig::StringToKeyCode(const std::wstring& str) const
 		{ L"Pad_L_Thumb", (int)PadButton::Pad_L_Thumb},
 		{ L"Pad_R_Thumb", (int)PadButton::Pad_R_Thumb},
 		{ L"Xbox_Start", (int)PadButton::Xbox_Start},
-		{ L"Xbox_back", (int)PadButton::Xbox_back},
+		{ L"Xbox_Back", (int)PadButton::Xbox_Back},
 		// 必要なキーをここに追加
 	};
 

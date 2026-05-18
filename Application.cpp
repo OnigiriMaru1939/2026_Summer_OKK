@@ -51,7 +51,7 @@ void Application::Run()
 	Fps fps;
 	// エンターキーとエスケープキーの同時押しで強制終了
 	// どちらか片方だけだと誤操作で終了してしまう可能性あり
-	while (ProcessMessage() == 0 && !sceneMng->GetExit() && (!CheckHitKey(KEY_INPUT_RETURN) || !CheckHitKey(KEY_INPUT_ESCAPE)))
+	while (ProcessMessage() == 0 && !sceneMng->GetExit() && (!CheckHitKey(KEY_INPUT_RETURN) || !CheckHitKey(KEY_INPUT_ESCAPE)) && !(GetJoypadInputState(DX_INPUT_PAD1) & PAD_INPUT_11))
 	{
 		SetDrawScreen(DX_SCREEN_BACK);
 		ClearDrawScreen();
