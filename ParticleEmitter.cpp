@@ -85,7 +85,9 @@ void ParticleEmitter::ActivateParticle()
 	p.y = base_y + getVar() * config.vY;
 
 	// 方向・速度
-	float angle = (config.initDir + getVar() * config.vInitDir) * (DX_PI_F / 180.0f);
+	float temp = config.initDir + getVar() * config.vInitDir;
+	float angle = (temp) * (DX_PI_F / 180.0f);
+	printfDx("angle: %f, %f\n", temp, angle);
 	float speed = config.initSpeed + getVar() * config.vInitSpeed;
 	p.vx = cosf(angle) * speed;
 	p.vy = sinf(angle) * speed;

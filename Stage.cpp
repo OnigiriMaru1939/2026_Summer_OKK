@@ -210,7 +210,7 @@ bool Stage::CheckWall(int worldX, int worldY) const
 	int cx = worldX / CHIP_SIZE;
 	int cy = worldY / CHIP_SIZE;
 
-	printfDx("%d, %d\n", mapHeight, mapWidth);
+	//printfDx("%d, %d\n", mapHeight, mapWidth);
 	if (cx < 0 || cx >= mapWidth || cy < 0 || cy >= mapHeight)
 	{
 		return true;
