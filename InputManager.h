@@ -143,7 +143,7 @@ private:
 	int prevPadRY[MAX_JOYPADS] = {};
 
 	// コントローラーごとのボタンマッピングを解決するための関数
-	bool GetRawState(int padNo, PadButton btn);
+	bool GetRawState(int padNo, PadButton btn, const DINPUT_JOYSTATE& dState, const XINPUT_STATE& xState);
 	// コントローラーの種類取得
 	const char* GetPadName(int type) const;
 	// アナログ値取得
