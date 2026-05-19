@@ -149,28 +149,21 @@ void InputManager::Update()
 		int type = GetJoypadType(dxNo);
 		DINPUT_JOYSTATE dState;
 		XINPUT_STATE xState;
-		GetJoypadDirectInputState(dxNo, &dState);
-		GetJoypadXInputState(dxNo, &xState);
+		int dResult = GetJoypadDirectInputState(dxNo, &dState);
+		int xResult = GetJoypadXInputState(dxNo, &xState);
 
+		// 正常に取得できた場合は、規格に応じてスティック値を更新する
 		if (type == DX_PADTYPE_XBOX_360 || type == DX_PADTYPE_XBOX_ONE)
 		{
 			padLX[no] = xState.ThumbLX;
 			padLY[no] = xState.ThumbLY;
-		}
-		else
-		{
-			padLX[no] = dState.X;
-			padLY[no] = dState.Y;
-		}
-
-		// XboxコントローラーはRx/Ryが右スティック
-		if (type == DX_PADTYPE_XBOX_360 || type == DX_PADTYPE_XBOX_ONE)
-		{
 			padRX[no] = xState.ThumbRX;
 			padRY[no] = xState.ThumbRY;
 		}
 		else
 		{
+			padLX[no] = dState.X;
+			padLY[no] = dState.Y;
 			padRX[no] = dState.Z;
 			padRY[no] = dState.Rz;
 		}
@@ -178,7 +171,7 @@ void InputManager::Update()
 		for (int btn = 0; btn < (int)PadButton::Max; btn++)
 		{
 			prevPadButton[no][btn] = padButton[no][btn];
-			if (GetRawState(no, (PadButton)btn))
+			if (GetRawState(no, (PadButton)btn, dState, xState))
 			{
 				padButton[no][btn]++;
 			}
@@ -446,6 +439,7 @@ void InputManager::ClearAllCallbacks()
 void InputManager::StartVibration(int Power, int Time, int EffectIndex, int padNo)
 {
 	int inputNo = padNo + 1; // DxLibのジョイパッド番号は1から始まる
+	StopVibration(padNo); // 先に振動を停止してから開始することで、連続して呼び出された場合の不具合を防止
 	StartJoypadVibration(inputNo, Power, Time, EffectIndex);
 }
 
@@ -475,14 +469,10 @@ void InputManager::DispatchCallbacks()
 	}
 }
 
-bool InputManager::GetRawState(int padNo, PadButton btn)
+bool InputManager::GetRawState(int padNo, PadButton btn, const DINPUT_JOYSTATE& dState, const XINPUT_STATE& xState)
 {
 	int dxNo = padNo + 1;
 	int type = GetJoypadType(dxNo);
-	DINPUT_JOYSTATE dState;
-	XINPUT_STATE xState;
-	GetJoypadDirectInputState(dxNo, &dState);
-	GetJoypadXInputState(dxNo, &xState);
 
 	switch (btn)
 	{

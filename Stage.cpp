@@ -17,7 +17,7 @@ Stage::Stage(FileManager& fileMng):fileMng_(fileMng)
 	mapHeight = 0;
 
 	// マップチップ画像の読み込み
-	bgImg_ = fileMng_.LoadImageFM("Resource/Image/Stage1_Haikei.png"); 
+	bgImg_ = fileMng_.LoadImageFM("Resource/Image/Stage1_bg.png"); 
 	// マップチップ画像の読み込み
 	chipImg_ = fileMng_.LoadImageFM("Resource/MapChip/Mapchip_def.png"); 
 	

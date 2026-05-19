@@ -97,11 +97,16 @@ void Player::Update()
 	if (sodaShakeGauge < 0.0f)
 	{
 		sodaShakeGauge = 0;
-		//InputManager::GetInstance().StopVibration();
+		InputManager::GetInstance().StopVibration();
 	}
 	else
 	{
-		//InputManager::GetInstance().StartVibration((int)(sodaShakeGauge));
+		if (GetRand(4) == 0)
+		{
+			float shakeRatio = sodaShakeGauge / SODA_SHAKE_GAUGE_MAX;
+			int power = (int)(shakeRatio * 1000);
+			InputManager::GetInstance().StartVibration(power, 100);
+		}
 	}
 	pMng->UpdateAll();
 
@@ -169,9 +174,11 @@ void Player::Draw()
 	//炭酸蓄積ゲージが0以上の場合のみ描画
 	if (sodaShakeGauge > 0)
 	{
-		DrawGauge(canvasX - 75, canvasY - 50, 20, 100, sodaShakeGauge, sodaShakeGaugeMax, GetColor(0, 0, 255), 1);		//炭酸蓄積ゲージ
+		DrawGauge(canvasX - 75, canvasY - 50, 20, 100, sodaShakeGauge, SODA_SHAKE_GAUGE_MAX, GetColor(0, 0, 255), 1);		//炭酸蓄積ゲージ
 	}
 	DrawCircle(canvasX, canvasY, 3, 0X0000ff);
+	// デバッグ
+	DrawFormatString(1000, 1000, GetColor(255, 0, 0), "SodaGauge: %d", (int)sodaShakeGauge);
 }
 
 //マウスを振ったり、スティックを動かすと炭酸ゲージが溜まる
