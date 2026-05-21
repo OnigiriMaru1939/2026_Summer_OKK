@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Enemy1.cpp" />
     <ClCompile Include="EnemyBase.cpp" />
     <ClCompile Include="Fps.cpp" />
     <ClCompile Include="InputManager.cpp" />
@@ -165,6 +166,7 @@
   <ItemGroup>
     <ClInclude Include="ActionID.h" />
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Enemy1.h" />
     <ClInclude Include="EnemyBase.h" />
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="FileSuper.h" />
