@@ -2,6 +2,7 @@
 #include "SceneSuper.h"
 #include "Application.h"
 #include "Stage.h"
+#include "EnemyBase.h"
 
 class Player;
 
@@ -21,5 +22,6 @@ private:
 
 	std::unique_ptr<Stage> stage_;
 	std::unique_ptr<Player> player_;
+	std::vector<std::shared_ptr<EnemyBase>> enemyList_;		//敵のリスト
 };
 

@@ -1,6 +1,8 @@
 ﻿#include "SceneGame.h"
 #include "InputManager.h"
 #include "Player.h"
+#include "EnemyBase.h"
+#include "Enemy1.h"
 #include "Stage.h"
 #include "FileManager.h"
 #include "StageConfig.h"
@@ -14,6 +16,14 @@ SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
 
 	stage_ = std::make_unique<Stage>(fileMng);
 	player_ = std::make_unique<Player>(fileMng, stage_.get());
+	//敵の生成
+	enemyList_.push_back(std::make_shared<Enemy1>(
+			fileMng,
+			0,
+			0
+		)
+	);
+
     player_->SystemInit();
 	player_->SetImage("Resource/Image/Monster.png");
 
@@ -39,6 +49,12 @@ void SceneGame::Update()
 {
 	player_->Update();
 
+	//敵の更新
+	for (auto& enemy : enemyList_)
+	{
+		enemy->Update();
+	}
+
 	// Stageの更新
 	if (stage_) stage_->Update();
 }
@@ -54,7 +70,11 @@ void SceneGame::Draw()
 	//プレイヤーを描画
 	player_->Draw();
 
-
+	//敵を描画
+	for (auto& enemy : enemyList_)
+	{
+		enemy->Draw();
+	}
 
 
 }

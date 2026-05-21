@@ -49,6 +49,7 @@
     <ClCompile Include="Player.cpp">
       <Filter>Player</Filter>
     </ClCompile>
+    <ClCompile Include="Enemy1.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Application">
@@ -182,5 +183,6 @@
     <ClInclude Include="Player.h">
       <Filter>Player</Filter>
     </ClInclude>
+    <ClInclude Include="Enemy1.h" />
   </ItemGroup>
 </Project>
