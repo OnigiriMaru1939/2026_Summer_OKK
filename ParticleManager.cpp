@@ -151,18 +151,22 @@ std::string ParticleManager::GetValue(const std::string& source, const std::stri
 	return val;
 }
 
-void ParticleManager::PlayParticle(const std::string& configName, float x, float y)
+std::weak_ptr<ParticleEmitter> ParticleManager::PlayParticle(const std::string& configName, float x, float y)
 {
-	if (configLibrary.find(configName) == configLibrary.end()) return;
+	if (configLibrary.find(configName) == configLibrary.end()) return std::weak_ptr<ParticleEmitter>();
 
 	const auto& cfg = configLibrary[configName];
 
-	emitters.push_back(std::make_shared<ParticleEmitter>(cfg, x, y));
+	std::shared_ptr<ParticleEmitter> newEmitter = std::make_shared<ParticleEmitter>(cfg, x, y);
+	emitters.push_back(newEmitter);
+	return newEmitter;
 }
 
-void ParticleManager::PlayParticle(const ParticleConfig& customConfig, float x, float y)
+std::weak_ptr<ParticleEmitter> ParticleManager::PlayParticle(const ParticleConfig& customConfig, float x, float y)
 {
-	emitters.push_back(std::make_shared<ParticleEmitter>(customConfig, x, y));
+	std::shared_ptr<ParticleEmitter> newEmitter = std::make_shared<ParticleEmitter>(customConfig, x, y);
+	emitters.push_back(newEmitter);
+	return newEmitter;
 }
 
 const ParticleConfig* ParticleManager::GetConfig(const std::string& configName)
