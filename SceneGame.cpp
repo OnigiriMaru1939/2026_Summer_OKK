@@ -19,8 +19,9 @@ SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
 	//敵の生成
 	enemyList_.push_back(std::make_shared<Enemy1>(
 			fileMng,
-			0,
-			0
+		    stage_.get(),
+			100.0f,
+			100.0f
 		)
 	);
 

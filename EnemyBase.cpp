@@ -3,12 +3,15 @@
 #include "ImageFile.h"
 #include <DxLib.h>
 
-EnemyBase::EnemyBase(FileManager& fileMng, float x, float y)
+
+EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, float x, float y)
 	: fileManager_(fileMng)
+	, stage_(stage)
 	, x_(x)
 	, y_(y)
 	, vx_(0.0f)
 	, vy_(0.0f)
+	, gravity(0.5f)
 	, width_(0)
 	, height_(0)
 	, hp_(1)
@@ -49,10 +52,39 @@ void EnemyBase::SetVelocity(float vx, float vy)
 	vy_ = vy; // y方向の速度を設定
 }
 
-void EnemyBase::Move(float dx, float dy)
+void EnemyBase::Move()
 {
-	x_ += dx; // x座標を移動
-	y_ += dy; // y座標を移動
+	int signX = (vx_ > 0) ? 1 : ((vx_ < 0) ? -1 : 0);
+	int loopX = (int)std::abs(vx_);
+	while (loopX > 0)
+	{
+		if (WillCollide(x_ + signX, y_))
+		{
+			//壁に当たると反転
+			vx_ = -vx_;
+			break;
+		}
+		x_ += signX;
+		loopX--;
+	}
+
+	int signY = (vy_ > 0) ? 1 : ((vy_ < 0) ? -1 : 0);
+	int loopY = (int)std::abs(vy_);
+	while (loopY > 0)
+	{
+		if (WillCollide(x_, signY + y_))
+		{
+			vy_ = 0;
+			break;
+		}
+		y_ += signY;
+		loopY--;
+	}
+}
+
+void EnemyBase::AddGravity()
+{
+	vy_ += gravity; //y方向の速度に重力を加算
 }
 
 void EnemyBase::ApplyDamage(int dmg)
@@ -71,6 +103,27 @@ bool EnemyBase::IsAlive() const
 	return isAlive_; // 生存フラグを返す
 }
 
+//衝突判定
+bool EnemyBase::WillCollide(int newX, int newY)
+{
+	int left = newX - width_ / 2;
+	int top = newY - height_ / 2;
+	int right = newX + width_ / 2;
+	int bottom = newY + height_ / 2;
+
+	// 八か所の座標で壁をチェック（マップチップの壁 + LightWallGimmickの壁チップ）
+	if (stage_->CheckWall(left, top)) return true;
+	if (stage_->CheckWall((left + right) / 2 - 1, top)) return true;
+	if (stage_->CheckWall(right - 1, top)) return true;
+	if (stage_->CheckWall(left, (top + bottom) / 2 - 1)) return true;
+	if (stage_->CheckWall(left, bottom - 1)) return true;
+	if (stage_->CheckWall((left + right) / 2 - 1, bottom - 1)) return true;
+	if (stage_->CheckWall(right - 1, bottom - 1)) return true;
+	if (stage_->CheckWall(right - 1, (top + bottom) / 2 - 1)) return true;
+
+	return false;
+}
+
 float EnemyBase::GetX() const { return x_; } 
 float EnemyBase::GetY() const { return y_; }
 int EnemyBase::GetWidth() const { return width_; }
@@ -83,6 +136,5 @@ void EnemyBase::Draw() const
 
 	int handle = 0;
 	handle = image_->GetHandle(); // 画像のハンドルを取得
-	DrawGraph(static_cast<int>(x_), static_cast<int>(y_), handle, TRUE); // 画像を描画
-
+	DrawGraph(static_cast<int>(x_ - width_ / 2 - stage_->GetScrollX()), static_cast<int>(y_ - height_ / 2 - stage_->GetScrollY()), handle, TRUE); // 画像を描画
 }
