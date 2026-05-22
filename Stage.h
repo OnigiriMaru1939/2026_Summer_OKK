@@ -77,6 +77,9 @@ private:
 	int scrollX;
 	int scrollY;
 
+	int bgScrollX;
+	int bgScrollY;
+
 	int mapWidth;
 	int mapHeight;
 

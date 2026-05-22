@@ -110,7 +110,6 @@ InputManager::~InputManager()
 
 void InputManager::Update()
 {
-	printfDx("Updating InputManager...\n");
 	// キー入力
 	for (int i = 0; i < KEY_COUNT; i++)
 	{
@@ -156,7 +155,6 @@ void InputManager::Update()
 		if (dResult == -1 && xResult == -1)
 		{
 			// パッドが接続されていないか、両方の入力取得に失敗した場合はスキップ
-			printfDx("Pad %d: No input detected.\n", no);
 			continue;
 		}
 		// 正常に取得できた場合は、規格に応じてスティック値を更新する
@@ -478,7 +476,6 @@ void InputManager::DispatchCallbacks()
 
 bool InputManager::GetRawState(int padNo, PadButton btn, const DINPUT_JOYSTATE& dState, const XINPUT_STATE& xState)
 {
-	printfDx("GetRawState called for Pad %d, Button %d\n", padNo, (int)btn);
 	int dxNo = padNo + 1;
 	int type = GetJoypadType(dxNo);
 

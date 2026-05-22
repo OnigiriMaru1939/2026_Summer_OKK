@@ -10,17 +10,10 @@
 
 Stage::Stage(FileManager& fileMng):fileMng_(fileMng)
 {
-	scrollX = 0;
-	scrollY = 0;
-
-	mapWidth = 0;
-	mapHeight = 0;
-
 	// マップチップ画像の読み込み
 	bgImg_ = fileMng_.LoadImageFM("Resource/Image/Stage1_bg.png"); 
 	// マップチップ画像の読み込み
 	chipImg_ = fileMng_.LoadImageFM("Resource/MapChip/Mapchip_def.png"); 
-	
 
 	chipInfo_.resize(CHIP_HEIGHT * CHIP_WIDTH + 1);
 
@@ -40,6 +33,14 @@ Stage::Stage(FileManager& fileMng):fileMng_(fileMng)
 	chipInfo_[13] = { true };
 	chipInfo_[14] = { true };
 	chipInfo_[15] = { true };
+
+	scrollX = 0;
+	scrollY = 0;
+	bgScrollX = 0;
+	bgScrollY = 0;
+
+	mapWidth = 0;
+	mapHeight = 0;
 }
 
 Stage::~Stage()
@@ -123,6 +124,9 @@ bool Stage::Load(const std::string& path)
 
 void Stage::Update()
 {
+	// GetMaxScrollX/Yでスクロールの最大値を取得して、現在のスクロール位置から背景のスクロール位置を計算
+	bgScrollX = static_cast<int>((static_cast<float>(scrollX) / GetMaxScrollX()) * (Application::SCREEN_WID - bgImg_->GetWidth()));
+	bgScrollY = static_cast<int>((static_cast<float>(scrollY) / GetMaxScrollY()) * (Application::SCREEN_HIG - bgImg_->GetHeight()));
 }
 
 
@@ -130,7 +134,8 @@ void Stage::Draw()
 {
 	int x, y;
 
-	DrawExtendGraph(0,0, Application::SCREEN_WID, Application::SCREEN_HIG, bgImg_->GetHandle(), true);
+	// 背景の描画
+	DrawExtendGraph(bgScrollX, bgScrollY, bgScrollX + bgImg_->GetWidth(), bgScrollY + bgImg_->GetHeight(), bgImg_->GetHandle(), true);
 
 	// マップデータの参照位置
 	int startX = static_cast<int>(scrollX / CHIP_SIZE);
