@@ -3,6 +3,8 @@
 
 SceneResult::SceneResult(FileManager& fileMng) : SceneSuper(fileMng)
 {
+	_bgImg = fileMng.LoadImageFM("Resource/Image/Title_bg_NoLogo.png");
+	_resultLogoImg = fileMng.LoadImageFM("Resource/Image/Result/Result_Clear_Logo.png");
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Decide,
 												   [this]()
 												   {
@@ -23,6 +25,6 @@ void SceneResult::Update()
 
 void SceneResult::Draw()
 {
-	DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0xaa0000, true);
-	DrawString(0, 20, "RESULT SCENE", 0xffffff);
+	DrawRotaGraph(Application::SCREEN_WID / 2, Application::SCREEN_HIG / 2, 1.0f, 0.0f, _bgImg->GetHandle(), true);
+	DrawRotaGraph(LOGO_X, LOGO_Y, 1.0f, -5.0f * (DX_PI_F / 180.0f), _resultLogoImg->GetHandle(), true);
 }
