@@ -292,7 +292,6 @@ void Player::Rotate()
 {
 	//回転速度
 	angle += rotateSpeed * (InputManager::GetInstance().GetActionValue(ActionID::Rotate) + InputManager::GetInstance().GetActionAxis(ActionID::Rotate));
-	printfDx("angle: %f\n", angle);
 }
 
 bool Player::WillCollide(int newX, int newY)
