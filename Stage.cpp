@@ -12,6 +12,10 @@ Stage::Stage(FileManager& fileMng):fileMng_(fileMng)
 {
 	// マップチップ画像の読み込み
 	bgImg_ = fileMng_.LoadImageFM("Resource/Image/Stage1_bg.png"); 
+	if (!bgImg_)
+	{
+		printfDx("背景画像の読み込みに失敗しました\n");
+	}
 	// マップチップ画像の読み込み
 	chipImg_ = fileMng_.LoadImageFM("Resource/MapChip/Mapchip_def.png"); 
 
@@ -125,8 +129,22 @@ bool Stage::Load(const std::string& path)
 void Stage::Update()
 {
 	// GetMaxScrollX/Yでスクロールの最大値を取得して、現在のスクロール位置から背景のスクロール位置を計算
-	bgScrollX = static_cast<int>((static_cast<float>(scrollX) / GetMaxScrollX()) * (Application::SCREEN_WID - bgImg_->GetWidth()));
-	bgScrollY = static_cast<int>((static_cast<float>(scrollY) / GetMaxScrollY()) * (Application::SCREEN_HIG - bgImg_->GetHeight()));
+	if (GetMaxScrollX() > 0)
+	{
+		bgScrollX = static_cast<int>((static_cast<float>(scrollX) / GetMaxScrollX()) * (Application::SCREEN_WID - bgImg_->GetWidth()));
+	}
+	else
+	{
+		bgScrollX = 0;
+	}
+	if (GetMaxScrollY() > 0)
+	{
+		 bgScrollY = static_cast<int>((static_cast<float>(scrollY) / GetMaxScrollY()) * (Application::SCREEN_HIG - bgImg_->GetHeight()));
+	}
+	else
+	{
+		bgScrollY = 0;
+	}
 }
 
 
@@ -162,49 +180,8 @@ void Stage::Draw()
 
 			DrawRectGraph(x * CHIP_SIZE - offsetX, y * CHIP_SIZE - scrollY % CHIP_SIZE,
 						  (chipId % CHIP_WIDTH) * CHIP_SIZE, (chipId / CHIP_WIDTH) * CHIP_SIZE, CHIP_SIZE, CHIP_SIZE, chipImg_->GetHandle(), true);
-
-
 		}
 	}
-
-	//if (!tileset_) return;
-	//int handle = tileset_->GetHandle();
-	//int tilesetW = tileset_->GetWidth();
-	//if (tileW_ <= 0 || tileH_ <= 0) return;
-	//int tilesPerRow = std::max(1, tilesetW / tileW_);
-
-	//// ステージ全体のサイズ
-	//int stageWidth = cols_ * tileW_;
-	//int stageHeight = rows_ * tileH_;
-
-	//int offsetX = (Application::SCREEN_WID - stageWidth) / 2;
-	//int offsetY = (Application::SCREEN_HIG - stageHeight) / 2;
-
-	//// ステージが画面より大きい場合は 0 に固定（左上合わせ）
-	//if (offsetX < 0) offsetX = 0;
-	//if (offsetY < 0) offsetY = 0;
-
-	//for (int r = 0; r < rows_; ++r)
-	//{
-	//	for (int c = 0; c < cols_; ++c)
-	//	{
-	//		int t = tiles_[r * cols_ + c];
-	//		if (t <= 0) continue; // 0 を空タイル扱い 
-	//		int ti = t; // タイルインデックス
-	//		// タイルインデックスが 1 始まりなら -1 する 
-	//	
-
-	//		int sx = (ti % tilesPerRow) * tileW_;
-	//		int sy = (ti / tilesPerRow) * tileH_;
-	//		int dx = offsetX + (c * tileW_);
-	//		int dy = offsetY + (r * tileH_);
-	//		// 描画
-	//		DrawRectGraph(dx, dy,
-	//					  sx, sy, tileW_, tileH_,
-	//					  handle,
-	//					  TRUE, FALSE);
-	//	}
-	//}
 }
 
 //bool Stage::IsSolidAt(int col, int row) const
