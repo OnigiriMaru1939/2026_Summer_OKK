@@ -2,6 +2,7 @@
 #include "SceneSuper.h"
 #include "Application.h"
 #include "ImageFile.h"
+#include "SoundFile.h"
 #include <memory>
 
 class SceneTitle :
@@ -21,5 +22,7 @@ private:
 	std::shared_ptr<ImageFile> _bgImg;
 	std::shared_ptr<ImageFile> _TitleLogoImg;
 	std::shared_ptr<ImageFile> _TitleStartImg;
+
+	std::shared_ptr<SoundFile> _mainBgm;
 };
 

@@ -28,9 +28,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="EnemyBase.cpp">
-      <Filter>Enemy</Filter>
-    </ClCompile>
     <ClCompile Include="Stage.cpp">
       <Filter>Scene\Game\Stage</Filter>
     </ClCompile>
@@ -49,7 +46,12 @@
     <ClCompile Include="Player.cpp">
       <Filter>Player</Filter>
     </ClCompile>
-    <ClCompile Include="Enemy1.cpp" />
+    <ClCompile Include="EnemyBase.cpp">
+      <Filter>Enemy\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy1.cpp">
+      <Filter>Enemy\One%28仮名称%29</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Application">
@@ -112,6 +114,18 @@
     <Filter Include="Player">
       <UniqueIdentifier>{e72ad11d-221b-422c-8cf8-2f56871e9acf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Manager\BGM">
+      <UniqueIdentifier>{63473213-247f-4591-8501-987dc578d61e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Enemy\Base">
+      <UniqueIdentifier>{60a20722-207c-4cef-a2fe-55f78200170d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Enemy\One%28仮名称%29">
+      <UniqueIdentifier>{837c6821-a963-4225-96d0-57155655ac89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Super">
+      <UniqueIdentifier>{87902af4-a1c4-45e4-8b3a-c0d02c7602c6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -141,9 +155,6 @@
     <ClInclude Include="SceneManager.h">
       <Filter>Manager\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="SceneSuper.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
     <ClInclude Include="SceneTitle.h">
       <Filter>Scene\Title</Filter>
     </ClInclude>
@@ -155,9 +166,6 @@
     </ClInclude>
     <ClInclude Include="SceneResult.h">
       <Filter>Scene\Result</Filter>
-    </ClInclude>
-    <ClInclude Include="EnemyBase.h">
-      <Filter>Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Stage.h">
       <Filter>Scene\Game\Stage</Filter>
@@ -183,6 +191,17 @@
     <ClInclude Include="Player.h">
       <Filter>Player</Filter>
     </ClInclude>
-    <ClInclude Include="Enemy1.h" />
+    <ClInclude Include="BGMManager.h">
+      <Filter>Manager\BGM</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyBase.h">
+      <Filter>Enemy\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy1.h">
+      <Filter>Enemy\One%28仮名称%29</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneSuper.h">
+      <Filter>Scene\Super</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
