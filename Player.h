@@ -10,6 +10,7 @@
 class FileManager;
 class ImageFile;
 class ParticleManager;
+class ParticleEmitter;
 
 class Player
 {
@@ -69,6 +70,7 @@ private:
 	FileManager& fileManager;					//ファイルマネージャー
 	std::shared_ptr<ImageFile> image_;			//プレイヤーの画像
 	Stage* stage_;								//ステージへのポインタ
+	std::weak_ptr<ParticleEmitter> sodaParticle;		//炭酸攻撃のパーティクルエミッター
 
 	int width_;					//プレイヤーの画像の幅
 	int height_;				//プレイヤーの画像の高さ

@@ -5,6 +5,7 @@
 #include "FileManager.h"
 #include "ImageFile.h"
 #include "ParticleManager.h"
+#include "ParticleEmitter.h"
 #include <DxLib.h>
 #include <memory>
 #include <algorithm>
@@ -105,10 +106,19 @@ void Player::Update()
 		{
 			float shakeRatio = sodaShakeGauge / SODA_SHAKE_GAUGE_MAX;
 			int power = (int)(shakeRatio * 1000);
-			InputManager::GetInstance().StartVibration(power, 100);
+			InputManager::GetInstance().StartVibration(power, 100, 0);
 		}
 	}
+	if (auto emitter = sodaParticle.lock())
+	{
+		emitter->SetPosition(posX - sinf(angle) * width_, posY + cosf(angle) * height_);
+	}
+	else
+	{
+		//sodaParticle.reset();
+	}
 	pMng->UpdateAll();
+
 
 	//プレイヤー画面スクロール処理
 	canvasX = posX - stage_->GetScrollX();
@@ -353,7 +363,7 @@ void Player::ClickSodaJump()
 		customCfg.initDir += plusAngle;
 		customCfg.startScale *= sodaRatio;
 		customCfg.initSpeed *= sodaRatio;
-		pMng->PlayParticle(customCfg, posX, posY);
+		sodaParticle = pMng->PlayParticle(customCfg, posX - sinf(angle) * width_, posY + cosf(angle) * height_);
 	}
 }
 

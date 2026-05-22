@@ -15,6 +15,8 @@ public:
 
 	bool IsDead() const { return isDead; }
 
+	void SetPosition(float x, float y) { base_x = x; base_y = y; }
+
 private:
 	void ActivateParticle(); // 粒子を一つ生成
 
