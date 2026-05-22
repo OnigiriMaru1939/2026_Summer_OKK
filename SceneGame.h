@@ -16,7 +16,7 @@ public:
 
 	void Update() override;
 	void Draw() override;
-
+	auto GetStage() { return stage_.get(); }
 private:
 	static int selectedStageIndex_;
 

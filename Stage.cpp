@@ -11,11 +11,15 @@
 Stage::Stage(FileManager& fileMng):fileMng_(fileMng)
 {
 	// マップチップ画像の読み込み
+<<<<<<< Updated upstream
 	bgImg_ = fileMng_.LoadImageFM("Resource/Image/Stage1_bg.png"); 
 	if (!bgImg_)
 	{
 		printfDx("背景画像の読み込みに失敗しました\n");
 	}
+=======
+	//bgImg_ = fileMng_.LoadImageFM("Resource/Image/Stage1_bg.png"); 
+>>>>>>> Stashed changes
 	// マップチップ画像の読み込み
 	chipImg_ = fileMng_.LoadImageFM("Resource/MapChip/Mapchip_def.png"); 
 
@@ -217,6 +221,12 @@ void Stage::SetScrollY(int s)
 {
 	scrollY = s;
 }
+
+void Stage::SetBgImage(const std::string& path)
+{
+	bgImg_ = fileMng_.LoadImageFM(path);
+}
+
 
 int Stage::GetScrollX()
 {
