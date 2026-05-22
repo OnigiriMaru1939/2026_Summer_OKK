@@ -9,7 +9,7 @@
 #include "StageConfigTablle.h"
 
 // 静的変数の定義
-int SceneGame::selectedStageIndex_ = 2;
+int SceneGame::selectedStageIndex_ = 1;
 
 SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
 {
