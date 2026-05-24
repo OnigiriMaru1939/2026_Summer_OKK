@@ -6,9 +6,9 @@
 #include "Stage.h"
 
 
-
 class FileManager;
 class ImageFile;
+class SoundFile;
 class ParticleManager;
 class ParticleEmitter;
 
@@ -68,9 +68,13 @@ private:
 
 	std::unique_ptr<ParticleManager> pMng;
 	FileManager& fileManager;					//ファイルマネージャー
+
 	std::shared_ptr<ImageFile> image_;			//プレイヤーの画像
+
+	std::shared_ptr<SoundFile> sodaAttackSE;		//炭酸攻撃のサウンド
+
 	Stage* stage_;								//ステージへのポインタ
-	std::weak_ptr<ParticleEmitter> sodaParticle;		//炭酸攻撃のパーティクルエミッター
+	std::weak_ptr<ParticleEmitter> sodaParticle;		// 炭酸攻撃のパーティクルエミッター weak_ptrにすることで、エミッターが削除された後も安全にアクセスできるようにする
 
 	int width_;					//プレイヤーの画像の幅
 	int height_;				//プレイヤーの画像の高さ
