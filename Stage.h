@@ -39,35 +39,6 @@ public:
 	// ワールド座標をチップ座標に変換
 	int WorldToChipX(int worldX) const { return worldX / CHIP_SIZE; }
 	int WorldToChipY(int worldY) const { return worldY / CHIP_SIZE; }
-
-
-/*
-	// タイルセット画像を読み込む
-	bool LoadTileSet(const std::string& path);
-
-	// CSVでマップを読み込む
-	bool LoadMapFromCSV(const std::string& path);
-
-	// 外部から直接マップデータを設定する場合
-	void SetMap(const std::vector<int>& tiles, int cols, int rows);
-
-
-	void Update();
-	void Draw() const;
-
-	// あたり判定
-	bool IsSolidAt(int col, int row) const; 
-
-	bool CheckCollision(float x, float y, float width, float height) const;
-
-	// ワールド座標（ピクセル）
-	bool IsSolidWorld(float x, float y) const;
-
-	int GetCols() const { return cols_; }
-	int GetRows() const { return rows_; }
-	int GetTileWidth() const { return tileW_; }
-	int GetTileHeight() const { return tileH_; }
-	*/
 private:
 	struct ChipInfo
 	{
@@ -89,15 +60,5 @@ private:
 	std::vector<std::vector<int>>tileMap;
 
 	FileManager& fileMng_;
-
-	/*
-	int tileW_;
-	int tileH_;
-
-	int cols_ = 0;
-	int rows_ = 0;
-	// tiles_[row * cols_ + col] = タイルインデックス（0 を空に使う）
-	std::vector<int> tiles_;
-	*/
 };
 

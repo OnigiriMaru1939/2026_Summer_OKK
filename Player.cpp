@@ -4,6 +4,7 @@
 #include "InputManager.h"
 #include "FileManager.h"
 #include "ImageFile.h"
+#include "SoundFile.h"
 #include "ParticleManager.h"
 #include "ParticleEmitter.h"
 #include <DxLib.h>
@@ -17,13 +18,16 @@ Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage
 	pMng = std::make_unique<ParticleManager>(fileMng);
 	pMng->RegisterConfig(WATER_PARTICLE_PATH);
 
+	sodaAttackSE = fileMng.LoadSoundFM("Resource/Sound/SE/Gun_SE.wav");
+
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Jump, [this]() { SpaceJump(); });
 	InputManager::GetInstance().SetTriggerCallback(ActionID::SJump, [this]() { ClickSodaJump(); });
-	InputManager::GetInstance().SetTriggerCallback(ActionID::Shake, [this]() { SodaShake(); });
+	 //マウス・スティック振り
 	InputManager::GetInstance().SetAxisCallback(ActionID::Shake, [this]() { SodaShake(); });
+	// キーボード回転
 	InputManager::GetInstance().SetPressCallback(ActionID::Rotate, [this]() { Rotate(); });
+	// コントローラー回転
 	InputManager::GetInstance().SetAxisCallback(ActionID::Rotate, [this]() { Rotate(); });
-	InputManager::GetInstance().SetAxisCallback(ActionID::Shake, [this]() { SodaShake(); });
 }
 
 Player::~Player()
@@ -363,6 +367,9 @@ void Player::ClickSodaJump()
 		customCfg.startScale *= sodaRatio;
 		customCfg.initSpeed *= sodaRatio;
 		sodaParticle = pMng->PlayParticle(customCfg, posX - sinf(angle) * width_, posY + cosf(angle) * height_);
+
+		sodaAttackSE->SetVolume((int)(sodaRatio * 255)); // 音量を炭酸ゲージの割合に応じて変化させる
+		sodaAttackSE->PlayOneShot();
 	}
 }
 

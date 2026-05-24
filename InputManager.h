@@ -86,6 +86,9 @@ public:
 	void Update();
 	void DrawDebug(int x, int y) const;
 
+	// キー入力フレーム数取得
+	int GetKeyFrameCount(int keyCode) const { return key[keyCode]; }
+
 	// マウス現在座標取得
 	int GetMouseX() const { return mouseX; }
 	int GetMouseY() const { return mouseY; }
@@ -108,8 +111,8 @@ public:
 	void ClearPressCallbacks();
 	void ClearReleaseCallbacks();
 	void ClearAllCallbacks();
-	// コントローラーごとのボタンマッピングを解決するための関数
-	// std::wstring GetActionName(ActionID action) const;
+
+	// 振動機能
 	void StartVibration(int Power, int Time = -1, int EffectIndex = -1, int padNo = 0);
 	void StopVibration(int padNo = 0);
 private:
