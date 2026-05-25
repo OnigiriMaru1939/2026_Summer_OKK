@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include "Stage.h"
+#include "EnemyBase.h"
 
 
 class FileManager;
@@ -21,7 +22,6 @@ public:
 
 	Player(FileManager& fileMng, Stage* stage);
 	~Player();
-	bool SystemInit();								//初期化
 	bool SetImage(const std::string& path);			//画像のセット
 	bool WillCollide(int newX, int newY);			//プレイヤーのステージとの衝突判定
 	void Update();
@@ -33,9 +33,10 @@ public:
 	void SpaceJump();				//スペースジャンプ処理
 	void ClickSodaJump();           //クリックジャンプ処理
 	void Rotate();					//回転処理
-	void SodaAttack(int power);		//炭酸攻撃処理
+	void SodaAttack(float power);	//炭酸攻撃処理
 	void Damage(float damage);		//ダメージ処理
 	void PlayerShake();				//プレイヤーの振動処理
+	RECT GetRect() const;			//プレイヤーの当たり判定の矩形を取得
   
 	float posX;					//プレイヤーのX座標
 	float posY;					//プレイヤーのY座標
@@ -48,12 +49,27 @@ public:
 	float sodaGaugeMax;			//炭酸残量ゲージの最大値
 	float sodaRatio;            //炭酸残量ゲージ
 	float sodaShakeGauge;		//炭酸蓄積ゲージ
+	int noDamageTime;			//無敵時間
+	int noDamageMaxTime;		//無敵時間の最大値
+	int attackTimer;			//攻撃時間
+
 	static constexpr float SODA_SHAKE_GAUGE_MAX = 1000.0f;	//炭酸蓄積ゲージの最大値
 
-private:
-	int GetWidth() const;											//プレイヤーの画像の幅を取得
-	int GetHeight() const;											//プレイヤーの画像の高さを取得
+	float GetX() const { return canvasX; }
+	float GetY() const { return canvasY; }
+	int GetWidth() const { return width_; }			//プレイヤーの画像の幅を取得
+	int GetHeight() const { return height_; }		//プレイヤーの画像の高さを取得
+	void SetVelocity(float vx, float vy);							//プレイヤーのX軸の速度を設定
+	//プレイヤーの当たり判定の座標を取得
+	int GetLeft() const { return static_cast<int>(canvasX - width_ / 2); }
+	int GetRight() const { return static_cast<int>(canvasX + width_ / 2); }
+	int GetTop() const { return static_cast<int>(canvasY - height_ / 2); }
+	int GetBottom() const { return static_cast<int>(canvasY + height_ / 2); }
+	//攻撃力を取得
 	bool GetAttakFlag() const { return sodaAttackFlag; }			//炭酸攻撃フラグを取得
+	float GetAttackDamage() const { return attackDamage; }			//攻撃のダメージを取得
+
+private:
 	bool GetAliveFlag() const { return aliveFlag; }					//生存フラグを取得
 	bool GetJumpFlag() const { return jumpFlag; }					//ジャンプフラグを取得
 	//ゲージの描画
@@ -79,8 +95,8 @@ private:
 
 	int width_;					//プレイヤーの画像の幅
 	int height_;				//プレイヤーの画像の高さ
-	int canvasX;				//プレイヤーの描画位置X
-	int canvasY;				//プレイヤーの描画位置Y
+	float canvasX;				//プレイヤーの描画位置X
+	float canvasY;				//プレイヤーの描画位置Y
 	
 	float sodaPower;			//炭酸攻撃の威力
 	bool aliveFlag;				//生存フラグ
@@ -92,7 +108,7 @@ private:
 	float angle;				//回転角度
 	float rotateSpeed;			//回転速度
 	float jumpPower;			//ジャンプ力
-	float AttckDamage;			//攻撃のダメージ
+	float attackDamage;			//攻撃のダメージ
 	float shakeMove;			//振動の移動量
 	float playerShakePower;		//プレイヤーの振動量
 };
