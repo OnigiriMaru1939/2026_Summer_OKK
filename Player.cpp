@@ -99,17 +99,13 @@ void Player::SetVelocity(float vx, float vy)
 
 void Player::Update()
 {
-	if (CheckHitKey(KEY_INPUT_K))
-	{
-		Damage(10);
-	}
-
 	//無敵時間のカウントダウン
 	if (noDamageTime > 0)
 	{
 		noDamageTime--;
 	}
 
+	//攻撃時間のカウントダウン
 	if (attackTimer > 0)
 	{
 		attackTimer--;
@@ -208,6 +204,18 @@ void Player::Draw()
 		TRUE
 	);
 
+	//当たり判定の矩形を描画
+	RECT rc = GetRect();
+
+	DrawBox(
+		rc.left - stage_->GetScrollX(),
+		rc.top - stage_->GetScrollY(),
+		rc.right - stage_->GetScrollX(),
+		rc.bottom - stage_->GetScrollY(),
+		GetColor(0, 255, 0),
+		FALSE
+	);
+
 	//ゲージの描画
 	DrawGauge(20, 50, 500, 40, playerHp, playerHpMax, GetColor(0, 255, 0), 0);		//プレイヤーのHPゲージ
 	//炭酸蓄積ゲージが0以上の場合のみ描画
@@ -220,7 +228,6 @@ void Player::Draw()
 	DrawFormatString(1000, 1000, GetColor(255, 0, 0), "SodaGauge: %d", static_cast<int>(sodaShakeGauge));
 	DrawFormatString(1000, 1020, GetColor(255, 0, 0), "noDamageTime: %d", static_cast<int>(noDamageTime));
 	DrawFormatString(1000, 1040, GetColor(255, 0, 0), "sodaAttackFlag: %d", sodaAttackFlag);
-
 }
 
 //マウスを振ったり、スティックを動かすと炭酸ゲージが溜まる
@@ -359,15 +366,16 @@ void Player::ClickSodaJump()
 {
 	sodaRatio = sodaShakeGauge / sodaGaugeMax;
 
-	//プレイヤーが向いている方向とは逆に移動する
-	velocityX += cos(angle - DX_PI_F / 2) * sodaPower;
-	velocityY += sin(angle - DX_PI_F / 2) * sodaPower;
-
 	//炭酸蓄積ゲージが0より大きい場合、炭酸蓄積ゲージを減らす
 	if (sodaShakeGauge > 0)
 	{
 		//炭酸蓄積ゲージの割合を炭酸攻撃の威力に変換
 		sodaPower = sodaRatio * 20.0f;
+
+		//プレイヤーが向いている方向とは逆に移動する
+		velocityX += cos(angle - DX_PI_F / 2) * sodaPower;
+		velocityY += sin(angle - DX_PI_F / 2) * sodaPower;
+
 		//炭酸攻撃処理
 		SodaAttack(sodaPower);
 		sodaGauge -= 20.0f;
@@ -403,6 +411,22 @@ void Player::PlayerShake()
 
 	shakeOffsetX = (GetRand(10) - 5) * playerShakePower;
 	shakeOffsetY = (GetRand(10) - 5) * playerShakePower;
+}
+
+//プレイヤーのノックバック処理
+void Player::PlayerKnockBack(float enemyX, float power)
+{
+	//敵より右にいる
+	if (posX > enemyX)
+	{
+		velocityX = power;
+	}
+	else
+	{
+		velocityX = -power;
+	}
+	//上方向へ吹っ飛ばす
+	velocityY = -power;
 }
 
 //プレイヤーの矩形衝突判定

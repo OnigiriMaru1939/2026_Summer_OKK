@@ -22,6 +22,7 @@ public:
 	virtual void Update() = 0; // 更新処理
 	virtual void Draw() const;   // 描画処理
 	bool SetImage(const std::string& path); // 画像読み込み
+	virtual const char* GetEnemyName() const = 0; // 敵の名前を取得
 
 	// 基本操作
 	void SetPosition(float x, float y);
@@ -50,6 +51,8 @@ public:
 	int GetBottom() const { return static_cast<int>(y_ + height_ / 2); }
 	//攻撃力を取得
 	int GetAttackDamage() const { return AttckDamage; }
+	//HPを取得
+	int GetHp() const { return hp_; }
 protected:
 	FileManager& fileManager_;
 	std::shared_ptr<ImageFile> image_;	//画像データ

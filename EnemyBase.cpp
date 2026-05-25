@@ -167,7 +167,15 @@ void EnemyBase::Draw() const
 	handle = image_->GetHandle(); // 画像のハンドルを取得
 	DrawGraph(static_cast<int>(x_ - width_ / 2 - stage_->GetScrollX()), static_cast<int>(y_ - height_ / 2 - stage_->GetScrollY()), handle, TRUE); // 画像を描画
 
-	//デバッグ
-	DrawFormatString(1200, 1000, GetColor(255, 0, 0), "Enemy1 HP: %d", static_cast<int>(hp_));
-	DrawFormatString(1200, 1020, GetColor(255, 0, 0), "Boss1 HP: %d", static_cast<int>(hp_));
+	//当たり判定の矩形を描画
+	RECT rc = GetRect();
+
+	DrawBox(
+		rc.left - stage_->GetScrollX(),
+		rc.top - stage_->GetScrollY(),
+		rc.right - stage_->GetScrollX(),
+		rc.bottom - stage_->GetScrollY(),
+		GetColor(0, 255, 0),
+		FALSE
+	);
 }
