@@ -1,22 +1,23 @@
 ﻿# ActionIDを追加するときはStringToActionIDも追加すること。
-# アクション名(ActionIDに登録されているID), デバイス, キーコード
-#MoveH, Keyboard, KEY_INPUT_D, 1.0
-#MoveH, Keyboard, KEY_INPUT_A, -1.0
-#MoveHAxis, GamepadAxis, Pad_L_X, 1.0
-#MoveHAxis, MouseAxis, Mouse_X, 1.0
-#MoveV, Keyboard, KEY_INPUT_W, -1.0
-#MoveV, Keyboard, KEY_INPUT_S, 1.0
-#MoveV, GamepadAxis, Pad_L_Y, 1.0
+# アクション名(ActionIDに登録されているID), デバイス(InputType), キーコード
+# InputTypeはKeyConfig.hに記載
+# キーコードはInputManager.hに記載
 
 Jump, Keyboard, KEY_INPUT_SPACE, 1.0
 Jump, GamepadButton, Pad_Face_Down, 1.0
-Rotate, Keyboard, KEY_INPUT_D, 1.0
-Rotate, Keyboard, KEY_INPUT_A, -1.0
-Rotate, GamepadAxis, Pad_L_X, 1.0
-Rotate, GamepadAxis, Pad_L_Y, -1.0
+
 SJump, Mouse, Mouse_Left, 1.0
 SJump, GamepadButton, Pad_L_Trigger, 1.0
+SJump, GamepadButton, Pad_R_Trigger, 1.0
+
 Shake, MouseAxis, Mouse_Dist, 1.0
-Shake, GamepadAxis, Pad_R_Dist, 200.0
+Shake, GamepadAxis, Pad_L_Dist, 150.0
+Shake, GamepadAxis, Pad_R_Dist, 150.0
+
+Rotate, Keyboard, KEY_INPUT_D, 1.0
+Rotate, Keyboard, KEY_INPUT_A, -1.0
+Rotate, GamepadButton, Pad_L_Shoulder, -1.0
+Rotate, GamepadButton, Pad_R_Shoulder, 1.0
+
 Decide, Keyboard, KEY_INPUT_RETURN, 1.0
-Decide, GamepadButton, Xbox_Back, 1.0
+Decide, GamepadButton, Xbox_Start, 1.0

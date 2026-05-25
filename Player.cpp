@@ -25,11 +25,8 @@ Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage
 	InputManager::GetInstance().SetTriggerCallback(ActionID::SJump, [this]() { ClickSodaJump(); });
 	 //マウス・スティック振り
 	InputManager::GetInstance().SetAxisCallback(ActionID::Shake, [this]() { SodaShake(); });
-	// キーボード回転
+	// 回転
 	InputManager::GetInstance().SetPressCallback(ActionID::Rotate, [this]() { Rotate(); });
-	// コントローラー回転
-	InputManager::GetInstance().SetAxisCallback(ActionID::Rotate, [this]() { Rotate(); });
-	InputManager::GetInstance().SetAxisCallback(ActionID::Shake, [this]() { SodaShake(); });
 
 	//位置と物理の初期化
 	posX = 200.0f;
