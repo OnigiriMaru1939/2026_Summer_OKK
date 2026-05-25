@@ -17,7 +17,11 @@ public:
 
 	void PlayLoop(int playType = DX_PLAYTYPE_LOOP) const
 	{
-		PlaySoundMem(handle_, playType);
+		// もし再生中でなければ再生する
+		if (!CheckSoundMem(handle_))
+		{
+			PlaySoundMem(handle_, playType);
+		}
 	}
 
 	void PlayOneShot(int playType = DX_PLAYTYPE_BACK) const

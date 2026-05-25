@@ -1,8 +1,10 @@
 ﻿#pragma once
 
-class FileManager;
-
+#include <memory>
+#include <list>
 #include "SceneSuper.h"
+
+class FileManager;
 
 class SceneManager
 {
@@ -24,15 +26,20 @@ public:
 	//};
 	SceneManager(FileManager& fileMng);
 	~SceneManager();
+
 	void Update();
 	void Draw();
 
 	bool GetExit() const;
 	//void SetClearResult(const ClearResult& result);
+
+	void PushScene(SceneSuper::SceneID sceneID);
+	void PopScene();
 private:
+	std::unique_ptr<SceneSuper> CreateScene(SceneSuper::SceneID sceneID);
 	void ChangeScene(SceneSuper::SceneID nextSceneID);
 	//void UpdateTransition();
-	std::unique_ptr<SceneSuper> currentScene; // 大元のSceneはかならず一つ
+	std::list<std::unique_ptr<SceneSuper>> scenes; // シーンリストをスタックで管理
 	FileManager& fileMng_;
 
 	bool isExit;

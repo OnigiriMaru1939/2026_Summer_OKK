@@ -18,7 +18,8 @@ Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage
 	pMng = std::make_unique<ParticleManager>(fileMng);
 	pMng->RegisterConfig(WATER_PARTICLE_PATH);
 
-	sodaAttackSE = fileMng.LoadSoundFM("Resource/Sound/SE/Gun_SE.wav");
+	sodaAttackSE = fileMng.LoadSoundFM("Resource/Sound/SE/Soda_SE.wav");
+	sodaChargeSE = fileMng.LoadSoundFM("Resource/Sound/SE/Soda_Charge_SE.wav");
 
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Jump, [this]() { SpaceJump(); });
 	InputManager::GetInstance().SetTriggerCallback(ActionID::SJump, [this]() { ClickSodaJump(); });
@@ -103,15 +104,15 @@ void Player::Update()
 	{
 		sodaShakeGauge = 0;
 		InputManager::GetInstance().StopVibration();
+		sodaChargeSE->Stop();
 	}
 	else
 	{
-		if (GetRand(4) == 0)
-		{
-			float shakeRatio = sodaShakeGauge / SODA_SHAKE_GAUGE_MAX;
-			int power = (int)(shakeRatio * 1000);
-			InputManager::GetInstance().StartVibration(power, 100, 0);
-		}
+		float shakeRatio = sodaShakeGauge / SODA_SHAKE_GAUGE_MAX;
+		int power = (int)(shakeRatio * 1000);
+		InputManager::GetInstance().StartVibration(power, 100, 0);
+		sodaChargeSE->SetVolume((int)(shakeRatio * 255));
+		sodaChargeSE->PlayLoop();
 	}
 	if (auto emitter = sodaParticle.lock())
 	{
