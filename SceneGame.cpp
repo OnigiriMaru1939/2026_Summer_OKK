@@ -58,42 +58,9 @@ void SceneGame::Update()
 	player_->Update();
 
 	//敵の更新
-	for (auto& enemy : enemyList_)
-	{
-		if (!enemy->IsAlive()) continue;
+	UpdateEnemy();
 
-		enemy->Update();
-
-		//プレイヤーと敵の衝突判定
-		RECT p = player_->GetRect();
-		RECT e = enemy->GetRect();
-
-		bool hit =
-			p.right > e.left &&
-			p.left < e.right &&
-			p.bottom > e.top &&
-			p.top < e.bottom;
-
-		//衝突時かつ攻撃フラグがtrueじゃないときはプレイヤーにダメージを与える
-		if (hit && !player_->GetAttakFlag())
-		{
-			player_->Damage(10.0f); // プレイヤーにダメージを与える
-		}
-
-		else if (hit && player_->GetAttakFlag())
-		{
-			enemy->ApplyDamage(
-				static_cast<int>(player_->GetAttackDamage())
-			);
-
-			//敵がまだ生きていたらプレイヤーと敵が衝突する
-			if (enemy->IsAlive())
-			{
-				//プレイヤーをノックバックさせる
-				player_->SetVelocity(-5.0f, -5.0f);
-			}
-		}
-	}
+	CheckPlayerEnemyCollision();
 
 	// Stageの更新
 	if (stage_) stage_->Update();
@@ -116,6 +83,68 @@ void SceneGame::Draw()
 		enemy->Draw();
 	}
 
+	//デバッグ用に敵のHPを表示
+	int y = 1000;
+
+	for (auto& enemy : enemyList_)
+	{
+		DrawFormatString(
+			1200,
+			y,
+			GetColor(255, 0, 0),
+			"%s HP: %d",
+			enemy->GetEnemyName(),
+			enemy->GetHp()
+		);
+
+		y += 20;
+	}
 
 }
 
+//敵の更新
+void SceneGame::UpdateEnemy()
+{
+	for (auto& enemy : enemyList_)
+	{
+		if (enemy->IsAlive())
+		{
+			enemy->Update();
+		}
+	}
+}
+
+//プレイヤーと敵の衝突判定
+void SceneGame::CheckPlayerEnemyCollision()
+{
+	for (auto& enemy : enemyList_)
+	{
+		if (!enemy->IsAlive()) continue;
+		RECT p = player_->GetRect();
+		RECT e = enemy->GetRect();
+
+		bool hit =
+			p.right > e.left &&
+			p.left < e.right &&
+			p.bottom > e.top &&
+			p.top < e.bottom;
+
+		if (hit && !player_->GetAttakFlag())
+		{
+			player_->Damage(10.0f); // プレイヤーにダメージを与える
+			//プレイヤーをノックバックさせる
+			player_->PlayerKnockBack(enemy->GetX(), 10.0f);
+		}
+		else if (hit && player_->GetAttakFlag())
+		{
+			enemy->ApplyDamage(
+				static_cast<int>(player_->GetAttackDamage())
+			);
+			if (enemy->IsAlive())
+			{
+				//プレイヤーをノックバックさせる
+				player_->PlayerKnockBack(enemy->GetX(), 10.0f);
+			}
+		}
+	}
+}

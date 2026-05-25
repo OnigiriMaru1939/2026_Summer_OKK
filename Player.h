@@ -36,6 +36,7 @@ public:
 	void SodaAttack(float power);	//炭酸攻撃処理
 	void Damage(float damage);		//ダメージ処理
 	void PlayerShake();				//プレイヤーの振動処理
+	void PlayerKnockBack(float enemyX, float power);			//プレイヤーのノックバック処理
 	RECT GetRect() const;			//プレイヤーの当たり判定の矩形を取得
   
 	float posX;					//プレイヤーのX座標
@@ -68,10 +69,9 @@ public:
 	//攻撃力を取得
 	bool GetAttakFlag() const { return sodaAttackFlag; }			//炭酸攻撃フラグを取得
 	float GetAttackDamage() const { return attackDamage; }			//攻撃のダメージを取得
-
-private:
 	bool GetAliveFlag() const { return aliveFlag; }					//生存フラグを取得
 	bool GetJumpFlag() const { return jumpFlag; }					//ジャンプフラグを取得
+private:
 	//ゲージの描画
 	void DrawGauge(int x,
 				   int y,

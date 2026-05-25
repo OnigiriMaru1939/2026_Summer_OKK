@@ -16,6 +16,8 @@ public:
 
 	void Update() override;
 	void Draw() override;
+	void UpdateEnemy();
+	void CheckPlayerEnemyCollision();
 	auto GetStage() { return stage_.get(); }
 private:
 	static int selectedStageIndex_;
