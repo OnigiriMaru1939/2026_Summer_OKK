@@ -31,6 +31,8 @@ public:
 	int GetScrollY();
 	int GetMaxScrollX();
 	int GetMaxScrollY();
+	// あたり判定
+	bool CheckHitWallRect(int x, int y, int width, int height);
 
 	// マップチップを設定・取得（LightWallGimmick用）
 	void SetChip(int chipX, int chipY, int chipId);
