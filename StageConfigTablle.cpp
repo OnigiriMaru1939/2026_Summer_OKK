@@ -1,5 +1,6 @@
 ﻿#include "StageConfigTablle.h"
 #include "Stage.h"
+#include "SceneGame.h"
 
 const std::vector<StageConfig>& GetStageConfigs()
 {
@@ -9,7 +10,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 			"Resource/MapJson/stage_01.json",
 			[](SceneGame& scene)
 			{
-
+				scene.GetStage()->SetBgImage("Resource/Image/Stage1_bg.png");
 			},
 			
 

@@ -52,6 +52,8 @@
     <ClCompile Include="Enemy1.cpp">
       <Filter>Enemy\One%28仮名称%29</Filter>
     </ClCompile>
+    <ClCompile Include="Enemy1.cpp" />
+    <ClCompile Include="Boss1.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Application">
@@ -203,5 +205,7 @@
     <ClInclude Include="SceneSuper.h">
       <Filter>Scene\Super</Filter>
     </ClInclude>
+    <ClInclude Include="Enemy1.h" />
+    <ClInclude Include="Boss1.h" />
   </ItemGroup>
 </Project>

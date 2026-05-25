@@ -1,6 +1,7 @@
 ﻿#include "EnemyBase.h"
 #include "FileManager.h"
 #include "ImageFile.h"
+#include "Player.h"
 #include <DxLib.h>
 
 
@@ -11,7 +12,12 @@ EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, float x, float y)
 	, y_(y)
 	, vx_(0.0f)
 	, vy_(0.0f)
+	, canvasX(0)
+	, canvasY(0)
 	, gravity(0.5f)
+	, AttckDamage(20)
+	, noDamageTime(0)
+	, noDamageMaxTime(60)
 	, width_(0)
 	, height_(0)
 	, hp_(1)
@@ -52,6 +58,12 @@ void EnemyBase::SetVelocity(float vx, float vy)
 	vy_ = vy; // y方向の速度を設定
 }
 
+void EnemyBase::Update()
+{
+	AddGravity();		//重力を加える
+	Move();				//移動
+}
+
 void EnemyBase::Move()
 {
 	int signX = (vx_ > 0) ? 1 : ((vx_ < 0) ? -1 : 0);
@@ -87,15 +99,28 @@ void EnemyBase::AddGravity()
 	vy_ += gravity; //y方向の速度に重力を加算
 }
 
+void EnemyBase::NoDamageCountDown()
+{
+	if (noDamageTime > 0)
+	{
+		noDamageTime--; //無敵時間のカウントダウン
+	}
+}
+
 void EnemyBase::ApplyDamage(int dmg)
 {
-	if (!isAlive_) 	return;
+	if (!isAlive_) 	return;				// 生存していない場合はダメージを受けない
+	if (noDamageTime > 0) return;		//無敵時間中はダメージを受けない
+
 	hp_ -= dmg; // ダメージを適用
 	if (hp_ <= 0)
 	{
 		isAlive_ = false;
 		hp_ = 0;
 	}
+
+	//無敵時間開始
+	noDamageTime = noDamageMaxTime;
 }
 
 bool EnemyBase::IsAlive() const
@@ -106,35 +131,43 @@ bool EnemyBase::IsAlive() const
 //衝突判定
 bool EnemyBase::WillCollide(int newX, int newY)
 {
-	int left = newX - width_ / 2;
-	int top = newY - height_ / 2;
-	int right = newX + width_ / 2;
-	int bottom = newY + height_ / 2;
-
-	// 八か所の座標で壁をチェック（マップチップの壁 + LightWallGimmickの壁チップ）
-	if (stage_->CheckWall(left, top)) return true;
-	if (stage_->CheckWall((left + right) / 2 - 1, top)) return true;
-	if (stage_->CheckWall(right - 1, top)) return true;
-	if (stage_->CheckWall(left, (top + bottom) / 2 - 1)) return true;
-	if (stage_->CheckWall(left, bottom - 1)) return true;
-	if (stage_->CheckWall((left + right) / 2 - 1, bottom - 1)) return true;
-	if (stage_->CheckWall(right - 1, bottom - 1)) return true;
-	if (stage_->CheckWall(right - 1, (top + bottom) / 2 - 1)) return true;
-
-	return false;
+	return stage_->CheckHitWallRect(
+		newX,
+		newY,
+		width_,
+		height_
+	);
 }
 
-float EnemyBase::GetX() const { return x_; } 
-float EnemyBase::GetY() const { return y_; }
-int EnemyBase::GetWidth() const { return width_; }
-int EnemyBase::GetHeight() const { return height_; }
+//敵の矩形衝突判定
+RECT EnemyBase::GetRect() const
+{
+	RECT rect;
+	rect.left = static_cast<LONG>(x_ - width_ / 2);
+	rect.top = static_cast<LONG>(y_ - height_ / 2);
+	rect.right = static_cast<LONG>(x_ + width_ / 2);
+	rect.bottom = static_cast<LONG>(y_ + height_ / 2);
+	return rect;
+}
 
 void EnemyBase::Draw() const
 {
 	if(!isAlive_ || !image_) return; // 生存していないか画像がない場合は描画しない
-	
+
+	//無敵時間中は点滅させる
+	if (noDamageTime > 0)
+	{
+		if ((noDamageTime / 4) % 2 == 0)
+		{
+			return;
+		}
+	}
 
 	int handle = 0;
 	handle = image_->GetHandle(); // 画像のハンドルを取得
 	DrawGraph(static_cast<int>(x_ - width_ / 2 - stage_->GetScrollX()), static_cast<int>(y_ - height_ / 2 - stage_->GetScrollY()), handle, TRUE); // 画像を描画
+
+	//デバッグ
+	DrawFormatString(1200, 1000, GetColor(255, 0, 0), "Enemy1 HP: %d", static_cast<int>(hp_));
+	DrawFormatString(1200, 1020, GetColor(255, 0, 0), "Boss1 HP: %d", static_cast<int>(hp_));
 }

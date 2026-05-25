@@ -26,10 +26,13 @@ public:
 
 	void SetScrollX(int s);
 	void SetScrollY(int s);
+	void SetBgImage(const std::string& path);
 	int GetScrollX();
 	int GetScrollY();
 	int GetMaxScrollX();
 	int GetMaxScrollY();
+	// あたり判定
+	bool CheckHitWallRect(int x, int y, int width, int height);
 
 	// マップチップを設定・取得（LightWallGimmick用）
 	void SetChip(int chipX, int chipY, int chipId);

@@ -16,6 +16,7 @@ Stage::Stage(FileManager& fileMng):fileMng_(fileMng)
 	{
 		printfDx("背景画像の読み込みに失敗しました\n");
 	}
+	//bgImg_ = fileMng_.LoadImageFM("Resource/Image/Stage1_bg.png"); 
 	// マップチップ画像の読み込み
 	chipImg_ = fileMng_.LoadImageFM("Resource/MapChip/Mapchip_def.png"); 
 
@@ -218,6 +219,12 @@ void Stage::SetScrollY(int s)
 	scrollY = s;
 }
 
+void Stage::SetBgImage(const std::string& path)
+{
+	bgImg_ = fileMng_.LoadImageFM(path);
+}
+
+
 int Stage::GetScrollX()
 {
 	return scrollX;
@@ -236,6 +243,27 @@ int Stage::GetMaxScrollX()
 int Stage::GetMaxScrollY()
 {
 	return mapHeight * CHIP_SIZE - Application::SCREEN_HIG;
+}
+
+//当たり判定
+bool Stage::CheckHitWallRect(int x, int y, int width, int height)
+{
+	// チップサイズを考慮して、矩形の四隅の座標を計算
+	int left = x;
+	int top = y;
+	int right = x + width - 1;
+	int bottom = y + height - 1;
+	// 四隅の座標で壁をチェック
+	if (CheckWall(left, top)) return true;
+	if (CheckWall((left + right) / 2 - 1, top)) return true;
+	if (CheckWall(right - 1, top)) return true;
+	if (CheckWall(left, (top + bottom) / 2 - 1)) return true;
+	if (CheckWall(left, bottom - 1)) return true;
+	if (CheckWall((left + right) / 2 - 1, bottom - 1)) return true;
+	if (CheckWall(right - 1, bottom - 1)) return true;
+	if (CheckWall(right - 1, (top + bottom) / 2 - 1)) return true;
+
+	return false;
 }
 
 // マップチップを設定

@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "EnemyBase.h"
 #include "Enemy1.h"
+#include "Boss1.h"
 #include "Stage.h"
 #include "FileManager.h"
 #include "StageConfig.h"
@@ -20,12 +21,18 @@ SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
 	enemyList_.push_back(std::make_shared<Enemy1>(
 			fileMng,
 		    stage_.get(),
-			100.0f,
-			100.0f
+			800.0f,
+			160.0f
+		)
+	);
+	enemyList_.push_back(std::make_shared<Boss1>(
+			fileMng,
+			stage_.get(),
+			1200.0f,
+			160.0f
 		)
 	);
 
-    player_->SystemInit();
 	player_->SetImage("Resource/Image/Monster.png");
 
   // ステージ固有のセットアップを実行
@@ -53,7 +60,39 @@ void SceneGame::Update()
 	//敵の更新
 	for (auto& enemy : enemyList_)
 	{
+		if (!enemy->IsAlive()) continue;
+
 		enemy->Update();
+
+		//プレイヤーと敵の衝突判定
+		RECT p = player_->GetRect();
+		RECT e = enemy->GetRect();
+
+		bool hit =
+			p.right > e.left &&
+			p.left < e.right &&
+			p.bottom > e.top &&
+			p.top < e.bottom;
+
+		//衝突時かつ攻撃フラグがtrueじゃないときはプレイヤーにダメージを与える
+		if (hit && !player_->GetAttakFlag())
+		{
+			player_->Damage(10.0f); // プレイヤーにダメージを与える
+		}
+
+		else if (hit && player_->GetAttakFlag())
+		{
+			enemy->ApplyDamage(
+				static_cast<int>(player_->GetAttackDamage())
+			);
+
+			//敵がまだ生きていたらプレイヤーと敵が衝突する
+			if (enemy->IsAlive())
+			{
+				//プレイヤーをノックバックさせる
+				player_->SetVelocity(-5.0f, -5.0f);
+			}
+		}
 	}
 
 	// Stageの更新
