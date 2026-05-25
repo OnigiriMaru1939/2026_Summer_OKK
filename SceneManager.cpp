@@ -2,7 +2,6 @@
 #include <algorithm>
 
 #include "Application.h"
-
 #include "SceneManager.h"
 #include "InputManager.h"
 #include "FileManager.h"
@@ -14,17 +13,25 @@
 
 SceneManager::SceneManager(FileManager& fileMng) : fileMng_(fileMng)
 {
-	currentScene = std::make_unique<SceneTitle>(fileMng_);
+	scenes.push_back(CreateScene(SceneSuper::SceneID::TITLE));
 	isExit = false;
 }
 
 SceneManager::~SceneManager()
 {
+	scenes.clear();
 }
 
 void SceneManager::Update()
 {
+	if (scenes.empty())
+	{
+		isExit = true;
+		return;
+	}
+	auto& currentScene = scenes.back();
 	currentScene->Update();
+
 	if (currentScene->IsEnd())
 	{
 		ChangeScene(currentScene->GetNextScene());
@@ -33,7 +40,29 @@ void SceneManager::Update()
 
 void SceneManager::Draw()
 {
-	currentScene->Draw();
+	if (scenes.empty()) return;
+
+	for (const auto& scene : scenes)
+	{
+		scene->Draw();
+	}
+}
+
+std::unique_ptr<SceneSuper> SceneManager::CreateScene(SceneSuper::SceneID sceneID)
+{
+	switch (sceneID)
+	{
+		case SceneSuper::SceneID::TITLE:
+			return std::make_unique<SceneTitle>(fileMng_);
+		case SceneSuper::SceneID::STAGE_SELECT:
+			return std::make_unique<SceneStageSelect>(fileMng_);
+		case SceneSuper::SceneID::GAME:
+			return std::make_unique<SceneGame>(fileMng_);
+		case SceneSuper::SceneID::RESULT:
+			return std::make_unique<SceneResult>(fileMng_);
+		default:
+			return nullptr;
+	}
 }
 
 void SceneManager::ChangeScene(SceneSuper::SceneID nextSceneID)
@@ -43,28 +72,41 @@ void SceneManager::ChangeScene(SceneSuper::SceneID nextSceneID)
 	InputManager::GetInstance().ClearTriggerCallbacks();
 	InputManager::GetInstance().ClearReleaseCallbacks();
 
-	switch (nextSceneID)
+	auto newScene = CreateScene(nextSceneID);
+
+	if (newScene != nullptr)
 	{
-		case SceneSuper::SceneID::TITLE:
-			currentScene = std::make_unique<SceneTitle>(fileMng_);
-			break;
-		case SceneSuper::SceneID::STAGE_SELECT:
-			currentScene = std::make_unique<SceneStageSelect>(fileMng_);
-			break;
-		case SceneSuper::SceneID::GAME:
-			currentScene = std::make_unique<SceneGame>(fileMng_);
-			break;
-		case SceneSuper::SceneID::RESULT:
-			currentScene = std::make_unique<SceneResult>(fileMng_);
-			break;
-		case SceneSuper::SceneID::EXIT:
-			isExit = true;
-			break;
-		default:
+		if (scenes.empty())
+		{
+			scenes.push_back(std::move(newScene));
+		}
+		else
+		{
+			scenes.back() = std::move(newScene);
+		}
+	}
+	else
+	{
 #ifdef _DEBUG
-			OutputDebugStringA("Unknown SceneID\n");
+		OutputDebugStringA("シーンの生成に失敗しました。\n");
 #endif
-			break;
+	}
+}
+
+void SceneManager::PushScene(SceneSuper::SceneID sceneID)
+{
+	auto newScene = CreateScene(sceneID);
+	if (newScene)
+	{
+		scenes.push_back(std::move(newScene));
+	}
+}
+
+void SceneManager::PopScene()
+{
+	if (scenes.size() > 1)
+	{
+		scenes.pop_back();
 	}
 }
 
