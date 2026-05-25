@@ -15,6 +15,8 @@
 constexpr auto WATER_PARTICLE_PATH = "Resource/ParticleJsonData/waterParameter.json";
 Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage_(stage)
 {
+	SetImage("Resource/Image/Monster.png");
+
 	pMng = std::make_unique<ParticleManager>(fileMng);
 	pMng->RegisterConfig(WATER_PARTICLE_PATH);
 
@@ -31,8 +33,6 @@ Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage
 	//位置と物理の初期化
 	posX = 200.0f;
 	posY = 200.0f;
-	width_ = 0;
-	height_ = 0;
 	canvasX = 0;
 	canvasY = 0;
 	gravity = 0.5f;
@@ -220,7 +220,7 @@ void Player::Draw()
 	DrawFormatString(1000, 1000, GetColor(255, 0, 0), "SodaGauge: %d", static_cast<int>(sodaShakeGauge));
 	DrawFormatString(1000, 1020, GetColor(255, 0, 0), "noDamageTime: %d", static_cast<int>(noDamageTime));
 	DrawFormatString(1000, 1040, GetColor(255, 0, 0), "sodaAttackFlag: %d", sodaAttackFlag);
-
+	DrawBox(posX - width_ / 2, posY - height_ / 2, posX + width_ / 2, posY + height_ / 2, GetColor(255, 0, 0), FALSE);
 }
 
 //マウスを振ったり、スティックを動かすと炭酸ゲージが溜まる
@@ -453,6 +453,7 @@ void Player::DrawGauge(
 			TRUE
 		);
 	}
+
 	else if (mode == 1)
 	{
 		//縦ゲージ割合

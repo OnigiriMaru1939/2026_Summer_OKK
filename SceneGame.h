@@ -17,6 +17,9 @@ public:
 	void Update() override;
 	void Draw() override;
 	auto GetStage() { return stage_.get(); }
+	auto GetPlayer() { return player_.get(); }
+	auto& GetEnemyList() { return enemyList_; }
+	auto& GetFileManager() { return fileMng_; }
 private:
 	static int selectedStageIndex_;
 

@@ -17,23 +17,6 @@ SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
 
 	stage_ = std::make_unique<Stage>(fileMng);
 	player_ = std::make_unique<Player>(fileMng, stage_.get());
-	//敵の生成
-	enemyList_.push_back(std::make_shared<Enemy1>(
-			fileMng,
-		    stage_.get(),
-			800.0f,
-			160.0f
-		)
-	);
-	enemyList_.push_back(std::make_shared<Boss1>(
-			fileMng,
-			stage_.get(),
-			1200.0f,
-			160.0f
-		)
-	);
-
-	player_->SetImage("Resource/Image/Monster.png");
 
   // ステージ固有のセットアップを実行
 	const auto& stageConfigs = GetStageConfigs();
@@ -60,8 +43,6 @@ void SceneGame::Update()
 	//敵の更新
 	for (auto& enemy : enemyList_)
 	{
-		if (!enemy->IsAlive()) continue;
-
 		enemy->Update();
 
 		//プレイヤーと敵の衝突判定
@@ -93,7 +74,24 @@ void SceneGame::Update()
 				player_->SetVelocity(-5.0f, -5.0f);
 			}
 		}
+
+		if (!enemy->IsAlive())
+		{
+			// 敵が死んでいる場合はリストから削除
+			if (std::dynamic_pointer_cast<IBoss>(enemy))
+			{
+				SetNextScene(SceneID::RESULT);
+				isEnd = true;
+			}
+			enemy = nullptr; // shared_ptrをnullptrに設定して削除
+		}
 	}
+	
+	// 敵リストからnullptrを削除
+	enemyList_.erase(
+		std::remove(enemyList_.begin(), enemyList_.end(), nullptr),
+		enemyList_.end()
+	);
 
 	// Stageの更新
 	if (stage_) stage_->Update();
