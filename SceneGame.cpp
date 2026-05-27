@@ -39,66 +39,17 @@ SceneGame::~SceneGame()
 void SceneGame::Update()
 {
 	player_->Update();
+  if (!player_->GetAliveFlag())
+	{
+		sceneMng_.SetGameResult(false); // ゲームオーバー
+		SetNextScene(SceneID::RESULT);
+		isEnd = true;
+	}
 
 	//敵の更新
-	for (auto& enemy : enemyList_)
-	{
-		enemy->Update();
+	UpdateEnemy();
 
-		//プレイヤーと敵の衝突判定
-		RECT p = player_->GetRect();
-		RECT e = enemy->GetRect();
-
-		bool hit =
-			p.right > e.left &&
-			p.left < e.right &&
-			p.bottom > e.top &&
-			p.top < e.bottom;
-
-		//衝突時かつ攻撃フラグがtrueじゃないときはプレイヤーにダメージを与える
-		if (hit && !player_->GetAttakFlag())
-		{
-			player_->Damage(10.0f); // プレイヤーにダメージを与える
-		}
-
-		else if (hit && player_->GetAttakFlag())
-		{
-			enemy->ApplyDamage(
-				static_cast<int>(player_->GetAttackDamage())
-			);
-
-			//敵がまだ生きていたらプレイヤーと敵が衝突する
-			if (enemy->IsAlive())
-			{
-				//プレイヤーをノックバックさせる
-				player_->SetVelocity(-5.0f, -5.0f);
-			}
-		}
-
-		if (!enemy->IsAlive())
-		{
-			// 敵が死んでいる場合はリストから削除
-			if (std::dynamic_pointer_cast<IBoss>(enemy))
-			{
-				sceneMng_.SetGameResult(true); // クリア
-				SetNextScene(SceneID::RESULT);
-				isEnd = true;
-			}
-			enemy = nullptr; // shared_ptrをnullptrに設定して削除
-		}
-		if (!player_->GetAliveFlag())
-		{
-			sceneMng_.SetGameResult(false); // ゲームオーバー
-			SetNextScene(SceneID::RESULT);
-			isEnd = true;
-		}
-	}
-	
-	// 敵リストからnullptrを削除
-	enemyList_.erase(
-		std::remove(enemyList_.begin(), enemyList_.end(), nullptr),
-		enemyList_.end()
-	);
+	CheckPlayerEnemyCollision();
 
 	// Stageの更新
 	if (stage_) stage_->Update();
@@ -120,7 +71,65 @@ void SceneGame::Draw()
 	{
 		enemy->Draw();
 	}
-
-
 }
 
+//敵の更新
+void SceneGame::UpdateEnemy()
+{
+	for (auto& enemy : enemyList_)
+	{
+		if (enemy->IsAlive())
+		{
+			enemy->Update();
+		}
+	}
+  
+  if (!enemy->IsAlive())
+	{
+		// 敵が死んでいる場合はリストから削除
+		if (std::dynamic_pointer_cast<IBoss>(enemy))
+		{
+			sceneMng_.SetGameResult(true); // クリア
+			SetNextScene(SceneID::RESULT);
+			isEnd = true;
+		}
+			enemy = nullptr; // shared_ptrをnullptrに設定して削除
+	}
+  enemyList_.erase(
+	std::remove(enemyList_.begin(), enemyList_.end(), nullptr),
+	enemyList_.end()
+	);
+ }
+
+//プレイヤーと敵の衝突判定
+void SceneGame::CheckPlayerEnemyCollision()
+{
+	for (auto& enemy : enemyList_)
+	{
+		if (!enemy->IsAlive()) continue;
+		RECT p = player_->GetRect();
+		RECT e = enemy->GetRect();
+
+		bool hit =
+			p.right > e.left &&
+			p.left < e.right &&
+			p.bottom > e.top &&
+			p.top < e.bottom;
+
+		if (hit && !player_->GetAttakFlag())
+		{
+			player_->Damage(10.0f); // プレイヤーにダメージを与える
+			//プレイヤーをノックバックさせる
+			player_->PlayerKnockBack(enemy->GetX(), 10.0f);
+		}
+		else if (hit && player_->GetAttakFlag())
+		{
+			enemy->ApplyDamage(static_cast<int>(player_->GetAttackDamage()));
+			if (enemy->IsAlive())
+			{
+				//プレイヤーをノックバックさせる
+				player_->PlayerKnockBack(enemy->GetX(), 10.0f);
+			}
+		}
+	}
+}

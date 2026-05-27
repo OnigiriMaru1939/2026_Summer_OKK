@@ -17,6 +17,8 @@ public:
 
 	void Update() override;
 	void Draw() override;
+	void UpdateEnemy();
+	void CheckPlayerEnemyCollision();
 	auto GetStage() { return stage_.get(); }
 	auto GetPlayer() { return player_.get(); }
 	auto& GetEnemyList() { return enemyList_; }
