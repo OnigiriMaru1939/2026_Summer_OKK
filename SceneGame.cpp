@@ -60,6 +60,7 @@ void SceneGame::Update()
 	//敵の更新
 	UpdateEnemy();
 
+	//プレイヤーと敵の衝突判定
 	CheckPlayerEnemyCollision();
 
 	// Stageの更新

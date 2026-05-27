@@ -53,11 +53,15 @@ public:
 	int GetAttackDamage() const { return AttckDamage; }
 	//HPを取得
 	int GetHp() const { return hp_; }
+	int GetHpMax() const { return hpMax_; }
 protected:
 	FileManager& fileManager_;
 	std::shared_ptr<ImageFile> image_;	//画像データ
 	Stage* stage_;						//ステージへのポインタ
 	
+	//ゲージの描画
+	void DrawGauge(int x, int y, int width, int height, float value, float maxValue, int color) const;
+
 	float x_;			//x座標
 	float y_;			//y座標
 	float vx_;			//x方向の速度
@@ -73,6 +77,7 @@ protected:
 	int canvasY;	//敵の描画位置Y
 
 	int hp_; //HP
+	int hpMax_; //HPの最大値
 	bool isAlive_; // 生存フラグ
 
 };

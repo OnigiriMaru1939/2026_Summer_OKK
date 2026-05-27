@@ -21,6 +21,7 @@ EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, float x, float y)
 	, width_(0)
 	, height_(0)
 	, hp_(1)
+	, hpMax_(200)
 	, isAlive_(true)
 {
 }
@@ -154,6 +155,18 @@ void EnemyBase::Draw() const
 {
 	if(!isAlive_ || !image_) return; // 生存していないか画像がない場合は描画しない
 
+	//当たり判定の矩形を描画
+	RECT rc = GetRect();
+
+	DrawBox(
+		rc.left - stage_->GetScrollX(),
+		rc.top - stage_->GetScrollY(),
+		rc.right - stage_->GetScrollX(),
+		rc.bottom - stage_->GetScrollY(),
+		GetColor(0, 255, 0),
+		FALSE
+	);
+
 	//無敵時間中は点滅させる
 	if (noDamageTime > 0)
 	{
@@ -166,16 +179,37 @@ void EnemyBase::Draw() const
 	int handle = 0;
 	handle = image_->GetHandle(); // 画像のハンドルを取得
 	DrawGraph(static_cast<int>(x_ - width_ / 2 - stage_->GetScrollX()), static_cast<int>(y_ - height_ / 2 - stage_->GetScrollY()), handle, TRUE); // 画像を描画
+}
 
-	//当たり判定の矩形を描画
-	RECT rc = GetRect();
+//横ゲージの描画
+void EnemyBase::DrawGauge(
+	int x,
+	int y,
+	int width,
+	int height,
+	float value,
+	float maxValue,
+	int color) const
+{
+	//ゲージの枠
+	DrawBox(x - 1,
+			y - 1,
+			x + width + 1,
+			y + height + 1,
+			GetColor(255, 0, 0),
+			FALSE
+	);
 
+	//横ゲージ割合
+	int barWidth = (int)((value / maxValue) * width);
+
+	//中身
 	DrawBox(
-		rc.left - stage_->GetScrollX(),
-		rc.top - stage_->GetScrollY(),
-		rc.right - stage_->GetScrollX(),
-		rc.bottom - stage_->GetScrollY(),
-		GetColor(0, 255, 0),
-		FALSE
+		x,
+		y,
+		x + barWidth,
+		y + height,
+		color,
+		TRUE
 	);
 }
