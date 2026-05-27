@@ -82,19 +82,19 @@ void SceneGame::UpdateEnemy()
 		{
 			enemy->Update();
 		}
-	}
-  
-  if (!enemy->IsAlive())
-	{
-		// 敵が死んでいる場合はリストから削除
-		if (std::dynamic_pointer_cast<IBoss>(enemy))
+		if (!enemy->IsAlive())
 		{
-			sceneMng_.SetGameResult(true); // クリア
-			SetNextScene(SceneID::RESULT);
-			isEnd = true;
-		}
+			// 敵が死んでいる場合はリストから削除
+			if (std::dynamic_pointer_cast<IBoss>(enemy))
+			{
+				sceneMng_.SetGameResult(true); // クリア
+				SetNextScene(SceneID::RESULT);
+				isEnd = true;
+			}
 			enemy = nullptr; // shared_ptrをnullptrに設定して削除
+		}
 	}
+
   enemyList_.erase(
 	std::remove(enemyList_.begin(), enemyList_.end(), nullptr),
 	enemyList_.end()
