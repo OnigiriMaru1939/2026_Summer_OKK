@@ -19,10 +19,12 @@ public:
 	void Draw() override;
 	void UpdateEnemy();
 	void CheckPlayerEnemyCollision();
-	auto GetStage() { return stage_.get(); }
-	auto GetPlayer() { return player_.get(); }
+	Stage* GetStage() { return stage_.get(); }
+	Player* GetPlayer() { return player_.get(); }
 	auto& GetEnemyList() { return enemyList_; }
-	auto& GetFileManager() { return fileMng_; }
+	FileManager& GetFileManager() { return fileMng_; }
+
+	static void SetSelectedStageIndex(int index) { selectedStageIndex_ = index; }
 private:
 	static int selectedStageIndex_;
 
@@ -31,5 +33,7 @@ private:
 	std::vector<std::shared_ptr<EnemyBase>> enemyList_;		//敵のリスト
 
 	SceneManager& sceneMng_; // シーンマネージャーへの弱い参照
+
+	float clearTime; // クリアタイム
 };
 

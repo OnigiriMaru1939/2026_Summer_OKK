@@ -50,7 +50,7 @@ enum class PadButton
 	Pad_Face_Down,
 	Pad_Left,
 	Pad_Right,
-	Pad_Top,
+	Pad_Up,
 	Pad_Down,
 	Pad_L_Shoulder,
 	Pad_R_Shoulder,

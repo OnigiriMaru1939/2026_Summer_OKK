@@ -23,6 +23,9 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(
 	const StageConfig& config = stageConfigs[selectedStageIndex_ - 1];
 	stage_->Load(config.mapPath);
 	config.setUpStage(*this);
+
+	clearTime = 0.0f;
+
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Decide, 
 												   [this]()
 												   {
@@ -38,9 +41,15 @@ SceneGame::~SceneGame()
 
 void SceneGame::Update()
 {
+	clearTime += 1.0f / 60.0f; // クリアタイムの更新
+
 	player_->Update();
-  if (!player_->GetAliveFlag())
+	if (!player_->GetAliveFlag())
 	{
+		ClearResult result;
+		result.time = 0.0f;
+		result.stageIndex = selectedStageIndex_;
+		sceneMng_.SetClearResult(result);
 		sceneMng_.SetGameResult(false); // ゲームオーバー
 		SetNextScene(SceneID::RESULT);
 		isEnd = true;
@@ -87,6 +96,10 @@ void SceneGame::UpdateEnemy()
 			// 敵が死んでいる場合はリストから削除
 			if (std::dynamic_pointer_cast<IBoss>(enemy))
 			{
+				ClearResult result;
+				result.time = clearTime;
+				result.stageIndex = selectedStageIndex_;
+				sceneMng_.SetClearResult(result);
 				sceneMng_.SetGameResult(true); // クリア
 				SetNextScene(SceneID::RESULT);
 				isEnd = true;

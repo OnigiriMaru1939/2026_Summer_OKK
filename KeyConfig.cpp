@@ -83,7 +83,7 @@ int KeyConfig::StringToKeyCode(const std::wstring& str) const
 		{ L"Pad_Face_Down", (int)PadButton::Pad_Face_Down},
 		{ L"Pad_Left", (int)PadButton::Pad_Left},
 		{ L"Pad_Right", (int)PadButton::Pad_Right},
-		{ L"Pad_Top", (int)PadButton::Pad_Top},
+		{ L"Pad_Up", (int)PadButton::Pad_Up},
 		{ L"Pad_Down", (int)PadButton::Pad_Down},
 		{ L"Pad_L_Shoulder", (int)PadButton::Pad_L_Shoulder},
 		{ L"Pad_R_Shoulder", (int)PadButton::Pad_R_Shoulder},
