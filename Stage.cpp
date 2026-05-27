@@ -249,19 +249,19 @@ int Stage::GetMaxScrollY()
 bool Stage::CheckHitWallRect(int x, int y, int width, int height)
 {
 	// チップサイズを考慮して、矩形の四隅の座標を計算
-	int left = x;
-	int top = y;
-	int right = x + width - 1;
-	int bottom = y + height - 1;
+	int left = x - width / 2;
+	int top = y - height / 2;
+	int right = x + width / 2 - 1;
+	int bottom = y + height / 2 - 1;
 	// 四隅の座標で壁をチェック
 	if (CheckWall(left, top)) return true;
-	if (CheckWall((left + right) / 2 - 1, top)) return true;
-	if (CheckWall(right - 1, top)) return true;
-	if (CheckWall(left, (top + bottom) / 2 - 1)) return true;
-	if (CheckWall(left, bottom - 1)) return true;
-	if (CheckWall((left + right) / 2 - 1, bottom - 1)) return true;
-	if (CheckWall(right - 1, bottom - 1)) return true;
-	if (CheckWall(right - 1, (top + bottom) / 2 - 1)) return true;
+	if (CheckWall((left + right) / 2, top)) return true;
+	if (CheckWall(right, top)) return true;
+	if (CheckWall(left, (top + bottom) / 2)) return true;
+	if (CheckWall(left, bottom)) return true;
+	if (CheckWall((left + right) / 2, bottom)) return true;
+	if (CheckWall(right, bottom)) return true;
+	if (CheckWall(right, (top + bottom) / 2)) return true;
 
 	return false;
 }

@@ -15,6 +15,8 @@
 constexpr auto WATER_PARTICLE_PATH = "Resource/ParticleJsonData/waterParameter.json";
 Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage_(stage)
 {
+	SetImage("Resource/Image/Monster.png");
+
 	pMng = std::make_unique<ParticleManager>(fileMng);
 	pMng->RegisterConfig(WATER_PARTICLE_PATH);
 
@@ -31,8 +33,6 @@ Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage
 	//位置と物理の初期化
 	posX = 200.0f;
 	posY = 200.0f;
-	width_ = 0;
-	height_ = 0;
 	canvasX = 0;
 	canvasY = 0;
 	gravity = 0.5f;
@@ -47,7 +47,7 @@ Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage
 	jumpPower = 12.0f;
 
 	//体力を初期化
-	playerHpMax = 100.0f;
+	playerHpMax = 10.0f;
 	playerHp = playerHpMax;
 
 	//ゲージ等の初期化
@@ -486,6 +486,7 @@ void Player::DrawGauge(
 			TRUE
 		);
 	}
+
 	else if (mode == 1)
 	{
 		//縦ゲージ割合

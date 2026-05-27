@@ -112,6 +112,11 @@ public:
 	void ClearReleaseCallbacks();
 	void ClearAllCallbacks();
 
+	// アクションに対する入力状態を取得する関数
+	bool IsActionPressed(ActionID action, int padNo = 0) const;
+	bool IsActionTriggered(ActionID action, int padNo = 0) const;
+	bool IsActionReleased(ActionID action, int padNo = 0) const;
+
 	// 振動機能
 	void StartVibration(int Power, int Time = -1, int EffectIndex = -1, int padNo = 0);
 	void StopVibration(int padNo = 0);
@@ -169,10 +174,6 @@ private:
 	bool IsPadPressed(int no, PadButton btn) const;
 	bool IsPadTriggered(int no, PadButton btn) const;
 	bool IsPadReleased(int no, PadButton btn) const;
-	// アクションに対する入力状態を取得する関数
-	bool IsActionPressed(ActionID action, int padNo = 0) const;
-	bool IsActionTriggered(ActionID action, int padNo = 0) const;
-	bool IsActionReleased(ActionID action, int padNo = 0) const;
 
 	// 登録されたコールバックを呼び出す関数
 	void DispatchCallbacks();

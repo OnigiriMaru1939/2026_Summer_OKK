@@ -9,12 +9,14 @@
 #include "SceneTitle.h"
 #include "SceneStageSelect.h"
 #include "SceneGame.h"
+#include "ScenePause.h"
 #include "SceneResult.h"
 
 SceneManager::SceneManager(FileManager& fileMng) : fileMng_(fileMng)
 {
 	scenes.push_back(CreateScene(SceneSuper::SceneID::TITLE));
 	isExit = false;
+	_isClear = false;
 }
 
 SceneManager::~SceneManager()
@@ -28,6 +30,10 @@ void SceneManager::Update()
 	{
 		isExit = true;
 		return;
+	}
+	if (InputManager::GetInstance().IsActionTriggered(ActionID::Pause))
+	{
+		RequestPause();
 	}
 	auto& currentScene = scenes.back();
 	currentScene->Update();
@@ -57,9 +63,11 @@ std::unique_ptr<SceneSuper> SceneManager::CreateScene(SceneSuper::SceneID sceneI
 		case SceneSuper::SceneID::STAGE_SELECT:
 			return std::make_unique<SceneStageSelect>(fileMng_);
 		case SceneSuper::SceneID::GAME:
-			return std::make_unique<SceneGame>(fileMng_);
+			return std::make_unique<SceneGame>(fileMng_, *this);
 		case SceneSuper::SceneID::RESULT:
-			return std::make_unique<SceneResult>(fileMng_);
+			return std::make_unique<SceneResult>(fileMng_, _isClear);
+		case SceneSuper::SceneID::PAUSE:
+			return std::make_unique<ScenePause>(fileMng_, *this);
 		default:
 			return nullptr;
 	}
@@ -107,6 +115,21 @@ void SceneManager::PopScene()
 	if (scenes.size() > 1)
 	{
 		scenes.pop_back();
+	}
+}
+
+void SceneManager::RequestPause()
+{
+	if (scenes.empty()) return;
+	// 現在のシーンがゲームシーンの場合にのみポーズシーンをプッシュする
+	if (dynamic_cast<SceneGame*>(scenes.back().get()))
+	{
+		PushScene(SceneSuper::SceneID::PAUSE);
+	}
+	// 現在のシーンがポーズシーンの場合はそれをポップしてゲームに戻る
+	else if (dynamic_cast<ScenePause*>(scenes.back().get()))
+	{
+		PopScene();
 	}
 }
 

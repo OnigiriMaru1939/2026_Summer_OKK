@@ -1,7 +1,8 @@
 ﻿#include "StageConfigTablle.h"
 #include "Stage.h"
 #include "SceneGame.h"
-
+#include "Enemy1.h"
+#include "Boss1.h"
 const std::vector<StageConfig>& GetStageConfigs()
 {
 	static std::vector<StageConfig> configs = {
@@ -11,6 +12,21 @@ const std::vector<StageConfig>& GetStageConfigs()
 			[](SceneGame& scene)
 			{
 				scene.GetStage()->SetBgImage("Resource/Image/Stage1_bg.png");
+				//敵の生成
+				scene.GetEnemyList().push_back(std::make_shared<Enemy1>(
+					scene.GetFileManager(),
+					scene.GetStage(),
+					800.0f,
+					160.0f
+				)
+				);
+				scene.GetEnemyList().push_back(std::make_shared<Boss1>(
+					scene.GetFileManager(),
+					scene.GetStage(),
+					1200.0f,
+					160.0f
+				)
+				);
 			},
 			
 
