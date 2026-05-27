@@ -68,9 +68,9 @@ public:
 	//攻撃力を取得
 	bool GetAttakFlag() const { return sodaAttackFlag; }			//炭酸攻撃フラグを取得
 	float GetAttackDamage() const { return attackDamage; }			//攻撃のダメージを取得
-
-private:
 	bool GetAliveFlag() const { return aliveFlag; }					//生存フラグを取得
+private:
+	
 	bool GetJumpFlag() const { return jumpFlag; }					//ジャンプフラグを取得
 	//ゲージの描画
 	void DrawGauge(int x,

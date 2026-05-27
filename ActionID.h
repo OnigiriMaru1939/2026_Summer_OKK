@@ -12,6 +12,7 @@ enum class ActionID
 	Rotate,
 	Decide,
 	Cancel,
+	Pause,
 	Exit,
 	Max
 };

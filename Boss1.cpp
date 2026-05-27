@@ -6,7 +6,7 @@ Boss1::Boss1(FileManager& fileMng, Stage* stage, float x, float y) : EnemyBase(f
 	SetImage("Resource/Image/RedBull.png");
 	SetPosition(x, y);				//初期位置を設定
 	SetVelocity(0.0f, 0.0f);		//初期速度を設定
-	hp_ = 300;						//HPを300に設定
+	hp_ = 100;						//HP
 }
 
 Boss1::~Boss1	()

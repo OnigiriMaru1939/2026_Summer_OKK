@@ -12,6 +12,7 @@ public:
 		STAGE_SELECT,
 		GAME,
 		RESULT,
+		PAUSE,
 		EXIT,
 	};
 

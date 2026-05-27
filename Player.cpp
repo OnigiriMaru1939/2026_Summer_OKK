@@ -47,7 +47,7 @@ Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage
 	jumpPower = 12.0f;
 
 	//体力を初期化
-	playerHpMax = 100.0f;
+	playerHpMax = 10.0f;
 	playerHp = playerHpMax;
 
 	//ゲージ等の初期化

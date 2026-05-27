@@ -43,6 +43,7 @@ bool KeyConfig::StringToActionID(const std::wstring& str, ActionID& actionId) co
 	if (str == L"Shake") { actionId = ActionID::Shake; return true; }
 	if (str == L"Decide") { actionId = ActionID::Decide; return true; }
 	if (str == L"Cancel") { actionId = ActionID::Cancel; return true; }
+	if (str == L"Pause") { actionId = ActionID::Pause; return true; }
 	if (str == L"Exit") { actionId = ActionID::Exit;   return true; }
 	else return false; // 未知のアクション名は無視
 }
@@ -52,6 +53,7 @@ int KeyConfig::StringToKeyCode(const std::wstring& str) const
 	// 文字列とDxLib定数の対応表
 	// staticにすることで、関数を呼ぶたびにテーブルが生成されるのを防ぐ
 	static const std::unordered_map<std::wstring, int> keyMap = {
+		{ L"KEY_INPUT_ESCAPE", KEY_INPUT_ESCAPE },
 		{ L"KEY_INPUT_SPACE",  KEY_INPUT_SPACE },
 		{ L"KEY_INPUT_RETURN", KEY_INPUT_RETURN },
 		{ L"KEY_INPUT_LEFT",   KEY_INPUT_LEFT },
@@ -172,10 +174,10 @@ bool KeyConfig::LoadFromFile(const std::wstring& filename)
 			}
 			// else: 未知のアクション名は無視
 		}
-		printfDx("%S, ", actionStr.c_str());
-		printfDx("%S, ", typeStr.c_str());
-		printfDx("%S, ", codeStr.c_str());
-		printfDx("%S\n", scaleStr.c_str());
+		//for (const auto& pair : keyConfigMap_)
+		//{
+		//	printfDx("Action %d has %d mappings\n", (int)pair.first, (int)pair.second.size());
+		//}
 	}
 	return true;
 }

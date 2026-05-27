@@ -8,13 +8,13 @@
 #include "FileManager.h"
 #include "StageConfig.h"
 #include "StageConfigTablle.h"
+#include "SceneManager.h"
 
 // 静的変数の定義
 int SceneGame::selectedStageIndex_ = 1;
 
-SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
+SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(fileMng), sceneMng_(sceneMng)
 {
-
 	stage_ = std::make_unique<Stage>(fileMng);
 	player_ = std::make_unique<Player>(fileMng, stage_.get());
 
@@ -80,10 +80,17 @@ void SceneGame::Update()
 			// 敵が死んでいる場合はリストから削除
 			if (std::dynamic_pointer_cast<IBoss>(enemy))
 			{
+				sceneMng_.SetGameResult(true); // クリア
 				SetNextScene(SceneID::RESULT);
 				isEnd = true;
 			}
 			enemy = nullptr; // shared_ptrをnullptrに設定して削除
+		}
+		if (!player_->GetAliveFlag())
+		{
+			sceneMng_.SetGameResult(false); // ゲームオーバー
+			SetNextScene(SceneID::RESULT);
+			isEnd = true;
 		}
 	}
 	

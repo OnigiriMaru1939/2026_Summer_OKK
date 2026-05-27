@@ -5,12 +5,13 @@
 #include "EnemyBase.h"
 
 class Player;
+class SceneManager;
 
 class SceneGame :
     public SceneSuper
 {
 public:
-	SceneGame(FileManager& fileMng);
+	SceneGame(FileManager& fileMng, SceneManager& sceneMng);
 
 	~SceneGame() override;
 
@@ -26,5 +27,7 @@ private:
 	std::unique_ptr<Stage> stage_;
 	std::unique_ptr<Player> player_;
 	std::vector<std::shared_ptr<EnemyBase>> enemyList_;		//敵のリスト
+
+	SceneManager& sceneMng_; // シーンマネージャーへの弱い参照
 };
 
