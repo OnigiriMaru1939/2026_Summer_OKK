@@ -17,7 +17,9 @@ public:
 
 	void Update() override;
 	void Draw() override;
+	void UpdatePlayer();
 	void UpdateEnemy();
+	void UpdateStage();
 	void CheckPlayerEnemyCollision();
 	Stage* GetStage() { return stage_.get(); }
 	Player* GetPlayer() { return player_.get(); }

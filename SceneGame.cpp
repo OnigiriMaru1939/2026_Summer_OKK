@@ -43,17 +43,8 @@ void SceneGame::Update()
 {
 	clearTime += 1.0f / 60.0f; // クリアタイムの更新
 
-	player_->Update();
-	if (!player_->GetAliveFlag())
-	{
-		ClearResult result;
-		result.time = 0.0f;
-		result.stageIndex = selectedStageIndex_;
-		sceneMng_.SetClearResult(result);
-		sceneMng_.SetGameResult(false); // ゲームオーバー
-		SetNextScene(SceneID::RESULT);
-		isEnd = true;
-	}
+	// プレイヤーの更新
+	UpdatePlayer();
 
 	//敵の更新
 	UpdateEnemy();
@@ -62,7 +53,7 @@ void SceneGame::Update()
 	CheckPlayerEnemyCollision();
 
 	// Stageの更新
-	if (stage_) stage_->Update();
+	UpdateStage();
 }
 
 void SceneGame::Draw()
@@ -80,6 +71,21 @@ void SceneGame::Draw()
 	for (auto& enemy : enemyList_)
 	{
 		enemy->Draw();
+	}
+}
+
+void SceneGame::UpdatePlayer()
+{
+	player_->Update();
+	if (!player_->GetAliveFlag())
+	{
+		ClearResult result;
+		result.time = 0.0f;
+		result.stageIndex = selectedStageIndex_;
+		sceneMng_.SetClearResult(result);
+		sceneMng_.SetGameResult(false); // ゲームオーバー
+		SetNextScene(SceneID::RESULT);
+		isEnd = true;
 	}
 }
 
@@ -114,6 +120,11 @@ void SceneGame::UpdateEnemy()
 	enemyList_.end()
 	);
  }
+
+void SceneGame::UpdateStage()
+{
+	if (stage_) stage_->Update();
+}
 
 //プレイヤーと敵の衝突判定
 void SceneGame::CheckPlayerEnemyCollision()
