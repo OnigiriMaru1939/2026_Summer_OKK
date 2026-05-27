@@ -70,6 +70,8 @@ public:
 	bool GetAttakFlag() const { return sodaAttackFlag; }			//炭酸攻撃フラグを取得
 	float GetAttackDamage() const { return attackDamage; }			//攻撃のダメージを取得
 	bool GetAliveFlag() const { return aliveFlag; }					//生存フラグを取得
+private:
+	
 	bool GetJumpFlag() const { return jumpFlag; }					//ジャンプフラグを取得
 private:
 	//ゲージの描画

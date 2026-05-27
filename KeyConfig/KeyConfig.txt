@@ -21,3 +21,6 @@ Rotate, GamepadButton, Pad_R_Shoulder, 1.0
 
 Decide, Keyboard, KEY_INPUT_RETURN, 1.0
 Decide, GamepadButton, Xbox_Start, 1.0
+
+Pause, Keyboard, KEY_INPUT_ESCAPE, 1.0
+Pause, GamepadButton, Xbox_Start, 1.0

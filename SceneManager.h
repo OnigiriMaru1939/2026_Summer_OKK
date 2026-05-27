@@ -31,10 +31,13 @@ public:
 	void Draw();
 
 	bool GetExit() const;
+	void SetGameResult(bool isClear) { _isClear = isClear; }
 	//void SetClearResult(const ClearResult& result);
 
 	void PushScene(SceneSuper::SceneID sceneID);
 	void PopScene();
+
+	void RequestPause();
 private:
 	std::unique_ptr<SceneSuper> CreateScene(SceneSuper::SceneID sceneID);
 	void ChangeScene(SceneSuper::SceneID nextSceneID);
@@ -43,6 +46,7 @@ private:
 	FileManager& fileMng_;
 
 	bool isExit;
+	bool _isClear;
 
 	//Transition transition_;
 

@@ -9,7 +9,7 @@ private:
 	static constexpr int LOGO_Y = 250;
 	static constexpr int LOGO_X = Application::SCREEN_WID / 2;
 public:
-	SceneResult(FileManager& fileMng);
+	SceneResult(FileManager& fileMng, bool isClear);
 
 	~SceneResult() override;
 
@@ -17,7 +17,9 @@ public:
 	void Draw() override;
 
 private:
+	bool _isClear;
 	std::shared_ptr<ImageFile> _bgImg;
-	std::shared_ptr<ImageFile> _resultLogoImg;
+	std::shared_ptr<ImageFile> _resultClearLogoImg;
+	std::shared_ptr<ImageFile> _resultFailedLogoImg;
 };
 

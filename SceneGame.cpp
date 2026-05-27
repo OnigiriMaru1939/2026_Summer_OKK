@@ -8,32 +8,15 @@
 #include "FileManager.h"
 #include "StageConfig.h"
 #include "StageConfigTablle.h"
+#include "SceneManager.h"
 
 // 静的変数の定義
 int SceneGame::selectedStageIndex_ = 1;
 
-SceneGame::SceneGame(FileManager& fileMng) : SceneSuper(fileMng)
+SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(fileMng), sceneMng_(sceneMng)
 {
-
 	stage_ = std::make_unique<Stage>(fileMng);
 	player_ = std::make_unique<Player>(fileMng, stage_.get());
-	//敵の生成
-	enemyList_.push_back(std::make_shared<Enemy1>(
-			fileMng,
-		    stage_.get(),
-			800.0f,
-			160.0f
-		)
-	);
-	enemyList_.push_back(std::make_shared<Boss1>(
-			fileMng,
-			stage_.get(),
-			1200.0f,
-			160.0f
-		)
-	);
-
-	player_->SetImage("Resource/Image/Monster.png");
 
   // ステージ固有のセットアップを実行
 	const auto& stageConfigs = GetStageConfigs();
@@ -56,6 +39,12 @@ SceneGame::~SceneGame()
 void SceneGame::Update()
 {
 	player_->Update();
+  if (!player_->GetAliveFlag())
+	{
+		sceneMng_.SetGameResult(false); // ゲームオーバー
+		SetNextScene(SceneID::RESULT);
+		isEnd = true;
+	}
 
 	//敵の更新
 	UpdateEnemy();
@@ -82,24 +71,6 @@ void SceneGame::Draw()
 	{
 		enemy->Draw();
 	}
-
-	//デバッグ用に敵のHPを表示
-	int y = 1000;
-
-	for (auto& enemy : enemyList_)
-	{
-		DrawFormatString(
-			1200,
-			y,
-			GetColor(255, 0, 0),
-			"%s HP: %d",
-			enemy->GetEnemyName(),
-			enemy->GetHp()
-		);
-
-		y += 20;
-	}
-
 }
 
 //敵の更新
@@ -112,7 +83,23 @@ void SceneGame::UpdateEnemy()
 			enemy->Update();
 		}
 	}
-}
+  
+  if (!enemy->IsAlive())
+	{
+		// 敵が死んでいる場合はリストから削除
+		if (std::dynamic_pointer_cast<IBoss>(enemy))
+		{
+			sceneMng_.SetGameResult(true); // クリア
+			SetNextScene(SceneID::RESULT);
+			isEnd = true;
+		}
+			enemy = nullptr; // shared_ptrをnullptrに設定して削除
+	}
+  enemyList_.erase(
+	std::remove(enemyList_.begin(), enemyList_.end(), nullptr),
+	enemyList_.end()
+	);
+ }
 
 //プレイヤーと敵の衝突判定
 void SceneGame::CheckPlayerEnemyCollision()
@@ -137,9 +124,7 @@ void SceneGame::CheckPlayerEnemyCollision()
 		}
 		else if (hit && player_->GetAttakFlag())
 		{
-			enemy->ApplyDamage(
-				static_cast<int>(player_->GetAttackDamage())
-			);
+			enemy->ApplyDamage(static_cast<int>(player_->GetAttackDamage()));
 			if (enemy->IsAlive())
 			{
 				//プレイヤーをノックバックさせる

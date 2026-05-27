@@ -158,6 +158,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SceneGame.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="ScenePause.cpp" />
     <ClCompile Include="SceneResult.cpp" />
     <ClCompile Include="SceneStageSelect.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
@@ -174,6 +175,7 @@
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="FileSuper.h" />
     <ClInclude Include="Fps.h" />
+    <ClInclude Include="IBoss.h" />
     <ClInclude Include="ImageFile.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="KeyConfig.h" />
@@ -183,6 +185,7 @@
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="SceneGame.h" />
     <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="ScenePause.h" />
     <ClInclude Include="SceneResult.h" />
     <ClInclude Include="SceneStageSelect.h" />
     <ClInclude Include="SceneSuper.h" />
