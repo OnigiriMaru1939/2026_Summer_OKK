@@ -10,8 +10,9 @@ SceneTitle::SceneTitle(FileManager& fileMng) : SceneSuper(fileMng)
 	_TitleStartImg = fileMng_.LoadImageFM("Resource/Image/Title_Start.png");
 	_mainBgm = fileMng_.LoadSoundFM("Resource/Sound/BGM/Night_Light.wav");
 
-	BGMManager::GetInstance().PlayBGM(_mainBgm);
 
+	BGMManager::GetInstance().PlayBGM(_mainBgm);
+	_mainBgm->SetVolume(128);
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Decide,
 												   [this]()
 												   {

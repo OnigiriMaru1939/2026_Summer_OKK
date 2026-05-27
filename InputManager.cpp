@@ -500,7 +500,7 @@ bool InputManager::GetRawState(int padNo, PadButton btn, const DINPUT_JOYSTATE& 
 			return (dState.POV[0] == 27000) || (xState.Buttons[XINPUT_BUTTON_DPAD_LEFT] != 0);
 		case PadButton::Pad_Right:
 			return (dState.POV[0] == 9000) || (xState.Buttons[XINPUT_BUTTON_DPAD_RIGHT] != 0);
-		case PadButton::Pad_Top:
+		case PadButton::Pad_Up:
 			return (dState.POV[0] == 0) || (xState.Buttons[XINPUT_BUTTON_DPAD_UP] != 0);
 		case PadButton::Pad_Down:
 			return (dState.POV[0] == 18000) || (xState.Buttons[XINPUT_BUTTON_DPAD_DOWN] != 0);

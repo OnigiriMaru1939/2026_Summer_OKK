@@ -6,6 +6,12 @@
 
 class FileManager;
 
+struct ClearResult
+{
+	float time;
+	int stageIndex;
+};
+
 class SceneManager
 {
 public:
@@ -32,7 +38,7 @@ public:
 
 	bool GetExit() const;
 	void SetGameResult(bool isClear) { _isClear = isClear; }
-	//void SetClearResult(const ClearResult& result);
+	void SetClearResult(const ClearResult& result);
 
 	void PushScene(SceneSuper::SceneID sceneID);
 	void PopScene();
@@ -50,5 +56,5 @@ private:
 
 	//Transition transition_;
 
-	//ClearResult clearResult_;
+	ClearResult clearResult_;
 };
