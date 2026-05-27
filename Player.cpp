@@ -190,20 +190,6 @@ void Player::Draw()
 
 	pMng->DrawAll(stage_->GetScrollX(), stage_->GetScrollY());
 
-	//プレイヤーの振動処理
-	PlayerShake();
-
-	//プレイヤー画像を描画(回転可)
-	int handle = image_->GetHandle();
-	DrawRotaGraph(
-		(int)canvasX + (int)shakeOffsetX,
-		(int)canvasY + (int)shakeOffsetY,
-		2.0,
-		angle,
-		handle,
-		TRUE
-	);
-
 	//当たり判定の矩形を描画
 	RECT rc = GetRect();
 
@@ -228,6 +214,29 @@ void Player::Draw()
 	DrawFormatString(1000, 1000, GetColor(255, 0, 0), "SodaGauge: %d", static_cast<int>(sodaShakeGauge));
 	DrawFormatString(1000, 1020, GetColor(255, 0, 0), "noDamageTime: %d", static_cast<int>(noDamageTime));
 	DrawFormatString(1000, 1040, GetColor(255, 0, 0), "sodaAttackFlag: %d", sodaAttackFlag);
+
+	//プレイヤーの振動処理
+	PlayerShake();
+
+	//無敵時間中は点滅させる
+	if (noDamageTime > 0)
+	{
+		if ((noDamageTime / 4) % 2 == 0)
+		{
+			return;
+		}
+	}
+
+	//プレイヤー画像を描画(回転可)
+	int handle = image_->GetHandle();
+	DrawRotaGraph(
+		(int)canvasX + (int)shakeOffsetX,
+		(int)canvasY + (int)shakeOffsetY,
+		1.0,
+		angle,
+		handle,
+		TRUE
+	);
 }
 
 //マウスを振ったり、スティックを動かすと炭酸ゲージが溜まる
@@ -315,8 +324,8 @@ void Player::SpaceJump()
 
 	//プレイヤーの向いている方向にジャンプ
 	//DX_PI_F / 2はジャンプ方向を90度補正するための値
-	velocityX += cos(angle - DX_PI_F / 2) * jumpPower;
-	velocityY += sin(angle - DX_PI_F / 2) * jumpPower;
+	velocityX = cos(angle - DX_PI_F / 2) * jumpPower;
+	velocityY = sin(angle - DX_PI_F / 2) * jumpPower;
 	jumpFlag = true;
 }
 
@@ -372,7 +381,7 @@ void Player::ClickSodaJump()
 		//炭酸蓄積ゲージの割合を炭酸攻撃の威力に変換
 		sodaPower = sodaRatio * 20.0f;
 
-		//プレイヤーが向いている方向とは逆に移動する
+		//プレイヤーが向いている方向に移動する
 		velocityX += cos(angle - DX_PI_F / 2) * sodaPower;
 		velocityY += sin(angle - DX_PI_F / 2) * sodaPower;
 
