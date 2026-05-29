@@ -158,3 +158,29 @@ void SceneGame::CheckPlayerEnemyCollision()
 		}
 	}
 }
+
+//敵生成関数(雑魚敵)
+void SceneGame::AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y)
+{
+	switch (type)
+	{
+	case EnemyBase::ENEMY_TYPE::E_TYPE_1:
+		enemyList_.push_back(std::make_shared<Enemy1>(fileMng_, stage_.get(), x, y));
+		break;
+	default:
+		break;
+	}
+}
+
+//敵生成関数(ボス敵)
+void SceneGame::AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y)
+{
+	switch (type)
+	{
+	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1:
+		enemyList_.push_back(std::make_shared<Boss1>(fileMng_, stage_.get(), x, y));
+		break;
+	default:
+		break;
+	}
+}

@@ -21,6 +21,9 @@ public:
 	void UpdateEnemy();
 	void UpdateStage();
 	void CheckPlayerEnemyCollision();
+	//敵生成関数
+	void AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y);
+	void AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y);
 	Stage* GetStage() { return stage_.get(); }
 	Player* GetPlayer() { return player_.get(); }
 	auto& GetEnemyList() { return enemyList_; }

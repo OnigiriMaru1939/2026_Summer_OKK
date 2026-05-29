@@ -23,6 +23,7 @@ public:
 	Player(FileManager& fileMng, Stage* stage);
 	~Player();
 	bool SetImage(const std::string& path);			//画像のセット
+	void SetPosition(float x, float y);				//プレイヤーの位置を設定
 	bool WillCollide(int newX, int newY);			//プレイヤーのステージとの衝突判定
 	void Update();
 	void Draw();
