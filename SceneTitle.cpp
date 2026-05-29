@@ -12,7 +12,7 @@ SceneTitle::SceneTitle(FileManager& fileMng) : SceneSuper(fileMng)
 
 
 	BGMManager::GetInstance().PlayBGM(_mainBgm);
-	_mainBgm->SetVolume(128);
+	_mainBgm->SetVolume(196);
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Decide,
 												   [this]()
 												   {

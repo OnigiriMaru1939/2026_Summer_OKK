@@ -26,6 +26,7 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(
 
 	clearTime = 0.0f;
 
+	// デバッグ
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Decide, 
 												   [this]()
 												   {

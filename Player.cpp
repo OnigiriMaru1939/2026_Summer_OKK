@@ -373,11 +373,12 @@ void Player::Damage(float dmg)
 
 void Player::ClickSodaJump()
 {
-	sodaRatio = sodaShakeGauge / sodaGaugeMax;
+	
 
 	//炭酸蓄積ゲージが0より大きい場合、炭酸蓄積ゲージを減らす
 	if (sodaShakeGauge > 0)
 	{
+		sodaRatio = sodaShakeGauge / sodaGaugeMax;
 		//炭酸蓄積ゲージの割合を炭酸攻撃の威力に変換
 		sodaPower = sodaRatio * 20.0f;
 

@@ -94,8 +94,8 @@ public:
 	int GetMouseY() const { return mouseY; }
 
 	// アクションに対する入力状態を取得する関数
-	float GetActionValue(ActionID action, int padNo = 0) const;
-	float GetActionAxis(ActionID action, int padNo = 0) const;
+	float GetActionValue(ActionID action, int padNo = 0) const; // ボタン
+	float GetActionAxis(ActionID action, int padNo = 0) const; // 軸
 
 	// アクションIDに対する入力状態を取得する関数
 	using ActionCallback = std::function<void()>;
@@ -113,9 +113,9 @@ public:
 	void ClearAllCallbacks();
 
 	// アクションに対する入力状態を取得する関数
-	bool IsActionPressed(ActionID action, int padNo = 0) const;
-	bool IsActionTriggered(ActionID action, int padNo = 0) const;
-	bool IsActionReleased(ActionID action, int padNo = 0) const;
+	bool IsActionPressed(ActionID action, int padNo = 0) const;// 押されている間
+	bool IsActionTriggered(ActionID action, int padNo = 0) const;// 押された瞬間
+	bool IsActionReleased(ActionID action, int padNo = 0) const;// 離された瞬間
 
 	// 振動機能
 	void StartVibration(int Power, int Time = -1, int EffectIndex = -1, int padNo = 0);
