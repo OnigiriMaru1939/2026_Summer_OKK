@@ -15,7 +15,7 @@
 constexpr auto WATER_PARTICLE_PATH = "Resource/ParticleJsonData/waterParameter.json";
 Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage_(stage)
 {
-	SetImage("Resource/Image/Monster.png");
+	SetImage("Resource/Image/Cider_Player.png");
 
 	pMng = std::make_unique<ParticleManager>(fileMng);
 	pMng->RegisterConfig(WATER_PARTICLE_PATH);
