@@ -87,7 +87,7 @@ const char* InputManager::GetPadName(int type) const
 // コントローラーのボタンマッピングを解決する関数
 InputManager::InputManager()
 {
-	// 配列の初期化を明示 (必須ではないが、可読性向上のため)
+	// 配列の初期化を明示
 	memset(key, 0, sizeof(key));
 	memset(prevKey, 0, sizeof(prevKey));
 	memset(padButton, 0, sizeof(padButton));

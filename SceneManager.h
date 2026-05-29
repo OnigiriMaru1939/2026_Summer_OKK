@@ -56,5 +56,5 @@ private:
 
 	//Transition transition_;
 
-	ClearResult clearResult_;
+	ClearResult _clearResult;
 };

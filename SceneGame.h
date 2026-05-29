@@ -27,9 +27,8 @@ public:
 	FileManager& GetFileManager() { return fileMng_; }
 
 	static void SetSelectedStageIndex(int index) { selectedStageIndex_ = index; }
-private:
 	static int selectedStageIndex_;
-
+private:
 	std::unique_ptr<Stage> stage_;
 	std::unique_ptr<Player> player_;
 	std::vector<std::shared_ptr<EnemyBase>> enemyList_;		//敵のリスト

@@ -23,7 +23,7 @@ Decide, Keyboard, KEY_INPUT_RETURN, 1.0
 Decide, GamepadButton, Xbox_Start, 1.0
 
 Pause, Keyboard, KEY_INPUT_ESCAPE, 1.0
-Pause, GamepadButton, Xbox_Start, 1.0
+Pause, GamepadButton, Xbox_Back, 1.0
 
 MoveH, Keyboard, KEY_INPUT_D, 1.0
 MoveH, Keyboard, KEY_INPUT_A, -1.0

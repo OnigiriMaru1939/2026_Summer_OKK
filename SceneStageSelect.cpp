@@ -1,11 +1,17 @@
 ﻿#define NOMINMAX
 #include <algorithm>
+#include <string>
 #include "SceneStageSelect.h"
 #include "InputManager.h"
 #include "SceneGame.h"
 
 SceneStageSelect::SceneStageSelect(FileManager& fileMng) : SceneSuper(fileMng)
 {
+	//AddFontResourceExA("Resource/fonts/KumarOneOutline-Regular.ttf", FR_PRIVATE, NULL);
+	//stageFontHandle = CreateFontToHandle("Kumar One Outline", 60, -1, DX_FONTTYPE_NORMAL);
+	AddFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
+	stageFontHandle = CreateFontToHandle("DotGothic16", 80, -1, DX_FONTTYPE_NORMAL);
+	stageNumFontHandle = CreateFontToHandle("DotGothic16", 120, -1, DX_FONTTYPE_NORMAL);
 	_selectedStage = 1; // 初期選択ステージは1
 
 	_bgImg = fileMng.LoadImageFM("Resource/Image/StageSelect/StageSelect_bg.png");
@@ -39,7 +45,10 @@ SceneStageSelect::SceneStageSelect(FileManager& fileMng) : SceneSuper(fileMng)
 
 SceneStageSelect::~SceneStageSelect()
 {
-
+	DeleteFontToHandle(stageFontHandle);
+	DeleteFontToHandle(stageNumFontHandle);
+	//RemoveFontResourceExA("Resource/fonts/KumarOneOutline-Regular.ttf", FR_PRIVATE, NULL);
+	RemoveFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
 }
 
 void SceneStageSelect::Update()
@@ -57,6 +66,14 @@ void SceneStageSelect::Draw()
 		int x = BLOCK_X + (i % 2) * (_stageSelectBlockImg->GetWidth() + 20);
 		int y = BLOCK_Y + (i / 2) * (_stageSelectBlockImg->GetHeight() + 20);
 		DrawGraph(x, y, _stageSelectBlockImg->GetHandle(), true);
+
+		std::string stageText = "STAGE";
+		int width = GetDrawStringWidthToHandle(stageText.c_str(), stageText.length(), stageFontHandle);
+		DrawStringToHandle(x + (_stageSelectBlockImg->GetWidth() / 2) - (width / 2), y + 40, stageText.c_str(), 0xaaebfb, stageFontHandle);
+		
+		std::string stageNumStr = std::to_string(i + 1);
+		int numWidth = GetDrawStringWidthToHandle(stageNumStr.c_str(), stageNumStr.length(), stageNumFontHandle);
+		DrawFormatStringToHandle(x + (_stageSelectBlockImg->GetWidth() / 2) - (numWidth / 2), y + 140, 0xffffff, stageNumFontHandle, "%d", i + 1);
 		if (_selectedStage == i + 1)
 		{
 			// 選択中のステージに赤い枠を描画

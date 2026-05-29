@@ -65,7 +65,7 @@ std::unique_ptr<SceneSuper> SceneManager::CreateScene(SceneSuper::SceneID sceneI
 		case SceneSuper::SceneID::GAME:
 			return std::make_unique<SceneGame>(fileMng_, *this);
 		case SceneSuper::SceneID::RESULT:
-			return std::make_unique<SceneResult>(fileMng_, _isClear, clearResult_);
+			return std::make_unique<SceneResult>(fileMng_, _isClear, _clearResult);
 		case SceneSuper::SceneID::PAUSE:
 			return std::make_unique<ScenePause>(fileMng_, *this);
 		default:
@@ -140,5 +140,5 @@ bool SceneManager::GetExit() const
 
 void SceneManager::SetClearResult(const ClearResult& result)
 {
-	clearResult_ = result;
+	_clearResult = result;
 }

@@ -29,5 +29,8 @@ private:
 	std::shared_ptr<ImageFile> _stageSelectBlockImg;
 
 	int _selectedStage;
+
+	int stageFontHandle;
+	int stageNumFontHandle;
 };
 
