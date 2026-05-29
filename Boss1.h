@@ -10,6 +10,8 @@ public:
 	~Boss1() override;
 	void Update() override;
 	void Draw() const override;
+	void BossMove();
+	void Jump();
 	const char* GetEnemyName() const override
 	{
 		return "Boss1";

@@ -54,6 +54,9 @@ public:
 	//HPを取得
 	int GetHp() const { return hp_; }
 	int GetHpMax() const { return hpMax_; }
+	//フラグを取得
+	bool GetJumpFlag() const { return jumpFlag; }
+	bool GetAliveFlag() const { return isAlive_; }
 protected:
 	FileManager& fileManager_;
 	std::shared_ptr<ImageFile> image_;	//画像データ
@@ -79,6 +82,7 @@ protected:
 	int hp_; //HP
 	int hpMax_; //HPの最大値
 	bool isAlive_; // 生存フラグ
+	bool jumpFlag;		//ジャンプフラグ
 
 };
 

@@ -47,7 +47,7 @@ Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage
 	jumpPower = 12.0f;
 
 	//体力を初期化
-	playerHpMax = 10.0f;
+	playerHpMax = 100.0f;
 	playerHp = playerHpMax;
 
 	//ゲージ等の初期化
@@ -336,6 +336,7 @@ void Player::Rotate()
 	angle += rotateSpeed * (InputManager::GetInstance().GetActionValue(ActionID::Rotate) + InputManager::GetInstance().GetActionAxis(ActionID::Rotate));
 }
 
+//衝突判定
 bool Player::WillCollide(int newX, int newY)
 {
 	return stage_->CheckHitWallRect(
