@@ -12,6 +12,11 @@ public:
 	enum class ENEMY_TYPE
 	{
 		E_TYPE_1,
+		E_TYPE_2,
+		E_TYPE_3,
+		E_TYPE_BOSS_1,
+		E_TYPE_BOSS_2,
+		E_TYPE_BOSS_3,
 
 		E_TYPE_MAX,
 	};
@@ -22,7 +27,6 @@ public:
 	virtual void Update() = 0; // 更新処理
 	virtual void Draw() const;   // 描画処理
 	bool SetImage(const std::string& path); // 画像読み込み
-	virtual const char* GetEnemyName() const = 0; // 敵の名前を取得
 
 	// 基本操作
 	void SetPosition(float x, float y);
@@ -44,6 +48,7 @@ public:
 	float GetY() const { return y_; }
 	int GetWidth() const { return width_; }
 	int GetHeight() const { return height_; }
+	ENEMY_TYPE GetEnemyType() const { return enemyType_; }
 	//敵の当たり判定の座標を取得
 	int GetLeft() const { return static_cast<int>(x_ - width_ / 2); }
 	int GetRight() const { return static_cast<int>(x_ + width_ / 2); }
@@ -61,6 +66,7 @@ protected:
 	FileManager& fileManager_;
 	std::shared_ptr<ImageFile> image_;	//画像データ
 	Stage* stage_;						//ステージへのポインタ
+	ENEMY_TYPE enemyType_;				//敵の種類
 	
 	//ゲージの描画
 	void DrawGauge(int x, int y, int width, int height, float value, float maxValue, int color) const;

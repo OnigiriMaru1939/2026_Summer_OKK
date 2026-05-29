@@ -12,9 +12,5 @@ public:
 	void Draw() const override;
 	void BossMove();
 	void Jump();
-	const char* GetEnemyName() const override
-	{
-		return "Boss1";
-	}
 };
 

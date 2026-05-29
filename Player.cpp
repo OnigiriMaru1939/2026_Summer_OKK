@@ -44,7 +44,7 @@ Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage
 	angle = 0.0f;
 	sodaRatio = 0.0f;
 	rotateSpeed = 0.05f;
-	jumpPower = 12.0f;
+	jumpPower = 15.0f;
 
 	//体力を初期化
 	playerHpMax = 100.0f;
@@ -91,6 +91,14 @@ bool Player::SetImage(const std::string& path)
 	return true;
 }
 
+//プレイヤーの位置を設定
+void Player::SetPosition(float x, float y)
+{
+	posX = x; // x座標を設定
+	posY = y; // y座標を設定
+}
+
+//プレイヤーの速度を設定
 void Player::SetVelocity(float vx, float vy)
 {
 	velocityX = vx; // x方向の速度を設定
@@ -382,11 +390,11 @@ void Player::ClickSodaJump()
 		sodaRatio = sodaShakeGauge / sodaGaugeMax;
 		//炭酸蓄積ゲージの割合を炭酸攻撃の威力に変換
 		sodaPower = sodaRatio * 20.0f;
+		float sodaMoveDist = sodaPower * 1.5f; //移動距離を攻撃力の1.5倍に設定
 
 		//プレイヤーが向いている方向に移動する
-		velocityX += cos(angle - DX_PI_F / 2) * sodaPower;
-		velocityY += sin(angle - DX_PI_F / 2) * sodaPower;
-
+		velocityX += cos(angle - DX_PI_F / 2) * sodaMoveDist;
+		velocityY += sin(angle - DX_PI_F / 2) * sodaMoveDist;
 		//炭酸攻撃処理
 		SodaAttack(sodaPower);
 		sodaGauge -= 20.0f;

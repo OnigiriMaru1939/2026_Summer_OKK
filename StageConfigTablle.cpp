@@ -1,6 +1,7 @@
 ﻿#include "StageConfigTablle.h"
 #include "Stage.h"
 #include "SceneGame.h"
+#include "Player.h"
 #include "Enemy1.h"
 #include "Boss1.h"
 const std::vector<StageConfig>& GetStageConfigs()
@@ -12,22 +13,12 @@ const std::vector<StageConfig>& GetStageConfigs()
 			[](SceneGame& scene)
 			{
 				scene.GetStage()->SetBgImage("Resource/Image/Stage1_bg.png");
+				//プレイヤーの初期化
+				scene.GetPlayer()->SetPosition(100.0f, 1840.0f);
 				//敵の生成
-				scene.GetEnemyList().push_back(std::make_shared<Enemy1>(
-					scene.GetFileManager(),
-					scene.GetStage(),
-					800.0f,
-					160.0f
-				)
-				);
-				//ボスの生成
-				scene.GetEnemyList().push_back(std::make_shared<Boss1>(
-					scene.GetFileManager(),
-					scene.GetStage(),
-					1200.0f,
-					160.0f
-				)
-				);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 500.0f, 200.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 800.0f, 1700.0f);
+				scene.AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1, 1200.0f, 200.0f);
 			},
 			
 
