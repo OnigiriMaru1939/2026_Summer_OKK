@@ -41,6 +41,12 @@ SceneStageSelect::SceneStageSelect(FileManager& fileMng) : SceneSuper(fileMng)
 														SetNextScene(SceneID::GAME);
 														isEnd = true;
 												   });
+	InputManager::GetInstance().SetTriggerCallback(ActionID::Cancel,
+												   [this]()
+												   {
+													   SetNextScene(SceneID::TITLE);
+													   isEnd = true;
+												   });
 }
 
 SceneStageSelect::~SceneStageSelect()
