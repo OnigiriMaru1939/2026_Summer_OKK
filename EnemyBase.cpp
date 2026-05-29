@@ -87,6 +87,10 @@ void EnemyBase::Move()
 	{
 		if (WillCollide(x_, signY + y_))
 		{
+			if (signY > 0)
+			{
+				jumpFlag = false;
+			}
 			vy_ = 0;
 			break;
 		}
@@ -153,7 +157,7 @@ RECT EnemyBase::GetRect() const
 
 void EnemyBase::Draw() const
 {
-	if(!isAlive_ || !image_) return; // 生存していないか画像がない場合は描画しない
+	if (!isAlive_ || !image_) return; // 生存していないか画像がない場合は描画しない
 
 	//当たり判定の矩形を描画
 	RECT rc = GetRect();
@@ -178,7 +182,14 @@ void EnemyBase::Draw() const
 
 	int handle = 0;
 	handle = image_->GetHandle(); // 画像のハンドルを取得
-	DrawGraph(static_cast<int>(x_ - width_ / 2 - stage_->GetScrollX()), static_cast<int>(y_ - height_ / 2 - stage_->GetScrollY()), handle, TRUE); // 画像を描画
+	DrawExtendGraph(
+		x_ - width_ / 2 - stage_->GetScrollX(),
+		y_ - height_ / 2 - stage_->GetScrollY(),
+		x_ + width_ / 2 - stage_->GetScrollX(),
+		y_ + height_ / 2 - stage_->GetScrollY(),
+		handle,
+		TRUE
+	);
 }
 
 //横ゲージの描画

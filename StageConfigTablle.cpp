@@ -20,6 +20,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 					160.0f
 				)
 				);
+				//ボスの生成
 				scene.GetEnemyList().push_back(std::make_shared<Boss1>(
 					scene.GetFileManager(),
 					scene.GetStage(),
