@@ -72,7 +72,6 @@ void Application::Run()
 
 void Application::Update()
 {
-	InputManager::GetInstance().Update();
 	sceneMng->Update();
 }
 

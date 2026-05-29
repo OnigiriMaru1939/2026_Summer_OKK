@@ -7,10 +7,12 @@
 
 ScenePause::ScenePause(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(fileMng), sceneMng_(sceneMng)
 {
+	InputManager::GetInstance().SetPauseMode(true);
 }
 
 ScenePause::~ScenePause()
 {
+	InputManager::GetInstance().SetPauseMode(false);
 }
 
 void ScenePause::Update()

@@ -120,7 +120,12 @@ public:
 	// 振動機能
 	void StartVibration(int Power, int Time = -1, int EffectIndex = -1, int padNo = 0);
 	void StopVibration(int padNo = 0);
+
+	void SetPauseMode(bool paused) { isPaused = paused; }
+	bool IsPaused() const { return isPaused; }
 private:
+	bool isPaused = false;
+	
 	std::map<ActionID, ActionCallback> axisCallbacks;
 	std::map<ActionID, ActionCallback> triggerCallbacks;
 	std::map<ActionID, ActionCallback> pressCallbacks;
