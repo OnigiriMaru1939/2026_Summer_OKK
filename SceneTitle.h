@@ -4,6 +4,7 @@
 #include "ImageFile.h"
 #include "SoundFile.h"
 #include <memory>
+#include <memory>
 
 class SceneTitle :
     public SceneSuper

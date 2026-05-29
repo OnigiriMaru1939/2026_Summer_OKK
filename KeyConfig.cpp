@@ -54,6 +54,7 @@ int KeyConfig::StringToKeyCode(const std::wstring& str) const
 	// staticにすることで、関数を呼ぶたびにテーブルが生成されるのを防ぐ
 	static const std::unordered_map<std::wstring, int> keyMap = {
 		{ L"KEY_INPUT_ESCAPE", KEY_INPUT_ESCAPE },
+		{ L"KEY_INPUT_TAB", KEY_INPUT_TAB },
 		{ L"KEY_INPUT_SPACE",  KEY_INPUT_SPACE },
 		{ L"KEY_INPUT_RETURN", KEY_INPUT_RETURN },
 		{ L"KEY_INPUT_LEFT",   KEY_INPUT_LEFT },

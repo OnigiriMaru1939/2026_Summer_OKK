@@ -26,6 +26,7 @@ SceneManager::~SceneManager()
 
 void SceneManager::Update()
 {
+	InputManager::GetInstance().Update();
 	if (scenes.empty())
 	{
 		isExit = true;
@@ -75,6 +76,11 @@ std::unique_ptr<SceneSuper> SceneManager::CreateScene(SceneSuper::SceneID sceneI
 
 void SceneManager::ChangeScene(SceneSuper::SceneID nextSceneID)
 {
+	if (nextSceneID == SceneSuper::SceneID::EXIT)
+	{
+		isExit = true;
+		return;
+	}
 	InputManager::GetInstance().ClearAxisCallbacks();
 	InputManager::GetInstance().ClearPressCallbacks();
 	InputManager::GetInstance().ClearTriggerCallbacks();

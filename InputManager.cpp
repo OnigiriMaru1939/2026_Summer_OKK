@@ -186,6 +186,10 @@ void InputManager::Update()
 			}
 		}
 	}
+	if (isPaused)
+	{
+		return;
+	}
 	DispatchCallbacks();
 }
 
