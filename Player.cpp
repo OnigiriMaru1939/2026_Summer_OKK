@@ -382,12 +382,11 @@ void Player::Damage(float dmg)
 
 void Player::ClickSodaJump()
 {
-	
+	sodaRatio = sodaShakeGauge / sodaGaugeMax;
 
 	//炭酸蓄積ゲージが0より大きい場合、炭酸蓄積ゲージを減らす
 	if (sodaShakeGauge > 0)
 	{
-		sodaRatio = sodaShakeGauge / sodaGaugeMax;
 		//炭酸蓄積ゲージの割合を炭酸攻撃の威力に変換
 		sodaPower = sodaRatio * 20.0f;
 		float sodaMoveDist = sodaPower * 1.5f; //移動距離を攻撃力の1.5倍に設定
@@ -401,26 +400,28 @@ void Player::ClickSodaJump()
 		sodaShakeGauge = 0;
 		//下限リミッター
 		if (sodaGauge < 0) sodaGauge = 0;
+
+		//ParticleConfig::acceleration = 0;
+		const ParticleConfig* masterCfg = pMng->GetConfig(WATER_PARTICLE_PATH);
+		if (masterCfg)
+		{
+			// ParticleConfig構造体のコピー
+			ParticleConfig customCfg = *masterCfg;
+
+			float plusAngle = angle * (180.0f / DX_PI_F);
+			while (plusAngle < 0) plusAngle += 360.0f;
+			while (plusAngle >= 360.0f) plusAngle -= 360.0f; // 0～360の範囲に収める
+			customCfg.initDir += plusAngle;
+			customCfg.startScale *= sodaRatio;
+			customCfg.initSpeed *= sodaRatio;
+			sodaParticle = pMng->PlayParticle(customCfg, posX - sinf(angle) * width_, posY + cosf(angle) * height_);
+
+			sodaAttackSE->SetVolume((int)(sodaRatio * 255)); // 音量を炭酸ゲージの割合に応じて変化させる
+			sodaAttackSE->PlayOneShot();
+		}
 	}
 
-	//ParticleConfig::acceleration = 0;
-	const ParticleConfig* masterCfg = pMng->GetConfig(WATER_PARTICLE_PATH);
-	if (masterCfg)
-	{
-		// ParticleConfig構造体のコピー
-		ParticleConfig customCfg = *masterCfg;
 
-		float plusAngle = angle * (180.0f / DX_PI_F);
-		while (plusAngle < 0) plusAngle += 360.0f;
-		while (plusAngle >= 360.0f) plusAngle -= 360.0f; // 0～360の範囲に収める
-		customCfg.initDir += plusAngle;
-		customCfg.startScale *= sodaRatio;
-		customCfg.initSpeed *= sodaRatio;
-		sodaParticle = pMng->PlayParticle(customCfg, posX - sinf(angle) * width_, posY + cosf(angle) * height_);
-
-		sodaAttackSE->SetVolume((int)(sodaRatio * 255)); // 音量を炭酸ゲージの割合に応じて変化させる
-		sodaAttackSE->PlayOneShot();
-	}
 }
 
 //プレイヤーの振動処理
