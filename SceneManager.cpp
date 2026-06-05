@@ -17,6 +17,8 @@ SceneManager::SceneManager(FileManager& fileMng) : fileMng_(fileMng)
 	scenes.push_back(CreateScene(SceneSuper::SceneID::TITLE));
 	isExit = false;
 	_isClear = false;
+
+	transition_.state = TransitionState::None;
 }
 
 SceneManager::~SceneManager()
@@ -33,12 +35,62 @@ void SceneManager::Update()
 		return;
 	}
 
-	auto& currentScene = scenes.back();
-	currentScene->Update();
-
-	if (currentScene->IsEnd())
+	if (IsTransitioning())
 	{
-		ChangeScene(currentScene->GetNextScene());
+		UpdateTransition();
+
+		currentScene->UpdateDuringTransition();
+	}
+	else
+	{
+		currentScene = scenes.back().get();
+		currentScene->Update();
+
+		if (currentScene->IsEnd())
+		{
+			currentScene->SetIsTransition(true);
+			// のちのち、シーン切り替えの演出を入れる際に、currentSceneからフェードアウトとフェードインのTimerやDurationを取得して、Transition構造体にセットする形にする
+			transition_.state = TransitionState::FadeOutCurrent;
+			transition_.timer = 0.0f;
+			transition_.duration = 45.0f; // フェードの総時間（フレーム数）
+			transition_.nextSceneID = currentScene->GetNextScene();
+		}
+	}
+}
+
+void SceneManager::UpdateTransition()
+{
+	transition_.timer += 1.0f; // フレームごとにタイマーを進める
+
+	switch (transition_.state)
+	{
+		case TransitionState::FadeOutCurrent:
+			currentScene->TransitionOut(transition_.timer / transition_.duration);
+			if (transition_.timer >= transition_.duration)
+			{
+				transition_.state = TransitionState::SwitchScene;
+			}
+			break;
+		case TransitionState::SwitchScene:
+			ChangeScene(transition_.nextSceneID);
+
+			currentScene = scenes.back().get();
+			currentScene->SetIsTransition(true);
+
+			transition_.state = TransitionState::FadeInNext;
+			transition_.timer = 0.0f; // フェードインのタイマーをリセット
+			break;
+		case TransitionState::FadeInNext:
+			currentScene->TransitionIn(transition_.timer / transition_.duration);
+			if (transition_.timer >= transition_.duration)
+			{
+				currentScene->SetIsTransition(false);
+				transition_.state = TransitionState::None; // トランジション終了
+				transition_.nextSceneID = SceneSuper::SceneID::NONE; // 次のシーンIDをリセット
+			}
+			break;
+		default:
+			break;
 	}
 }
 

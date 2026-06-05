@@ -23,7 +23,7 @@ public:
 	void Draw();
 
 	bool CheckWall(int cx, int cy) const;
-
+	
 	void SetScrollX(int s);
 	void SetScrollY(int s);
 	void SetBgImage(const std::string& path);

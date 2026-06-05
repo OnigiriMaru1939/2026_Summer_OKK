@@ -5,7 +5,7 @@
 #include <map>
 #include "ActionID.h"
 
-enum class PadAxis { Pad_L_X, Pad_L_Y, Pad_R_X, Pad_R_Y, Pad_L_Dist, Pad_R_Dist, Pad_L_Vec, Pad_R_Vec };
+enum class PadAxis { Pad_L_X, Pad_L_Y, Pad_R_X, Pad_R_Y, Pad_L_Dist, Pad_R_Dist };
 enum class MouseAxis { Mouse_X, Mouse_Y, Mouse_Dist };
 // ゲームコントローラーの認識番
 // DxLib定数、DX_INPUT_PAD1等に対応
@@ -106,7 +106,9 @@ public:
 	float GetActionValue(ActionID action, int padNo = 0) const; // ボタン
 	float GetActionAxis(ActionID action, int padNo = 0) const; // 軸
 
-
+	// アナログ値取得
+	float GetMouseAxisValue(MouseAxis axis) const; // 変化量を取得(正規化はしていない)
+	float GetPadAxisValue(PadAxis axis, int padNo = 0) const;// -1.0～1.0で取得
 
 	// アクションに対するコールバックの登録
 	void SetAxisCallback(ActionID action, ActionCallback callback);
@@ -172,9 +174,7 @@ private:
 	bool GetRawState(int padNo, PadButton btn, const DINPUT_JOYSTATE& dState, const XINPUT_STATE& xState);
 	// コントローラーの種類取得
 	const char* GetPadName(int type) const;
-	// アナログ値取得
-	float GetMouseAxisValue(MouseAxis axis) const;
-	float GetPadAxisValue(int padNo, PadAxis axis) const;
+
 	// 入力状態の判定を行う共通関数
 	bool IsInputTriggered(int current, int previous) const { return current == 1; }
 	bool IsInputPressed(int current) const { return current > 0; }

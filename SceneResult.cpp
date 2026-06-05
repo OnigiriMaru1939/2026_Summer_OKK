@@ -1,7 +1,9 @@
-﻿#include "SceneResult.h"
+﻿#define NOMINMAX
+#include "SceneResult.h"
 #include "SceneGame.h"
 #include "InputManager.h"
 #include <string>
+#include <algorithm>
 
 SceneResult::SceneResult(FileManager& fileMng, bool isClear, ClearResult& result) : SceneSuper(fileMng), _isClear(isClear), _clearResult(result)
 {
@@ -14,30 +16,41 @@ SceneResult::SceneResult(FileManager& fileMng, bool isClear, ClearResult& result
 	_bgImg = fileMng.LoadImageFM("Resource/Image/Title_bg_NoLogo.png");
 	_resultClearLogoImg = fileMng.LoadImageFM("Resource/Image/Result/Result_Clear_Logo.png");
 	_resultFailedLogoImg = fileMng.LoadImageFM("Resource/Image/Result/Result_Failed_Logo.png");
+
+	_decideSE = fileMng_.LoadSoundFM("Resource/Sound/SE/Decide_SE.wav");
+	_cursorSE = fileMng_.LoadSoundFM("Resource/Sound/SE/Cursor_SE.wav");
+
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Decide,
 												   [this]()
 												   {
-													   switch (static_cast<NextScene>(_selectedNext))
+													   if (!isTransition)
 													   {
-														   case NextScene::Next:
-															   SceneGame::selectedStageIndex_++;
-															   SetNextScene(SceneID::GAME);
-															   break;
-														   case NextScene::StageSelect:
-															   SetNextScene(SceneID::STAGE_SELECT);
-															   break;
-														   case NextScene::Title:
-															   SetNextScene(SceneID::TITLE);
-															   break;
+														   _decideSE->PlayOneShot();
+														   switch (static_cast<NextScene>(_selectedNext))
+														   {
+															   case NextScene::Next:
+																   SceneGame::selectedStageIndex_++;
+																   SetNextScene(SceneID::GAME);
+																   break;
+															   case NextScene::StageSelect:
+																   SetNextScene(SceneID::STAGE_SELECT);
+																   break;
+															   case NextScene::Title:
+																   SetNextScene(SceneID::TITLE);
+																   break;
+														   }
+
+														   isEnd = true;
 													   }
-													   
-													   isEnd = true;
 												   });
 	InputManager::GetInstance().SetTriggerCallback(ActionID::MoveH,
 												   [this]()
 												   {
-													   float moveValue = InputManager::GetInstance().GetActionValue(ActionID::MoveH);
-													   MoveSelect(moveValue);
+													   if (!isTransition)
+													   {
+														   float moveValue = InputManager::GetInstance().GetActionValue(ActionID::MoveH);
+														   MoveSelect(moveValue);
+													   }
 												   });
 }
 
@@ -88,10 +101,30 @@ void SceneResult::MoveSelect(float moveValue)
 {
 	if (moveValue > 0)
 	{
-		_selectedNext = (_selectedNext == 2) ? _selectedNext : _selectedNext + 1;
+		if (_selectedNext != 2)
+		{
+			_selectedNext++;
+			_cursorSE->PlayOneShot();
+		}
 	}
 	else
 	{
-		_selectedNext = (SceneGame::selectedStageIndex_ == 4) ? (_selectedNext == 1) ? _selectedNext : _selectedNext - 1 : (_selectedNext == 0) ? _selectedNext : _selectedNext - 1;
+		if (SceneGame::selectedStageIndex_ == 4)
+		{
+			if (_selectedNext != 1)
+			{
+				_selectedNext--;
+				_cursorSE->PlayOneShot();
+			}
+		}
+		else
+		{
+			if (_selectedNext != 0)
+			{
+				_selectedNext--;
+				_cursorSE->PlayOneShot();
+			}
+		}
 	}
+	_selectedNext = std::max(0, std::min(2, _selectedNext));
 }

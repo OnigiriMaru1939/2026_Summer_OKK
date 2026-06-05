@@ -4,7 +4,6 @@
 #include "ImageFile.h"
 #include "SoundFile.h"
 #include <memory>
-#include <memory>
 
 class SceneTitle :
     public SceneSuper
@@ -25,5 +24,6 @@ private:
 	std::shared_ptr<ImageFile> _TitleStartImg;
 
 	std::shared_ptr<SoundFile> _mainBgm;
+	std::shared_ptr<SoundFile> _decideSE;
 };
 

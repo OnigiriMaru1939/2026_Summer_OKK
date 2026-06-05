@@ -79,7 +79,7 @@ void Application::Draw()
 {
 	sceneMng->Draw();
 
-	//InputManager::GetInstance().DrawDebug(0, 40);
+	InputManager::GetInstance().DrawDebug(0, 40);
 }
 
 void Application::DebugMoveX()
