@@ -99,6 +99,8 @@ InputManager::InputManager()
 	memset(mouseButton, 0, sizeof(mouseButton));
 	memset(prevMouseButton, 0, sizeof(prevMouseButton));
 	mouseX = mouseY = prevMouseX = prevMouseY = 0;
+
+	_layerStack.push_back(InputLayer());
 }
 
 InputManager::~InputManager()
@@ -186,10 +188,7 @@ void InputManager::Update()
 			}
 		}
 	}
-	if (isPaused)
-	{
-		return;
-	}
+
 	DispatchCallbacks();
 }
 
@@ -261,6 +260,24 @@ float InputManager::GetPadAxisValue(int padNo, PadAxis axis) const
 				int dx = padRX[padNo] - prevPadRX[padNo];
 				int dy = padRY[padNo] - prevPadRY[padNo];
 				rawValue = (int)sqrtf(dx * dx + dy * dy);
+				break;
+			}
+		case PadAxis::Pad_L_Vec:
+			{
+			// ベクトルの向きをラジアンで取得する
+				int dx = padLX[padNo];
+				int dy = padLY[padNo];
+				float angle = atan2f(dy, dx);
+				return angle; // 角度はデッドゾーンの影響を受けないようにここで返す
+				break;
+			}
+		case PadAxis::Pad_R_Vec:
+			{
+				// ベクトルの向きをラジアンで取得する
+				int dx = padRX[padNo];
+				int dy = padRY[padNo];
+				float angle = atan2f(dy, dx);
+				return angle; // 角度はデッドゾーンの影響を受けないようにここで返す
 				break;
 			}
 	}
@@ -405,36 +422,36 @@ bool InputManager::IsActionReleased(ActionID action, int padNo) const
 // アクションに対するコールバックの登録
 void InputManager::SetAxisCallback(ActionID action, ActionCallback callback)
 {
-	axisCallbacks[action] = callback;
+	GetCurrentLayer().axisCallbacks[action] = callback;
 }
 void InputManager::SetTriggerCallback(ActionID action, ActionCallback callback)
 {
-	triggerCallbacks[action] = callback;
+	GetCurrentLayer().triggerCallbacks[action] = callback;
 }
 void InputManager::SetPressCallback(ActionID action, ActionCallback callback)
 {
-	pressCallbacks[action] = callback;
+	GetCurrentLayer().pressCallbacks[action] = callback;
 }
 void InputManager::SetReleaseCallback(ActionID action, ActionCallback callback)
 {
-	releaseCallbacks[action] = callback;
+	GetCurrentLayer().releaseCallbacks[action] = callback;
 }
 // 登録されたコールバックのクリア
 void InputManager::ClearAxisCallbacks()
 {
-	axisCallbacks.clear();
+	GetCurrentLayer().axisCallbacks.clear();
 }
 void InputManager::ClearTriggerCallbacks()
 {
-	triggerCallbacks.clear();
+	GetCurrentLayer().triggerCallbacks.clear();
 }
 void InputManager::ClearPressCallbacks()
 {
-	pressCallbacks.clear();
+	GetCurrentLayer().pressCallbacks.clear();
 }
 void InputManager::ClearReleaseCallbacks()
 {
-	releaseCallbacks.clear();
+	GetCurrentLayer().releaseCallbacks.clear();
 }
 
 void InputManager::ClearAllCallbacks()
@@ -460,19 +477,25 @@ void InputManager::StopVibration(int padNo)
 
 void InputManager::DispatchCallbacks()
 {
-	for (const auto& [action, callback] : axisCallbacks)
+	if (_layerStack.empty()) return; // レイヤーがない場合は処理をスキップ
+
+	auto axisSnapshot = GetCurrentLayer().axisCallbacks; // 軸コールバックのスナップショットを作成
+	for (const auto& [action, callback] : axisSnapshot)
 	{
 		if (GetActionAxis(action)) callback();
 	}
-	for (const auto& [action, callback] : triggerCallbacks)
+	auto triggerSnapshot = GetCurrentLayer().triggerCallbacks; // トリガーコールバックのスナップショットを作成
+	for (const auto& [action, callback] : triggerSnapshot)
 	{
 		if (IsActionTriggered(action)) callback();
 	}
-	for (const auto& [action, callback] : pressCallbacks)
+	auto pressSnapshot = GetCurrentLayer().pressCallbacks; // 押下コールバックのスナップショットを作成
+	for (const auto& [action, callback] : pressSnapshot)
 	{
 		if (IsActionPressed(action)) callback();
 	}
-	for (const auto& [action, callback] : releaseCallbacks)
+	auto releaseSnapshot = GetCurrentLayer().releaseCallbacks; // 解放コールバックのスナップショットを作成
+	for (const auto& [action, callback] : releaseSnapshot)
 	{
 		if (IsActionReleased(action)) callback();
 	}

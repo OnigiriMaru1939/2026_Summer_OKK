@@ -12,7 +12,8 @@ SceneStageSelect::SceneStageSelect(FileManager& fileMng) : SceneSuper(fileMng)
 	AddFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
 	stageFontHandle = CreateFontToHandle("DotGothic16", 80, -1, DX_FONTTYPE_NORMAL);
 	stageNumFontHandle = CreateFontToHandle("DotGothic16", 120, -1, DX_FONTTYPE_NORMAL);
-	_selectedStage = 1; // 初期選択ステージは1
+	titleFontHandle = CreateFontToHandle("DotGothic16", 100, -1, DX_FONTTYPE_NORMAL);
+	_selectedButton = 1; // 初期選択ステージは1
 
 	_bgImg = fileMng.LoadImageFM("Resource/Image/StageSelect/StageSelect_bg.png");
 	_stageSelectH1Img = fileMng.LoadImageFM("Resource/Image/StageSelect/StageSelect_H1.png");
@@ -36,16 +37,17 @@ SceneStageSelect::SceneStageSelect(FileManager& fileMng) : SceneSuper(fileMng)
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Decide,
 												   [this]()
 												   {
+													   if (_selectedButton == 0)
+													   {
+														   // タイトルが選択されている場合はタイトルに戻る
+														   SetNextScene(SceneID::TITLE);
+														   isEnd = true;
+														   return;
+													   }
 													   // 選択されたステージをSceneGameに渡すために、SceneManagerに保存
-													   SceneGame::SetSelectedStageIndex(_selectedStage);
+													   SceneGame::SetSelectedStageIndex(_selectedButton);
 														SetNextScene(SceneID::GAME);
 														isEnd = true;
-												   });
-	InputManager::GetInstance().SetTriggerCallback(ActionID::Cancel,
-												   [this]()
-												   {
-													   SetNextScene(SceneID::TITLE);
-													   isEnd = true;
 												   });
 }
 
@@ -53,6 +55,7 @@ SceneStageSelect::~SceneStageSelect()
 {
 	DeleteFontToHandle(stageFontHandle);
 	DeleteFontToHandle(stageNumFontHandle);
+	DeleteFontToHandle(titleFontHandle);
 	//RemoveFontResourceExA("Resource/fonts/KumarOneOutline-Regular.ttf", FR_PRIVATE, NULL);
 	RemoveFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
 }
@@ -67,10 +70,11 @@ void SceneStageSelect::Draw()
 	DrawGraph(0, 0, _bgImg->GetHandle(), true);
 	DrawGraph(H1_X, H1_Y, _stageSelectH1Img->GetHandle(), true);
 	// 4つを一グループで描画
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < BLOCK_NUM; ++i)
 	{
-		int x = BLOCK_X + (i % 2) * (_stageSelectBlockImg->GetWidth() + 20);
-		int y = BLOCK_Y + (i / 2) * (_stageSelectBlockImg->GetHeight() + 20);
+		int x = BLOCK_X + (i % BLOCK_NUM_ROW) * (_stageSelectBlockImg->GetWidth() + BLOCK_SPACING_X);
+		int y = BLOCK_Y + (i / BLOCK_NUM_ROW) * (_stageSelectBlockImg->GetHeight() + BLOCK_SPACING_Y);
+
 		DrawGraph(x, y, _stageSelectBlockImg->GetHandle(), true);
 
 		std::string stageText = "STAGE";
@@ -80,13 +84,21 @@ void SceneStageSelect::Draw()
 		std::string stageNumStr = std::to_string(i + 1);
 		int numWidth = GetDrawStringWidthToHandle(stageNumStr.c_str(), stageNumStr.length(), stageNumFontHandle);
 		DrawFormatStringToHandle(x + (_stageSelectBlockImg->GetWidth() / 2) - (numWidth / 2), y + 140, 0xffffff, stageNumFontHandle, "%d", i + 1);
-		if (_selectedStage == i + 1)
+		if (_selectedButton == i + 1)
 		{
 			// 選択中のステージに赤い枠を描画
 			DrawBox(x - 5, y - 5, x + _stageSelectBlockImg->GetWidth() + 5, y + _stageSelectBlockImg->GetHeight() + 5, GetColor(255, 0, 0), false);
 		}
 	}
-	DrawString(0, 20, "STAGESELECT SCENE", 0xffffff);
+	DrawBox(TITLE_X, TITLE_Y, TITLE_X + TITLE_W, TITLE_Y + TITLE_H, GetColor(255, 0, 255), true);
+	std::string titleText = "TITLE";
+	int titleWidth = GetDrawStringWidthToHandle(titleText.c_str(), titleText.length(), titleFontHandle);
+	int titleHeight = GetFontSizeToHandle(titleFontHandle);
+	DrawStringToHandle(TITLE_X + (TITLE_W / 2) - (titleWidth / 2), TITLE_Y + (TITLE_H / 2) - (titleHeight / 2), titleText.c_str(), GetColor(255, 255, 255), titleFontHandle);
+	if (_selectedButton == 0)
+	{
+		DrawBox(TITLE_X - 5, TITLE_Y - 5, TITLE_X + TITLE_W + 5, TITLE_Y + TITLE_H + 5, GetColor(255, 0, 0), false);
+	}
 }
 
 void SceneStageSelect::MoveSelect(float moveValue, bool isHorizontal)
@@ -96,12 +108,27 @@ void SceneStageSelect::MoveSelect(float moveValue, bool isHorizontal)
 		if (moveValue > 0)
 		{
 			// 右移動
-			_selectedStage = (_selectedStage % 2 == 0) ? _selectedStage : _selectedStage + 1;
+			if (_selectedButton == 0)
+			{
+				_selectedButton = 3; // タイトルから右に移動した場合は左下のステージに移動
+			}
+			else
+			{
+				_selectedButton = (_selectedButton % 2 == 0) ? _selectedButton : _selectedButton + 1;
+			}
 		}
 		else
 		{
 			// 左移動
-			_selectedStage = (_selectedStage % 2 == 0) ? _selectedStage - 1 : _selectedStage;
+			// 左下のステージから左に移動した場合はタイトルに移動、それ以外は通常の左移動
+			if (_selectedButton == 3)
+			{
+				_selectedButton = 0; // タイトルに移動
+			}
+			else
+			{
+				_selectedButton = (_selectedButton % 2 == 0) ? _selectedButton - 1 : _selectedButton;
+			}
 		}
 	}
 	else
@@ -109,14 +136,14 @@ void SceneStageSelect::MoveSelect(float moveValue, bool isHorizontal)
 		if (moveValue > 0)
 		{
 			// 下移動
-			_selectedStage = (_selectedStage <= 2) ? _selectedStage + 2 : _selectedStage;
+			_selectedButton = (_selectedButton <= 2) ? _selectedButton + 2 : _selectedButton;
 		}
 		else
 		{
 			// 上移動
-			_selectedStage = (_selectedStage > 2) ? _selectedStage - 2 : _selectedStage;
+			_selectedButton = (_selectedButton > 2) ? _selectedButton - 2 : _selectedButton;
 		}
 	}
-	// ステージは1～4の範囲でループ
-	_selectedStage = std::max(1, std::min(4, _selectedStage));
+	// ステージは0～4の範囲でループ
+	_selectedButton = std::max(0, std::min(4, _selectedButton));
 }

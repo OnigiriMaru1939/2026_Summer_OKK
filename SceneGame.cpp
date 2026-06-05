@@ -27,11 +27,16 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(
 	clearTime = 0.0f;
 
 	// デバッグ
-	InputManager::GetInstance().SetTriggerCallback(ActionID::Decide, 
+	InputManager::GetInstance().SetTriggerCallback(ActionID::Cancel, 
 												   [this]()
 												   {
 													   SetNextScene(SceneID::RESULT);
 													   isEnd = true;
+												   });
+	InputManager::GetInstance().SetTriggerCallback(ActionID::Pause,
+												   [this]()
+												   {
+													   sceneMng_.PushScene(SceneID::PAUSE);
 												   });
 }
 
@@ -64,7 +69,6 @@ void SceneGame::Draw()
 	// Stageを描画
 	if (stage_) stage_->Draw();
 
-	DrawString(0, 20, "GAME SCENE", 0xffffff);
 	//プレイヤーを描画
 	player_->Draw();
 

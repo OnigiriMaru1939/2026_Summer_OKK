@@ -41,4 +41,7 @@ void SceneTitle::Draw()
 	DrawRotaGraph(Application::SCREEN_WID / 2, Application::SCREEN_HIG / 2, 1.0f, 0.0f, _bgImg->GetHandle(), true);
 	DrawRotaGraph(Application::SCREEN_WID / 2, LOGO_Y, 1.0f, 0.0f, _TitleLogoImg->GetHandle(), true);
 	DrawRotaGraph(Application::SCREEN_WID / 2, START_Y, 1.0f, 0.0f, _TitleStartImg->GetHandle(), true);
+	std::string TitleEndText = "Press Escape/Back to Exit";
+	int textWidth = GetDrawStringWidth(TitleEndText.c_str(), TitleEndText.length());
+	DrawString((Application::SCREEN_WID / 2) - (textWidth / 2), Application::SCREEN_HIG - 100, TitleEndText.c_str(), GetColor(255, 255, 255));
 }

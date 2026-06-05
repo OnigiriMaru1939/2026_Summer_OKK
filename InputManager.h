@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include <string>
 #include <functional>
+#include <vector>
 #include <map>
 #include "ActionID.h"
 
-enum class PadAxis { Pad_L_X, Pad_L_Y, Pad_R_X, Pad_R_Y, Pad_L_Dist, Pad_R_Dist };
+enum class PadAxis { Pad_L_X, Pad_L_Y, Pad_R_X, Pad_R_Y, Pad_L_Dist, Pad_R_Dist, Pad_L_Vec, Pad_R_Vec };
 enum class MouseAxis { Mouse_X, Mouse_Y, Mouse_Dist };
 // ゲームコントローラーの認識番
 // DxLib定数、DX_INPUT_PAD1等に対応
@@ -63,6 +64,9 @@ enum class PadButton
 	Max
 };
 
+// アクションIDに対する入力状態を取得する関数
+using ActionCallback = std::function<void()>;
+
 class InputManager
 {
 private:
@@ -71,7 +75,7 @@ private:
 	static constexpr int KEY_COUNT = 256;
 	static constexpr int MOUSE_BUTTON_COUNT = 3;
 	static constexpr int MAX_JOYPADS = 4;
-	static constexpr int DEADZONE = 200; // スティックのデッドゾーン
+	static constexpr float DEADZONE = 200.0f; // スティックのデッドゾーン
 	static constexpr float STICK_MAX = 32767.0f; // スティックの最大値
 	static constexpr float AXIS_THRESHOLD = 0.5f; // 軸入力を「押された」とみなす閾値
 
@@ -86,6 +90,11 @@ public:
 	void Update();
 	void DrawDebug(int x, int y) const;
 
+	// 新しいレイヤーを追加
+	void PushLayer() { _layerStack.push_back(InputLayer()); }
+	// 最前のレイヤーを削除して、前のレイヤーに戻る
+	void PopLayer() { if (_layerStack.size() > 1) _layerStack.pop_back(); }
+
 	// キー入力フレーム数取得
 	int GetKeyFrameCount(int keyCode) const { return key[keyCode]; }
 
@@ -97,8 +106,7 @@ public:
 	float GetActionValue(ActionID action, int padNo = 0) const; // ボタン
 	float GetActionAxis(ActionID action, int padNo = 0) const; // 軸
 
-	// アクションIDに対する入力状態を取得する関数
-	using ActionCallback = std::function<void()>;
+
 
 	// アクションに対するコールバックの登録
 	void SetAxisCallback(ActionID action, ActionCallback callback);
@@ -120,16 +128,21 @@ public:
 	// 振動機能
 	void StartVibration(int Power, int Time = -1, int EffectIndex = -1, int padNo = 0);
 	void StopVibration(int padNo = 0);
-
-	void SetPauseMode(bool paused) { isPaused = paused; }
-	bool IsPaused() const { return isPaused; }
 private:
-	bool isPaused = false;
-	
-	std::map<ActionID, ActionCallback> axisCallbacks;
-	std::map<ActionID, ActionCallback> triggerCallbacks;
-	std::map<ActionID, ActionCallback> pressCallbacks;
-	std::map<ActionID, ActionCallback> releaseCallbacks;
+	struct InputLayer
+	{
+		std::map<ActionID, ActionCallback> axisCallbacks;
+		std::map<ActionID, ActionCallback> triggerCallbacks;
+		std::map<ActionID, ActionCallback> pressCallbacks;
+		std::map<ActionID, ActionCallback> releaseCallbacks;
+	};
+
+	std::vector<InputLayer> _layerStack = {InputLayer()};
+
+	// 最前のレイヤーを取得するヘルパー関数
+	InputLayer& GetCurrentLayer() { return _layerStack.back(); }
+	const InputLayer& GetCurrentLayer() const { return _layerStack.back(); }
+
 	// キー入力
 	int key[KEY_COUNT] = {};
 	int prevKey[KEY_COUNT] = {};

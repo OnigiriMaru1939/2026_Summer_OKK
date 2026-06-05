@@ -182,7 +182,6 @@ std::vector<float> ParticleEmitter::GetColorHSL(float H, float S, float L)
 			if (res < 0.0f) return 0.0f;
 			return res;
 		};
-
 	// std::vector<int> で要素3（R, G, B）を返す
 	return { to255(r), to255(g), to255(b) };
 }

@@ -43,7 +43,6 @@ public:
 	void PushScene(SceneSuper::SceneID sceneID);
 	void PopScene();
 
-	void RequestPause();
 private:
 	std::unique_ptr<SceneSuper> CreateScene(SceneSuper::SceneID sceneID);
 	void ChangeScene(SceneSuper::SceneID nextSceneID);
