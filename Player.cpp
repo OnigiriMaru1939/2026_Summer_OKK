@@ -7,13 +7,14 @@
 #include "SoundFile.h"
 #include "ParticleManager.h"
 #include "ParticleEmitter.h"
+#include "SceneGame.h"
 #include <DxLib.h>
 #include <memory>
 #include <algorithm>
 
 
 constexpr auto WATER_PARTICLE_PATH = "Resource/ParticleJsonData/waterParameter.json";
-Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage_(stage)
+Player::Player(FileManager& fileMng, Stage* stage, SceneGame& game) : fileManager(fileMng), stage_(stage), sceneGame(game)
 {
 	SetImage("Resource/Image/Cider_Player.png");
 
@@ -23,13 +24,43 @@ Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage
 	sodaAttackSE = fileMng.LoadSoundFM("Resource/Sound/SE/Soda_SE.wav");
 	sodaChargeSE = fileMng.LoadSoundFM("Resource/Sound/SE/Soda_Charge_SE.wav");
 
-	InputManager::GetInstance().SetTriggerCallback(ActionID::Jump, [this]() { SpaceJump(); });
-	InputManager::GetInstance().SetTriggerCallback(ActionID::SJump, [this]() { ClickSodaJump(); });
+	InputManager::GetInstance().SetTriggerCallback(ActionID::Jump, [this]()
+												   { 
+													   if (!sceneGame.GetIsTransition())
+													   {
+														   SpaceJump();
+													   }
+												   });
+	InputManager::GetInstance().SetTriggerCallback(ActionID::SJump, [this]()
+												   {
+													   if (!sceneGame.GetIsTransition())
+													   {
+														   ClickSodaJump();
+													   }
+												   });
 	 //マウス・スティック振り
-	InputManager::GetInstance().SetAxisCallback(ActionID::Shake, [this]() { SodaShake(); });
+	InputManager::GetInstance().SetAxisCallback(ActionID::Shake, [this]()
+												{ 
+													if (!sceneGame.GetIsTransition())
+													{
+														SodaShake();
+													}
+												});
 	// 回転
-	InputManager::GetInstance().SetPressCallback(ActionID::Rotate, [this]() { Rotate(); });
-	InputManager::GetInstance().SetAxisCallback(ActionID::Rotate, [this]() { Rotate(); });
+	InputManager::GetInstance().SetPressCallback(ActionID::Rotate, [this]() 
+												 {
+													 if (!sceneGame.GetIsTransition())
+													 {
+														 Rotate();
+													 }
+												 });
+	InputManager::GetInstance().SetAxisCallback(ActionID::Rotate, [this]() 
+												{ 
+													if (!sceneGame.GetIsTransition())
+													{
+														RotateAxis();
+													}
+												});
 
 	//位置と物理の初期化
 	posX = 200.0f;
@@ -97,6 +128,7 @@ void Player::SetPosition(float x, float y)
 {
 	posX = x; // x座標を設定
 	posY = y; // y座標を設定
+	UpdateStageScroll(); // ステージのスクロールを更新
 }
 
 //プレイヤーの速度を設定
@@ -155,7 +187,11 @@ void Player::Update()
 	}
 	pMng->UpdateAll();
 
+	UpdateStageScroll();
+}
 
+void Player::UpdateStageScroll()
+{
 	//プレイヤー画面スクロール処理
 	canvasX = posX - stage_->GetScrollX();
 	canvasY = posY - stage_->GetScrollY();
@@ -253,11 +289,11 @@ void Player::SodaShake()
 {
   	//距離
 	float dist = InputManager::GetInstance().GetActionAxis(ActionID::Shake);
-	printfDx("Shake Axis: %f\n", dist);
+	//printfDx("Shake Axis: %f\n", dist);
 	shakeMove = dist;
 
 	//ゲージ加算
-	sodaShakeGauge += shakeMove * 0.25f;
+	sodaShakeGauge += shakeMove * 0.45f;
 
 	//上限
 	if (sodaShakeGauge > SODA_SHAKE_GAUGE_MAX) sodaShakeGauge = SODA_SHAKE_GAUGE_MAX;
@@ -331,6 +367,7 @@ void Player::SpaceJump()
 	//二段ジャンプを防止
 	if (GetJumpFlag()) return;
 
+
 	//プレイヤーの向いている方向にジャンプ
 	//DX_PI_F / 2はジャンプ方向を90度補正するための値
 	velocityX = cos(angle - DX_PI_F / 2) * jumpPower;
@@ -343,9 +380,20 @@ void Player::Rotate()
 {
 	//回転速度
 	angle += rotateSpeed * (InputManager::GetInstance().GetActionValue(ActionID::Rotate));
-	// パッドの回転入力はベクトルのため、rotateSpeedは関係なく、直接角度を計算する
-	// InputManager::GetInstance().GetAxisValue(ActionID::Rotate)は内部で計算したラジアンを返す
-	angle = InputManager::GetInstance().GetActionAxis(ActionID::Rotate) + DX_PI_F / 2;
+
+}
+
+void Player::RotateAxis()
+{
+	float x = InputManager::GetInstance().GetPadAxisValue(PadAxis::Pad_L_X);
+	float y = InputManager::GetInstance().GetPadAxisValue(PadAxis::Pad_L_Y);
+
+	if (x != 0.0f || y != 0.0f)
+	{
+		float targetAngle = atan2f(-y, x) + (DX_PI_F / 2.0f);
+
+		angle = targetAngle;
+	}
 }
 
 //衝突判定

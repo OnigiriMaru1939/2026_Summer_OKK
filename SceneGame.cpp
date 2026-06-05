@@ -16,7 +16,7 @@ int SceneGame::selectedStageIndex_ = 1;
 SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(fileMng), sceneMng_(sceneMng)
 {
 	stage_ = std::make_unique<Stage>(fileMng);
-	player_ = std::make_unique<Player>(fileMng, stage_.get());
+	player_ = std::make_unique<Player>(fileMng, stage_.get(), *this);
 
   // ステージ固有のセットアップを実行
 	const auto& stageConfigs = GetStageConfigs();
@@ -30,13 +30,19 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Cancel, 
 												   [this]()
 												   {
-													   SetNextScene(SceneID::RESULT);
-													   isEnd = true;
+													   if (!isTransition)
+													   {
+														   SetNextScene(SceneID::RESULT);
+														   isEnd = true;
+													   }
 												   });
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Pause,
 												   [this]()
 												   {
-													   sceneMng_.PushScene(SceneID::PAUSE);
+													   if (!isTransition)
+													   {
+														   sceneMng_.PushScene(SceneID::PAUSE);
+													   }
 												   });
 }
 
@@ -129,6 +135,17 @@ void SceneGame::UpdateEnemy()
 void SceneGame::UpdateStage()
 {
 	if (stage_) stage_->Update();
+}
+
+void SceneGame::UpdateDuringTransition()
+{
+	// プレイヤーの更新
+	player_->UpdateStageScroll();
+	//UpdatePlayer();
+
+	// Stageの更新
+	UpdateStage();
+
 }
 
 //プレイヤーと敵の衝突判定

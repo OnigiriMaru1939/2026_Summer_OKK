@@ -105,9 +105,7 @@ InputManager::InputManager()
 
 InputManager::~InputManager()
 {
-	ClearTriggerCallbacks();
-	ClearPressCallbacks();
-	ClearReleaseCallbacks();
+	ClearAllCallbacks();
 }
 
 void InputManager::Update()
@@ -239,7 +237,7 @@ float InputManager::GetMouseAxisValue(MouseAxis axis) const
 	return 0.0f;
 }
 // スティックの値を-1.0f〜1.0fの範囲で取得する関数
-float InputManager::GetPadAxisValue(int padNo, PadAxis axis) const
+float InputManager::GetPadAxisValue(PadAxis axis, int padNo) const
 {
 	int rawValue = 0;
 	switch (axis)
@@ -260,24 +258,6 @@ float InputManager::GetPadAxisValue(int padNo, PadAxis axis) const
 				int dx = padRX[padNo] - prevPadRX[padNo];
 				int dy = padRY[padNo] - prevPadRY[padNo];
 				rawValue = (int)sqrtf(dx * dx + dy * dy);
-				break;
-			}
-		case PadAxis::Pad_L_Vec:
-			{
-			// ベクトルの向きをラジアンで取得する
-				int dx = padLX[padNo];
-				int dy = padLY[padNo];
-				float angle = atan2f(dy, dx);
-				return angle; // 角度はデッドゾーンの影響を受けないようにここで返す
-				break;
-			}
-		case PadAxis::Pad_R_Vec:
-			{
-				// ベクトルの向きをラジアンで取得する
-				int dx = padRX[padNo];
-				int dy = padRY[padNo];
-				float angle = atan2f(dy, dx);
-				return angle; // 角度はデッドゾーンの影響を受けないようにここで返す
 				break;
 			}
 	}
@@ -345,7 +325,7 @@ float InputManager::GetActionAxis(ActionID action, int padNo) const
 		switch (m.inputType)
 		{
 			case InputType::GamepadAxis:
-				val = GetPadAxisValue(padNo, (PadAxis)m.code);
+				val = GetPadAxisValue((PadAxis)m.code, padNo);
 				break;
 			case InputType::MouseAxis:
 				val = GetMouseAxisValue((MouseAxis)m.code);

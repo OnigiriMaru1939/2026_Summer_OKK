@@ -19,35 +19,50 @@ SceneStageSelect::SceneStageSelect(FileManager& fileMng) : SceneSuper(fileMng)
 	_stageSelectH1Img = fileMng.LoadImageFM("Resource/Image/StageSelect/StageSelect_H1.png");
 	_stageSelectBlockImg = fileMng.LoadImageFM("Resource/Image/StageSelect/StageSelect_Block.png");
 
+	_decideSE = fileMng_.LoadSoundFM("Resource/Sound/SE/Decide_SE.wav");
+	_cursorSE = fileMng_.LoadSoundFM("Resource/Sound/SE/Cursor_SE.wav");
+
 	InputManager::GetInstance().SetTriggerCallback(ActionID::MoveH,
 												   [this]()
 												   {
-														// 2*2のブロック配置のため、1と2、3と4で選択が切り替わる
-														float moveValue = InputManager::GetInstance().GetActionValue(ActionID::MoveH);
-														MoveSelect(moveValue, true);
-													});
+													   if (!isTransition)
+													   {
+														   // 2*2のブロック配置のため、1と2、3と4で選択が切り替わる
+														   float moveValue = InputManager::GetInstance().GetActionValue(ActionID::MoveH);
+														   MoveSelect(moveValue, true);
+													   }
+												   });
 	InputManager::GetInstance().SetTriggerCallback(ActionID::MoveV,
 												   [this]()
 												   {
-														// 2*2のブロック配置のため、1と3、2と4で選択が切り替わる
-														float moveValue = InputManager::GetInstance().GetActionValue(ActionID::MoveV);
-														MoveSelect(moveValue, false);
+													   if (!isTransition)
+													   {
+															// 2*2のブロック配置のため、1と3、2と4で選択が切り替わる
+															float moveValue = InputManager::GetInstance().GetActionValue(ActionID::MoveV);
+															MoveSelect(moveValue, false);
+													   }
 												   });
 
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Decide,
 												   [this]()
 												   {
-													   if (_selectedButton == 0)
+													   if (!isTransition)
 													   {
-														   // タイトルが選択されている場合はタイトルに戻る
-														   SetNextScene(SceneID::TITLE);
+														   // 堅牢にしても良いが、FileManagerでリソースが確実に存在する前提で動いているため、ここでは直接再生
+														   // _decideSE->GetHandle() != -1 ? _decideSE->PlayOneShot() : void();
+														   _decideSE->PlayOneShot();
+														   if (_selectedButton == 0)
+														   {
+															   // タイトルが選択されている場合はタイトルに戻る
+															   SetNextScene(SceneID::TITLE);
+															   isEnd = true;
+															   return;
+														   }
+														   // 選択されたステージをSceneGameに渡すために、SceneManagerに保存
+														   SceneGame::SetSelectedStageIndex(_selectedButton);
+														   SetNextScene(SceneID::GAME);
 														   isEnd = true;
-														   return;
 													   }
-													   // 選択されたステージをSceneGameに渡すために、SceneManagerに保存
-													   SceneGame::SetSelectedStageIndex(_selectedButton);
-														SetNextScene(SceneID::GAME);
-														isEnd = true;
 												   });
 }
 
@@ -110,11 +125,13 @@ void SceneStageSelect::MoveSelect(float moveValue, bool isHorizontal)
 			// 右移動
 			if (_selectedButton == 0)
 			{
-				_selectedButton = 3; // タイトルから右に移動した場合は左下のステージに移動
+				_selectedButton = 3; // タイトルボタンから右に移動した場合は左下のステージに移動
+				_cursorSE->PlayOneShot();
 			}
-			else
+			else if (_selectedButton % 2 != 0)
 			{
-				_selectedButton = (_selectedButton % 2 == 0) ? _selectedButton : _selectedButton + 1;
+				_selectedButton++;
+				_cursorSE->PlayOneShot();		
 			}
 		}
 		else
@@ -124,10 +141,12 @@ void SceneStageSelect::MoveSelect(float moveValue, bool isHorizontal)
 			if (_selectedButton == 3)
 			{
 				_selectedButton = 0; // タイトルに移動
+				_cursorSE->PlayOneShot();
 			}
-			else
+			else if (_selectedButton % 2 == 0 && _selectedButton != 0)
 			{
-				_selectedButton = (_selectedButton % 2 == 0) ? _selectedButton - 1 : _selectedButton;
+				_selectedButton--;
+				_cursorSE->PlayOneShot();
 			}
 		}
 	}
@@ -136,12 +155,20 @@ void SceneStageSelect::MoveSelect(float moveValue, bool isHorizontal)
 		if (moveValue > 0)
 		{
 			// 下移動
-			_selectedButton = (_selectedButton <= 2) ? _selectedButton + 2 : _selectedButton;
+			if (0 < _selectedButton && _selectedButton <= 2)
+			{
+				_selectedButton += 2;
+				_cursorSE->PlayOneShot();
+			}
 		}
 		else
 		{
 			// 上移動
-			_selectedButton = (_selectedButton > 2) ? _selectedButton - 2 : _selectedButton;
+			if (_selectedButton > 2)
+			{
+				_selectedButton -= 2;
+				_cursorSE->PlayOneShot();
+			}
 		}
 	}
 	// ステージは0～4の範囲でループ

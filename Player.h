@@ -6,7 +6,7 @@
 #include "Stage.h"
 #include "EnemyBase.h"
 
-
+class SceneGame;
 class FileManager;
 class ImageFile;
 class SoundFile;
@@ -20,7 +20,7 @@ public:
 	static constexpr int PLAYER_HEIGHT = 64;		//プレイヤーの縦幅
 	static constexpr int SPEED = 15;				//プレイヤーの移動速度
 
-	Player(FileManager& fileMng, Stage* stage);
+	Player(FileManager& fileMng, Stage* stage, SceneGame& game);
 	~Player();
 	bool SetImage(const std::string& path);			//画像のセット
 	void SetPosition(float x, float y);				//プレイヤーの位置を設定
@@ -34,6 +34,7 @@ public:
 	void SpaceJump();				//スペースジャンプ処理
 	void ClickSodaJump();           //クリックジャンプ処理
 	void Rotate();					//回転処理
+	void RotateAxis();				//回転処理（軸入力）
 	void SodaAttack(float power);	//炭酸攻撃処理
 	void Damage(float damage);		//ダメージ処理
 	void PlayerShake();				//プレイヤーの振動処理
@@ -71,10 +72,11 @@ public:
 	bool GetAttakFlag() const { return sodaAttackFlag; }			//炭酸攻撃フラグを取得
 	float GetAttackDamage() const { return attackDamage; }			//攻撃のダメージを取得
 	bool GetAliveFlag() const { return aliveFlag; }					//生存フラグを取得
+
+	void UpdateStageScroll();		//プレイヤーの位置に応じてステージのスクロールを更新
 private:
 	
 	bool GetJumpFlag() const { return jumpFlag; }					//ジャンプフラグを取得
-private:
 	//ゲージの描画
 	void DrawGauge(int x,
 				   int y,
@@ -87,6 +89,7 @@ private:
 
 	std::unique_ptr<ParticleManager> pMng;
 	FileManager& fileManager;					//ファイルマネージャー
+	SceneGame& sceneGame;
 
 	std::shared_ptr<ImageFile> image_;			//プレイヤーの画像
 

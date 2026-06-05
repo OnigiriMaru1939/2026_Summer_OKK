@@ -11,14 +11,20 @@ ScenePause::ScenePause(FileManager& fileMng, SceneManager& sceneMng) : SceneSupe
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Cancel,
 												   [this]()
 												   {
-													   SetNextScene(SceneID::EXIT);
-													   isEnd = true;
+													   if (!isTransition)
+													   {
+														   SetNextScene(SceneID::EXIT);
+														   isEnd = true;
+													   }
 												   });
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Pause,
 												   [this]()
 												   {
-													   sceneMng_.PopScene();
-												   });
+													   if (!isTransition)
+													   {
+														   sceneMng_.PopScene();
+													   }
+												   }); 
 }
 
 ScenePause::~ScenePause()

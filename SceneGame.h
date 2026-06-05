@@ -20,6 +20,7 @@ public:
 	void UpdatePlayer();
 	void UpdateEnemy();
 	void UpdateStage();
+	void UpdateDuringTransition() override; // トランジション中の更新処理
 	void CheckPlayerEnemyCollision();
 	//敵生成関数
 	void AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y);
