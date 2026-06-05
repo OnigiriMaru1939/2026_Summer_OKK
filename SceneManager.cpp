@@ -32,10 +32,7 @@ void SceneManager::Update()
 		isExit = true;
 		return;
 	}
-	if (InputManager::GetInstance().IsActionTriggered(ActionID::Pause))
-	{
-		RequestPause();
-	}
+
 	auto& currentScene = scenes.back();
 	currentScene->Update();
 
@@ -121,21 +118,6 @@ void SceneManager::PopScene()
 	if (scenes.size() > 1)
 	{
 		scenes.pop_back();
-	}
-}
-
-void SceneManager::RequestPause()
-{
-	if (scenes.empty()) return;
-	// 現在のシーンがゲームシーンの場合にのみポーズシーンをプッシュする
-	if (dynamic_cast<SceneGame*>(scenes.back().get()))
-	{
-		PushScene(SceneSuper::SceneID::PAUSE);
-	}
-	// 現在のシーンがポーズシーンの場合はそれをポップしてゲームに戻る
-	else if (dynamic_cast<ScenePause*>(scenes.back().get()))
-	{
-		PopScene();
 	}
 }
 

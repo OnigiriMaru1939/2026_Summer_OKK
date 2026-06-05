@@ -11,22 +11,20 @@ SJump, GamepadButton, Pad_L_Trigger, 1.0
 SJump, GamepadButton, Pad_R_Trigger, 1.0
 
 Shake, MouseAxis, Mouse_Dist, 1.0
-Shake, GamepadAxis, Pad_L_Dist, 150.0
-Shake, GamepadAxis, Pad_R_Dist, 150.0
+Shake, GamepadAxis, Pad_R_Dist, 300.0
 
 Rotate, Keyboard, KEY_INPUT_D, 1.0
 Rotate, Keyboard, KEY_INPUT_A, -1.0
-Rotate, GamepadButton, Pad_L_Shoulder, -1.0
-Rotate, GamepadButton, Pad_R_Shoulder, 1.0
+Rotate, GamepadAxis, Pad_L_Vec, -1.0
 
-Decide, Keyboard, KEY_INPUT_RETURN, 1.0
-Decide, GamepadButton, Xbox_Start, 1.0
+Decide, Keyboard, KEY_INPUT_SPACE, 1.0
+Decide, GamepadButton, Pad_Face_Down, 1.0
 
 Cancel, Keyboard, KEY_INPUT_ESCAPE, 1.0
 Cancel, GamepadButton, Xbox_Back
 
 Pause, Keyboard, KEY_INPUT_TAB, 1.0
-Pause, GamepadButton, Pad_Face_Left, 1.0
+Pause, GamepadButton, Xbox_Start, 1.0
 
 MoveH, Keyboard, KEY_INPUT_D, 1.0
 MoveH, Keyboard, KEY_INPUT_A, -1.0

@@ -29,6 +29,7 @@ Player::Player(FileManager& fileMng, Stage* stage) : fileManager(fileMng), stage
 	InputManager::GetInstance().SetAxisCallback(ActionID::Shake, [this]() { SodaShake(); });
 	// 回転
 	InputManager::GetInstance().SetPressCallback(ActionID::Rotate, [this]() { Rotate(); });
+	InputManager::GetInstance().SetAxisCallback(ActionID::Rotate, [this]() { Rotate(); });
 
 	//位置と物理の初期化
 	posX = 200.0f;
@@ -252,6 +253,7 @@ void Player::SodaShake()
 {
   	//距離
 	float dist = InputManager::GetInstance().GetActionAxis(ActionID::Shake);
+	printfDx("Shake Axis: %f\n", dist);
 	shakeMove = dist;
 
 	//ゲージ加算
@@ -322,7 +324,6 @@ void Player::SodaMove()
 		posY += signY;
 		loopY--;
 	}
-
 }
 
 void Player::SpaceJump()
@@ -341,7 +342,10 @@ void Player::SpaceJump()
 void Player::Rotate()
 {
 	//回転速度
-	angle += rotateSpeed * (InputManager::GetInstance().GetActionValue(ActionID::Rotate) + InputManager::GetInstance().GetActionAxis(ActionID::Rotate));
+	angle += rotateSpeed * (InputManager::GetInstance().GetActionValue(ActionID::Rotate));
+	// パッドの回転入力はベクトルのため、rotateSpeedは関係なく、直接角度を計算する
+	// InputManager::GetInstance().GetAxisValue(ActionID::Rotate)は内部で計算したラジアンを返す
+	angle = InputManager::GetInstance().GetActionAxis(ActionID::Rotate) + DX_PI_F / 2;
 }
 
 //衝突判定
