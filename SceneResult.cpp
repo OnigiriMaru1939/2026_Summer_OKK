@@ -13,12 +13,14 @@ SceneResult::SceneResult(FileManager& fileMng, bool isClear, ClearResult& result
 	resultFontHandle = CreateFontToHandle("DotGothic16", 80, -1, DX_FONTTYPE_NORMAL);
 	nextButtonFontHandle = CreateFontToHandle("DotGothic16", 40, -1, DX_FONTTYPE_NORMAL);
 
-	_bgImg = fileMng.LoadImageFM("Resource/Image/Title_bg_NoLogo.png");
+	_bgImg = fileMng.LoadImageFM("Resource/Image/Result/Result_bg.png");
 	_resultClearLogoImg = fileMng.LoadImageFM("Resource/Image/Result/Result_Clear_Logo.png");
 	_resultFailedLogoImg = fileMng.LoadImageFM("Resource/Image/Result/Result_Failed_Logo.png");
 
 	_decideSE = fileMng_.LoadSoundFM("Resource/Sound/SE/Decide_SE.wav");
 	_cursorSE = fileMng_.LoadSoundFM("Resource/Sound/SE/Cursor_SE.wav");
+
+	_fadeAlpha = 255.0f;
 
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Decide,
 												   [this]()
@@ -30,6 +32,9 @@ SceneResult::SceneResult(FileManager& fileMng, bool isClear, ClearResult& result
 														   {
 															   case NextScene::Next:
 																   SceneGame::selectedStageIndex_++;
+																   SetNextScene(SceneID::GAME);
+																   break;
+															   case NextScene::Retry:
 																   SetNextScene(SceneID::GAME);
 																   break;
 															   case NextScene::StageSelect:
@@ -80,28 +85,34 @@ void SceneResult::Draw()
 
 	for (int i = 0; i < static_cast<int>(NextScene::Max); i++)
 	{
-		if (i == 0)
+		if (i == static_cast<int>(NextScene::Next))
 		{
 			if (SceneGame::selectedStageIndex_ == 4) continue;
 		}
 		std::string text = "";
-		i == 0 ? text = "NEXT STAGE" : i == 1 ? text = "STAGE SELECT" : text = "TITLE";
+		i == 0 ? text = "NEXT STAGE" : i == 1 ? text = "RETRY" : i == 2 ? text = "STAGE SELECT" : text = "TITLE";
+
 		int textWidth = GetDrawStringWidthToHandle(text.c_str(), static_cast<int>(strlen(text.c_str())), nextButtonFontHandle);
 		int x = NEXT_BUTTON_X + (NEXT_BUTTON_MARGIN + NEXT_BUTTON_WID) * i;
-		DrawBox(x, NEXT_BUTTON_Y, x + NEXT_BUTTON_WID, NEXT_BUTTON_Y + NEXT_BUTTON_HIG, 0x114444 + 0x114444 * i, true);
+		DrawBox(x, NEXT_BUTTON_Y, x + NEXT_BUTTON_WID, NEXT_BUTTON_Y + NEXT_BUTTON_HIG, 0x114444 * i, true);
 		DrawStringToHandle((x + NEXT_BUTTON_WID / 2) - (textWidth / 2), (NEXT_BUTTON_Y + NEXT_BUTTON_HIG / 2) - (GetFontSizeToHandle(nextButtonFontHandle) / 2), text.c_str(), 0xffffff, nextButtonFontHandle);
 		if (_selectedNext == i)
 		{
 			DrawBox(x - 5, NEXT_BUTTON_Y - 5, x + NEXT_BUTTON_WID + 5, NEXT_BUTTON_Y + NEXT_BUTTON_HIG + 5, 0xff0000, false);
 		}
 	}
+	DrawFormatString(500, 0, 0x00ff00, "_selectedNext = %d", _selectedNext);
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(_fadeAlpha));
+	DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0xffffff, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
 void SceneResult::MoveSelect(float moveValue)
 {
 	if (moveValue > 0)
 	{
-		if (_selectedNext != 2)
+		if (_selectedNext < static_cast<int>(NextScene::Max))
 		{
 			_selectedNext++;
 			_cursorSE->PlayOneShot();
@@ -111,7 +122,7 @@ void SceneResult::MoveSelect(float moveValue)
 	{
 		if (SceneGame::selectedStageIndex_ == 4)
 		{
-			if (_selectedNext != 1)
+			if (_selectedNext > 1)
 			{
 				_selectedNext--;
 				_cursorSE->PlayOneShot();
@@ -119,12 +130,18 @@ void SceneResult::MoveSelect(float moveValue)
 		}
 		else
 		{
-			if (_selectedNext != 0)
+			if (_selectedNext > 0)
 			{
 				_selectedNext--;
 				_cursorSE->PlayOneShot();
 			}
 		}
 	}
-	_selectedNext = std::max(0, std::min(2, _selectedNext));
+	_selectedNext = std::max(0, std::min(static_cast<int>(NextScene::Max) - 1, _selectedNext));
+}
+
+void SceneResult::TransitionIn(float t)
+{
+	float e = EaseInCubic(1 - t);
+	_fadeAlpha = e * 255.0f;
 }

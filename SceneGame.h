@@ -32,6 +32,8 @@ public:
 
 	static void SetSelectedStageIndex(int index) { selectedStageIndex_ = index; }
 	static int selectedStageIndex_;
+
+	void TransitionOut(float t) override;
 private:
 	std::unique_ptr<Stage> stage_;
 	std::unique_ptr<Player> player_;
@@ -40,5 +42,24 @@ private:
 	SceneManager& sceneMng_; // シーンマネージャーへの弱い参照
 
 	float clearTime; // クリアタイム
+
+	int _gameScreen;
+
+	bool _isClear;
+	bool IsClear() { return _isClear; }
+
+	float _fadeAlpha;
+	// ステージクリア時演出用 ------------------
+	static constexpr int DOWN_SCALE = 8;
+	static constexpr int DOWN_SCALE_SCREEN_W = (Application::SCREEN_WID / DOWN_SCALE);	// ガウスフィルタを掛ける画像の横幅
+	static constexpr int DOWN_SCALE_SCREEN_H = (Application::SCREEN_HIG / DOWN_SCALE);	// ガウスフィルタを掛ける画像の縦幅
+	int highBrightScreen;	// 普通の描画結果から高輝度部分を抜き出した結果を書き込むスクリーン
+	int downScaleScreen;	// 高輝度部分を縮小した結果を書き込むスクリーン
+	int gaussScreen;	// 縮小画像をガウスフィルタでぼかした結果を書き込むスクリーン
+	int gaussRatio;
+	int filterRatio;
+
+	void DrawClearTransition();
+	// -------------------------------------
 };
 

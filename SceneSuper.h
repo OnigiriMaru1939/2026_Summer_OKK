@@ -27,7 +27,17 @@ public:
 	bool IsEnd() const { return isEnd; }
 	SceneID GetNextScene() const { return nextSceneID; }
 	void SetNextScene(SceneID next) { nextSceneID = next; }
-	//float EaseInOut(float t) { return t * t * (3.0f - 2.0f * t); }
+	float EaseInOut(float t) { return t * t * (3.0f - 2.0f * t); }
+	// 3次イージング
+	float EaseInCubic(float t)
+	{
+		return t * t * t;
+	}
+	float EaseOutCubic(float t)
+	{
+		float f = t - 1.0f;
+		return (f * f * f) + 1.0f;
+	}
 
 	virtual void TransitionIn(float t) {}
 	virtual void TransitionOut(float t) {}
