@@ -98,6 +98,9 @@ void SceneManager::Draw()
 {
 	if (scenes.empty()) return;
 
+	clsDx();
+	printfDx("SceneNum = %d", static_cast<int>(scenes.size()));
+
 	for (const auto& scene : scenes)
 	{
 		scene->Draw();
@@ -130,6 +133,9 @@ void SceneManager::ChangeScene(SceneSuper::SceneID nextSceneID)
 		isExit = true;
 		return;
 	}
+
+	scenes.clear();
+
 	InputManager::GetInstance().ClearAxisCallbacks();
 	InputManager::GetInstance().ClearPressCallbacks();
 	InputManager::GetInstance().ClearTriggerCallbacks();

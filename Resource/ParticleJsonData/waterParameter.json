@@ -24,10 +24,11 @@
     "startAlphaVariance": "0",
     "finishAlpha": 0.51,
     "finishAlphaVariance": 0.5,
-    "shapeIdList": [
-        "circle",
-        "blur_circle"
-    ],
+  "shapeIdList": [
+    "circle",
+    "blur_circle",
+    "kirakira"
+  ],
     "startColor": {
         "hue": 195,
         "hueVariance": 21,

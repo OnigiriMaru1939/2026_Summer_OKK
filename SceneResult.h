@@ -7,6 +7,7 @@
 enum class NextScene
 {
 	Next = 0,
+	Retry,
 	StageSelect,
 	Title,
 	Max
@@ -22,7 +23,7 @@ private:
 	static constexpr int RESULT_TIME_X = 600;
 	static constexpr int RESULT_TIME_Y = 500;
 
-	static constexpr int NEXT_BUTTON_X = 310;
+	static constexpr int NEXT_BUTTON_X = 95;
 	static constexpr int NEXT_BUTTON_Y = 800;
 	static constexpr int NEXT_BUTTON_WID = 400;
 	static constexpr int NEXT_BUTTON_HIG = 150;
@@ -35,7 +36,7 @@ public:
 	void Update() override;
 	void Draw() override;
 
-	void MoveSelect(float moveValue);
+	void TransitionIn(float t) override;
 private:
 	bool _isClear;
 	std::shared_ptr<ImageFile> _bgImg;
@@ -50,4 +51,8 @@ private:
 
 	ClearResult _clearResult;
 	int _selectedNext;
+
+	float _fadeAlpha;
+
+	void MoveSelect(float moveValue);
 };

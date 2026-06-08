@@ -5,9 +5,9 @@
 
 SceneTitle::SceneTitle(FileManager& fileMng) : SceneSuper(fileMng)
 {
-	_bgImg = fileMng_.LoadImageFM("Resource/Image/Title_bg_NoLogo.png");
-	_TitleLogoImg = fileMng_.LoadImageFM("Resource/Image/Title_Logo.png");
-	_TitleStartImg = fileMng_.LoadImageFM("Resource/Image/Title_Start.png");
+	_bgImg = fileMng_.LoadImageFM("Resource/Image/Title/Title_bg.png");
+	_TitleLogoImg = fileMng_.LoadImageFM("Resource/Image/Title/Title_Logo.png");
+	_TitleStartImg = fileMng_.LoadImageFM("Resource/Image/Title/Title_Start.png");
 	_mainBgm = fileMng_.LoadSoundFM("Resource/Sound/BGM/Night_Light.wav");
 	_decideSE = fileMng_.LoadSoundFM("Resource/Sound/SE/Decide_SE.wav");
 

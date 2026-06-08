@@ -26,6 +26,17 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(
 
 	clearTime = 0.0f;
 
+	_isClear = false;
+
+	_gameScreen = MakeScreen(Application::SCREEN_WID, Application::SCREEN_HIG);
+
+	highBrightScreen = MakeScreen(Application::SCREEN_WID, Application::SCREEN_HIG, false);
+	downScaleScreen = MakeScreen(DOWN_SCALE_SCREEN_W, DOWN_SCALE_SCREEN_H, FALSE);
+	gaussScreen = MakeScreen(DOWN_SCALE_SCREEN_W, DOWN_SCALE_SCREEN_H, FALSE);
+
+	gaussRatio = 0;
+	filterRatio = 200;
+
 	// デバッグ
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Cancel, 
 												   [this]()
@@ -48,7 +59,10 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(
 
 SceneGame::~SceneGame()
 {
-
+	DeleteGraph(_gameScreen);
+	DeleteGraph(highBrightScreen);
+	DeleteGraph(downScaleScreen);
+	DeleteGraph(gaussScreen);
 }
 
 void SceneGame::Update()
@@ -70,6 +84,9 @@ void SceneGame::Update()
 
 void SceneGame::Draw()
 {
+	SetDrawScreen(_gameScreen);
+	ClearDrawScreen();
+
 	DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0x00aa00, true);
 
 	// Stageを描画
@@ -83,6 +100,45 @@ void SceneGame::Draw()
 	{
 		enemy->Draw();
 	}
+	SetDrawScreen(DX_SCREEN_BACK);
+	DrawGraph(0, 0, _gameScreen, false);
+
+	DrawClearTransition();
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(_fadeAlpha));
+	if (IsClear())
+	{
+		DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0xffffff, true);
+	}
+	else
+	{
+		DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0x000000, true);
+	}
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+}
+
+void SceneGame::DrawClearTransition()
+{
+	if (IsClear())
+	{
+		// 描画結果から高輝度部分のみを抜き出した画像を得る
+		GraphFilterBlt(_gameScreen, highBrightScreen, DX_GRAPH_FILTER_BRIGHT_CLIP, DX_CMP_LESS, filterRatio, TRUE, GetColor(0, 0, 0), 255);
+		// 高輝度部分を８分の１に縮小した画像を得る
+		GraphFilterBlt(highBrightScreen, downScaleScreen, DX_GRAPH_FILTER_DOWN_SCALE, DOWN_SCALE);
+		// ８分の１に縮小した画像をガウスフィルタでぼかす
+		GraphFilterBlt(downScaleScreen, gaussScreen, DX_GRAPH_FILTER_GAUSS, 16, gaussRatio);
+		// 描画モードをバイリニアフィルタリングにする(拡大したときにドットがぼやけるようにする)
+		SetDrawMode(DX_DRAWMODE_BILINEAR);
+		// 描画ブレンドモードを加算にする
+		SetDrawBlendMode(DX_BLENDMODE_ADD, 255);
+		// 高輝度部分を縮小してぼかした画像を画面いっぱいに数回描画する( 数回描画するのはより明るくみえるようにするため )
+		DrawExtendGraph(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, gaussScreen, FALSE);
+		DrawExtendGraph(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, gaussScreen, FALSE);
+		// 描画ブレンドモードをブレンド無しに戻す
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+		// 描画モードを二アレストに戻す
+		SetDrawMode(DX_DRAWMODE_NEAREST);
+	}
 }
 
 void SceneGame::UpdatePlayer()
@@ -90,11 +146,12 @@ void SceneGame::UpdatePlayer()
 	player_->Update();
 	if (!player_->GetAliveFlag())
 	{
+		_isClear = false;
 		ClearResult result;
 		result.time = 0.0f;
 		result.stageIndex = selectedStageIndex_;
 		sceneMng_.SetClearResult(result);
-		sceneMng_.SetGameResult(false); // ゲームオーバー
+		sceneMng_.SetGameResult(_isClear); // ゲームオーバー
 		SetNextScene(SceneID::RESULT);
 		isEnd = true;
 	}
@@ -112,13 +169,15 @@ void SceneGame::UpdateEnemy()
 		if (!enemy->IsAlive())
 		{
 			// 敵が死んでいる場合はリストから削除
+			// ボスを倒したらトランジション
 			if (std::dynamic_pointer_cast<IBoss>(enemy))
 			{
+				_isClear = true;
 				ClearResult result;
 				result.time = clearTime;
 				result.stageIndex = selectedStageIndex_;
 				sceneMng_.SetClearResult(result);
-				sceneMng_.SetGameResult(true); // クリア
+				sceneMng_.SetGameResult(_isClear); // クリア
 				SetNextScene(SceneID::RESULT);
 				isEnd = true;
 			}
@@ -204,5 +263,15 @@ void SceneGame::AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y)
 		break;
 	default:
 		break;
+	}
+}
+
+void SceneGame::TransitionOut(float t)
+{
+	if (IsClear())
+	{
+		// クリア時の遷移アニメーション
+		_fadeAlpha = EaseOutCubic(t) * 255.0f;
+		gaussRatio = static_cast<int>(t * 1000);
 	}
 }

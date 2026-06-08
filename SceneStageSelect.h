@@ -39,11 +39,12 @@ private:
 	std::shared_ptr<ImageFile> _bgImg;
 	std::shared_ptr<ImageFile> _stageSelectH1Img;
 	std::shared_ptr<ImageFile> _stageSelectBlockImg;
+	std::shared_ptr<ImageFile> _stageSelectBlockSelectedImg;
 
 	std::shared_ptr<SoundFile> _decideSE;
 	std::shared_ptr<SoundFile> _cursorSE;
 
-	int _selectedButton; // 0がタイトル、1～4がステージ選択
+	int _selectedIndex; // 0がタイトル、1～4がステージ選択
 
 	int stageFontHandle;
 	int titleFontHandle;
