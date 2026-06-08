@@ -18,7 +18,7 @@ Stage::Stage(FileManager& fileMng):fileMng_(fileMng)
 	}
 	//bgImg_ = fileMng_.LoadImageFM("Resource/Image/Stage1_bg.png"); 
 	// マップチップ画像の読み込み
-	chipImg_ = fileMng_.LoadImageFM("Resource/MapChip/Mapchip_def.png"); 
+	//chipImg_ = fileMng_.LoadImageFM("Resource/MapChip/Mapchip_def.png"); 
 
 	chipInfo_.resize(CHIP_HEIGHT * CHIP_WIDTH + 1);
 
@@ -224,6 +224,11 @@ void Stage::SetBgImage(const std::string& path)
 	bgImg_ = fileMng_.LoadImageFM(path);
 }
 
+void Stage::SetMchipImage(const std::string& path)
+{
+	chipImg_ = fileMng_.LoadImageFM(path);
+	printfDx("マップチップ画像の読み込みに%s。\n Handle = %d", chipImg_ ? "成功しました" : "失敗しました", chipImg_->GetHandle());
+}
 
 int Stage::GetScrollX()
 {

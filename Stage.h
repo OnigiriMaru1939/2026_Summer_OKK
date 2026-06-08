@@ -27,6 +27,7 @@ public:
 	void SetScrollX(int s);
 	void SetScrollY(int s);
 	void SetBgImage(const std::string& path);
+	void SetMchipImage(const std::string& path);
 	int GetScrollX();
 	int GetScrollY();
 	int GetMaxScrollX();
