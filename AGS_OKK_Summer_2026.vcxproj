@@ -115,6 +115,7 @@
       </TreatSpecificWarningsAsErrors>
       <DisableSpecificWarnings>4828;4010</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
