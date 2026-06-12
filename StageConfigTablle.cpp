@@ -13,7 +13,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 			[](SceneGame& scene)
 			{
 				scene.GetStage()->SetBgImage("Resource/Image/Stage1_bg.png");
-				scene.GetStage()->SetMchipImage("Resource/MapChip/Mapchip_def.png");
+				scene.GetStage()->SetMchipImage("Resource/MapChip/Mapchip_neon.png");
 				//プレイヤーの初期化
 				scene.GetPlayer()->SetPosition(100.0f, 1840.0f);
 				//敵の生成
@@ -31,7 +31,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 			"Resource/MapJson/stage_02.json",
 			[](SceneGame& scene)
 			{
-			scene.GetStage()->SetMchipImage("Resource/MapChip/MapChip_PinkTile.png");
+			scene.GetStage()->SetMchipImage("Resource/MapChip/Mapchip_neon.png");
 			//プレイヤーの初期化
 			scene.GetPlayer()->SetPosition(100.0f, 1840.0f);
 
