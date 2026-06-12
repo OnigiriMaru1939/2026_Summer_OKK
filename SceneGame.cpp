@@ -18,16 +18,12 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(
 	stage_ = std::make_unique<Stage>(fileMng);
 	player_ = std::make_unique<Player>(fileMng, stage_.get(), *this);
 
-	// ステージ固有のセットアップを実行
+  // ステージ固有のセットアップを実行
 	const auto& stageConfigs = GetStageConfigs();
 	const StageConfig& config = stageConfigs[selectedStageIndex_ - 1];
 	stage_->Load(config.mapPath);
 	config.setUpStage(*this);
 
-	bossEventState = BossEventState::NONE;
-	isBossSpawned_ = false;
-
-	bossTimer = 0;
 	clearTime = 0.0f;
 
 	_isClear = false;
@@ -42,11 +38,7 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(
 	filterRatio = 200;
 
 	// デバッグ
-<<<<<<< Updated upstream
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Cancel, 
-=======
-	InputManager::GetInstance().SetTriggerCallback(ActionID::Decide,
->>>>>>> Stashed changes
 												   [this]()
 												   {
 													   if (!isTransition)
@@ -83,12 +75,6 @@ void SceneGame::Update()
 	//敵の更新
 	UpdateEnemy();
 
-	//ボスの生成判定
-	CheckBossSpawn();
-
-	//ボスイベントの処理
-	BossEvent();
-	
 	//プレイヤーと敵の衝突判定
 	CheckPlayerEnemyCollision();
 
@@ -106,28 +92,14 @@ void SceneGame::Draw()
 	// Stageを描画
 	if (stage_) stage_->Draw();
 
-<<<<<<< Updated upstream
 	//プレイヤーを描画
 	player_->Draw();
-=======
-	//ボスエリアを描画
-	RECT area = bossArea;
-
-	DrawBox(area.left - stage_->GetScrollX(),
-			area.top - stage_->GetScrollY(),
-			area.right - stage_->GetScrollX(),
-			area.bottom - stage_->GetScrollY(),
-			0xff0000, false);
-
-	DrawString(0, 20, "GAME SCENE", 0xffffff);
->>>>>>> Stashed changes
 
 	//敵を描画
 	for (auto& enemy : enemyList_)
 	{
 		enemy->Draw();
 	}
-<<<<<<< Updated upstream
 	SetDrawScreen(DX_SCREEN_BACK);
 	DrawGraph(0, 0, _gameScreen, false);
 
@@ -167,80 +139,8 @@ void SceneGame::DrawClearTransition()
 		// 描画モードを二アレストに戻す
 		SetDrawMode(DX_DRAWMODE_NEAREST);
 	}
-=======
-
-	//プレイヤーを描画
-	player_->Draw();
-	
-	//ボスイベントの描画
-	BossEventDraw();
->>>>>>> Stashed changes
 }
 
-//ボスイベントの描画
-void SceneGame::BossEventDraw()
-{
-	auto boss = GetBoss();
-
-	int strWidth = 0;
-
-	if (boss)
-	{
-		strWidth = GetDrawStringWidth(
-		boss->GetName().c_str(),
-		strlen(boss->GetName().c_str())
-		);
-	}
-	
-
-	if (bossEventState == BossEventState::WARNING)
-	{
-		if (bossTimer > 0)
-		{
-			if ((bossTimer / 10) % 6 == 0) return;
-		}
-
-		DrawBox(
-			0,
-			Application::SCREEN_HIG / 2 - 100,
-			Application::SCREEN_WID,
-			Application::SCREEN_HIG / 2 + 100,
-			GetColor(255, 0, 0),
-			true);
-		DrawFormatString(
-			900,
-			Application::SCREEN_HIG / 2 - 20,
-			GetColor(255, 255, 255),
-			"WARNING !!");
-	}
-
-	if (bossEventState == BossEventState::UIDRAW)
-	{
-		DrawString(
-			(Application::SCREEN_WID - strWidth) / 2,
-			60,
-			boss->GetName().c_str(),
-			GetColor(255, 255, 255)
-		);
-
-		DrawGauge(100, 90, 1720, 50, bossHpGauge, bossHpGaugeMax, GetColor(255, 0, 0));
-		
-	}
-
-	if (bossEventState == BossEventState::BATTLE)
-	{
-		DrawString(
-			(Application::SCREEN_WID - strWidth) / 2,
-			60,
-			boss->GetName().c_str(),
-			GetColor(255, 255, 255)
-		);
-
-		DrawGauge(100, 90, 1720, 50, boss->GetHp(), boss->GetHpMax(), GetColor(255, 0, 0));
-	}
-}
-
-//プレイヤーの更新
 void SceneGame::UpdatePlayer()
 {
 	player_->Update();
@@ -285,13 +185,12 @@ void SceneGame::UpdateEnemy()
 		}
 	}
 
-	enemyList_.erase(
-		std::remove(enemyList_.begin(), enemyList_.end(), nullptr),
-		enemyList_.end()
+  enemyList_.erase(
+	std::remove(enemyList_.begin(), enemyList_.end(), nullptr),
+	enemyList_.end()
 	);
-}
+ }
 
-//ステージの更新
 void SceneGame::UpdateStage()
 {
 	if (stage_) stage_->Update();
@@ -325,10 +224,9 @@ void SceneGame::CheckPlayerEnemyCollision()
 
 		if (hit && !player_->GetAttakFlag())
 		{
-			//プレイヤーにダメージを与える
-			player_->Damage(10.0f);
+			player_->Damage(10.0f); // プレイヤーにダメージを与える
 			//プレイヤーをノックバックさせる
-			player_->PlayerKnockBack(enemy->GetX(), enemy-> GetY(), 10.0f);
+			player_->PlayerKnockBack(enemy->GetX(), 10.0f);
 		}
 		else if (hit && player_->GetAttakFlag())
 		{
@@ -336,133 +234,9 @@ void SceneGame::CheckPlayerEnemyCollision()
 			if (enemy->IsAlive())
 			{
 				//プレイヤーをノックバックさせる
-				player_->PlayerKnockBack(enemy->GetX(), enemy->GetY(), 10.0f);
+				player_->PlayerKnockBack(enemy->GetX(), 10.0f);
 			}
 		}
-	}
-}
-
-//ボスエリアの矩形を設定
-void SceneGame::SetBossArea(int left, int top, int right, int bottom)
-{
-	// ボスエリアの矩形を定義
-	bossArea.left = left;
-	bossArea.top = top;
-	bossArea.right = right;
-	bossArea.bottom = bottom;
-}
-
-//ボスエリアの矩形を取得
-RECT SceneGame::GetBossArea() const
-{
-	return bossArea;
-}
-
-//ボスの生成判定
-void SceneGame::CheckBossSpawn()
-{
-	if (isBossSpawned_) return;
-
-	bossArea = GetBossArea();
-
-	float x = player_->GetX();
-	float y = player_->GetY();
-
-	if (x >= bossArea.left - stage_->GetScrollX() &&
-		x <= bossArea.right - stage_->GetScrollX() &&
-		y >= bossArea.top - stage_->GetScrollY() &&
-		y <= bossArea.bottom - stage_->GetScrollY())
-	{
-		bossEventState = BossEventState::WARNING;
-		bossTimer = 0;
-
-		player_->SetCanMoveFlag(false); // プレイヤーの移動を制限
-
-		isBossSpawned_ = true;
-	}
-}
-
-std::shared_ptr<Boss1> SceneGame::GetBoss()
-{
-	for (auto& enemy : enemyList_)
-	{
-		auto boss = std::dynamic_pointer_cast<Boss1>(enemy);
-
-		if (boss)
-		{
-			return boss;
-		}
-	}
-
-	return nullptr;
-}
-
-void SceneGame::BossEvent()
-{
-	auto boss = GetBoss();
-
-	switch (bossEventState)
-	{
-		case SceneGame::BossEventState::NONE:
-			break;
-
-		case SceneGame::BossEventState::WARNING:
-			bossTimer++;
-			if (bossTimer > 180)
-			{
-				AddBoss(
-					EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1,
-					1800.0f,
-					200.0f
-				);
-				bossEventState = BossEventState::APPEAR;
-				bossTimer = 0;
-			}
-			break;
-
-		case SceneGame::BossEventState::APPEAR:
-			bossTimer++;
-			//2秒後にUIを表示
-			if (bossTimer > 120)
-			{
-				bossEventState = BossEventState::UIDRAW;
-
-				if (boss)
-				{
-					bossHpGauge = 0;
-					bossHpGaugeMax = boss->GetHpMax();
-				}
-				bossTimer = 0;
-			}
-			break;
-
-		case SceneGame::BossEventState::UIDRAW:
-			if (bossHpGauge < bossHpGaugeMax)
-			{
-				bossHpGauge += 2.0f;
-			}
-
-			if (bossHpGauge >= bossHpGaugeMax)
-			{
-				bossHpGauge = bossHpGaugeMax;
-
-				player_->SetCanMoveFlag(true);
-
-				if (boss)
-				{
-					boss->SetAppearFlag(false);
-				}
-
-				bossEventState = BossEventState::BATTLE;
-			}
-
-			break;
-
-		case SceneGame::BossEventState::BATTLE:
-			break;
-
-		default:
-			break;
 	}
 }
 
@@ -471,11 +245,11 @@ void SceneGame::AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y)
 {
 	switch (type)
 	{
-		case EnemyBase::ENEMY_TYPE::E_TYPE_1:
-			enemyList_.push_back(std::make_shared<Enemy1>(fileMng_, stage_.get(), x, y));
-			break;
-		default:
-			break;
+	case EnemyBase::ENEMY_TYPE::E_TYPE_1:
+		enemyList_.push_back(std::make_shared<Enemy1>(fileMng_, stage_.get(), x, y));
+		break;
+	default:
+		break;
 	}
 }
 
@@ -484,15 +258,14 @@ void SceneGame::AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y)
 {
 	switch (type)
 	{
-		case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1:
-			enemyList_.push_back(std::make_shared<Boss1>(fileMng_, stage_.get(), x, y));
-			break;
-		default:
-			break;
+	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1:
+		enemyList_.push_back(std::make_shared<Boss1>(fileMng_, stage_.get(), x, y));
+		break;
+	default:
+		break;
 	}
 }
 
-<<<<<<< Updated upstream
 void SceneGame::TransitionOut(float t)
 {
 	if (IsClear())
@@ -502,36 +275,3 @@ void SceneGame::TransitionOut(float t)
 		gaussRatio = static_cast<int>(t * 1000);
 	}
 }
-=======
-void SceneGame::DrawGauge(
-	int x,
-	int y,
-	int width,
-	int height,
-	float value,
-	float maxValue,
-	int color)
-{
-	//ゲージの枠
-	DrawBox(
-		x - 1,
-		y - 1,
-		x + width + 1,
-		y + height + 1,
-		GetColor(255, 255, 255),
-		FALSE
-	);
-	//横ゲージ割合
-	int barWidth = (int)((value / maxValue) * width);
-
-	//中身
-	DrawBox(
-		x,
-		y,
-		x + barWidth,
-		y + height,
-		color,
-		TRUE
-	);
-}
->>>>>>> Stashed changes
