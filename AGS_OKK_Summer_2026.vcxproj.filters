@@ -54,6 +54,7 @@
     </ClCompile>
     <ClCompile Include="Enemy1.cpp" />
     <ClCompile Include="Boss1.cpp" />
+    <ClCompile Include="ScenePause.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Application">
@@ -207,5 +208,7 @@
     </ClInclude>
     <ClInclude Include="Enemy1.h" />
     <ClInclude Include="Boss1.h" />
+    <ClInclude Include="IBoss.h" />
+    <ClInclude Include="ScenePause.h" />
   </ItemGroup>
 </Project>

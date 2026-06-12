@@ -101,7 +101,6 @@ void SceneResult::Draw()
 			DrawBox(x - 5, NEXT_BUTTON_Y - 5, x + NEXT_BUTTON_WID + 5, NEXT_BUTTON_Y + NEXT_BUTTON_HIG + 5, 0xff0000, false);
 		}
 	}
-	DrawFormatString(500, 0, 0x00ff00, "_selectedNext = %d", _selectedNext);
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(_fadeAlpha));
 	DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0xffffff, true);
