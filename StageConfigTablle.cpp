@@ -33,7 +33,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 			{
 			scene.GetStage()->SetMchipImage("Resource/MapChip/MapChip_PinkTile.png");
 			//プレイヤーの初期化
-			scene.GetPlayer()->SetPosition(100.0f, 1840.0f);
+			scene.GetPlayer()->SetPosition(100.0f, 3480.0f);
 
 			},
 

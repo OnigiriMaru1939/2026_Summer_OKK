@@ -103,7 +103,14 @@ void SceneResult::Draw()
 	}
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(_fadeAlpha));
-	DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0xffffff, true);
+	if (_isClear)
+	{
+		DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0xffffff, true);
+	}
+	else
+	{
+		DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0x000000, true);
+	}
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
@@ -141,6 +148,6 @@ void SceneResult::MoveSelect(float moveValue)
 
 void SceneResult::TransitionIn(float t)
 {
-	float e = EaseInCubic(1 - t);
-	_fadeAlpha = e * 255.0f;
+		float e = EaseInCubic(1 - t);
+		_fadeAlpha = e * 255.0f;
 }

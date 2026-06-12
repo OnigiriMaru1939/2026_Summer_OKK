@@ -282,6 +282,7 @@ void Player::Draw()
 		handle,
 		TRUE
 	);
+	DrawFormatString(0, 800, 0x00ff00, "PlayerPosition: X=%f, Y=%f", posX, posY);
 }
 
 //マウスを振ったり、スティックを動かすと炭酸ゲージが溜まる

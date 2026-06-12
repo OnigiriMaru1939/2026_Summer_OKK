@@ -43,6 +43,12 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(
 												   {
 													   if (!isTransition)
 													   {
+														   _isClear = false;
+														   ClearResult result;
+														   result.time = 0.0f;
+														   result.stageIndex = selectedStageIndex_;
+														   sceneMng_.SetClearResult(result);
+														   sceneMng_.SetGameResult(_isClear); // ゲームオーバー
 														   SetNextScene(SceneID::RESULT);
 														   isEnd = true;
 													   }
@@ -273,5 +279,9 @@ void SceneGame::TransitionOut(float t)
 		// クリア時の遷移アニメーション
 		_fadeAlpha = EaseOutCubic(t) * 255.0f;
 		gaussRatio = static_cast<int>(t * 1000);
+	}
+	else
+	{
+		_fadeAlpha = EaseOutCubic(t) * 255.0f;
 	}
 }
