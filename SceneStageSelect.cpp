@@ -70,8 +70,8 @@ SceneStageSelect::~SceneStageSelect()
 	DeleteFontToHandle(stageFontHandle);
 	DeleteFontToHandle(stageNumFontHandle);
 	DeleteFontToHandle(titleFontHandle);
-	//RemoveFontResourceExA("Resource/fonts/KumarOneOutline-Regular.ttf", FR_PRIVATE, NULL);
 	RemoveFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
+	//RemoveFontResourceExA("Resource/fonts/KumarOneOutline-Regular.ttf", FR_PRIVATE, NULL);
 }
 
 void SceneStageSelect::Update()

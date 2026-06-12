@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "SceneSuper.h"
 #include "SoundFile.h"
+#include "ImageFile.h"
 #include <memory>
 class SceneManager;
 
@@ -19,7 +20,7 @@ class ScenePause :
 {
 private:
 	static constexpr int BUTTON_X = 610;
-	static constexpr int BUTTON_Y = 150;
+	static constexpr int BUTTON_Y = 250;
 	static constexpr int BUTTON_WID = 700;
 	static constexpr int BUTTON_HIG = 100;
 	static constexpr int BUTTON_MARGIN = 70;
@@ -31,8 +32,14 @@ public:
 private:
 	void MoveSelect(float moveValue);
 	void DecidePauseScene();
+	std::shared_ptr<ImageFile> _blockImg;
+	std::shared_ptr<ImageFile> _blockSelectImg;
 	std::shared_ptr<SoundFile> _decideSE;
 	std::shared_ptr<SoundFile> _cursorSE;
+
+	int _fontHandle;
+	int _fontPauseHandle;
+	int _fontExplainHandle;
 
 	int _selectedIndex;
 
