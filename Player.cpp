@@ -97,6 +97,7 @@ Player::Player(FileManager& fileMng, Stage* stage, SceneGame& game) : fileManage
 	aliveFlag = true;
 	jumpFlag = false;
 	sodaAttackFlag = false;
+	canMoveFlag = true;
 }
 
 Player::~Player()
@@ -155,8 +156,31 @@ void Player::Update()
 	{
 		sodaAttackFlag = false;
 	}
-
+	//プレイヤー画面スクロール処理
+	PlayerScroll();
+	//重力処理
 	AddGravity();
+
+	if (!canMoveFlag)
+	{
+		//炭酸ゲージを0にする
+		sodaShakeGauge = 0.0f;
+
+		//振動停止
+		InputManager::GetInstance().StopVibration();
+
+		//炭酸チャージ音停止
+		sodaChargeSE->Stop();
+
+		//攻撃状態も解除
+		sodaAttackFlag = false;
+
+		MoveY();
+
+		pMng->UpdateAll();
+		return;
+	}
+
 	SodaMove();
 	
 	SodaGaugeCharge();
@@ -186,13 +210,89 @@ void Player::Update()
 		//sodaParticle.reset();
 	}
 	pMng->UpdateAll();
+}
 
+<<<<<<< Updated upstream
 	UpdateStageScroll();
 }
 
 void Player::UpdateStageScroll()
 {
 	//プレイヤー画面スクロール処理
+=======
+void Player::Draw()
+{
+	//DrawFormatString(1000, 1000, GetColor(255,0, 0), "HP %d", (int)playerHp);
+	//プレイヤーが死んでいる又は画像が読み込まれていないときは表示しない
+	if (!aliveFlag || !image_) return;
+
+	//プレイヤー画像を描画するか
+	bool drawPlayer = true;
+
+	//無敵時間中は点滅させる
+	if (noDamageTime > 0)
+	{
+		if ((noDamageTime / 4) % 2 == 0)
+		{
+			drawPlayer = false;
+		}
+	}
+
+	if (drawPlayer)
+	{
+		//プレイヤー画像を描画(回転可)
+		int handle = image_->GetHandle();
+		DrawRotaGraph(
+			(int)canvasX + (int)shakeOffsetX,
+			(int)canvasY + (int)shakeOffsetY,
+			1.0,
+			angle,
+			handle,
+			TRUE
+		);
+
+	}
+	
+	pMng->DrawAll(stage_->GetScrollX(), stage_->GetScrollY());
+
+	//当たり判定の矩形を描画
+	RECT rc = GetRect();
+
+	DrawBox(
+		rc.left - stage_->GetScrollX(),
+		rc.top - stage_->GetScrollY(),
+		rc.right - stage_->GetScrollX(),
+		rc.bottom - stage_->GetScrollY(),
+		GetColor(0, 255, 0),
+		FALSE
+	);
+
+	//ゲージの描画
+	if (CollisionHpBar())
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
+	}
+	DrawGauge(1350, 1000, 500, 40, playerHp, playerHpMax, GetColor(0, 255, 0), 0);		//プレイヤーのHPゲージ
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	//炭酸蓄積ゲージが0以上の場合のみ描画
+	if (sodaShakeGauge > 0 && canMoveFlag)
+	{
+		DrawGauge(static_cast<int>(canvasX) - 75, static_cast<int>(canvasY) - 50, 20, 100, sodaShakeGauge, SODA_SHAKE_GAUGE_MAX, GetColor(0, 0, 255), 1);		//炭酸蓄積ゲージ
+	}
+	DrawCircle(static_cast<int>(canvasX), static_cast<int>(canvasY), 3, 0X0000ff);
+	// デバッグ
+	DrawFormatString(1000, 1000, GetColor(255, 0, 0), "SodaGauge: %d", static_cast<int>(sodaShakeGauge));
+	DrawFormatString(1000, 1020, GetColor(255, 0, 0), "noDamageTime: %d", static_cast<int>(noDamageTime));
+	DrawFormatString(1000, 1040, GetColor(255, 0, 0), "sodaAttackFlag: %d", sodaAttackFlag);
+
+	//プレイヤーの振動処理
+	PlayerShake();
+}
+
+//プレイヤー画面スクロール処理
+void Player::PlayerScroll()
+{
+>>>>>>> Stashed changes
 	canvasX = posX - stage_->GetScrollX();
 	canvasY = posY - stage_->GetScrollY();
 	if (canvasX < Stage::CHIP_SIZE * 10)
@@ -227,6 +327,7 @@ void Player::UpdateStageScroll()
 	}
 }
 
+<<<<<<< Updated upstream
 void Player::Draw()
 {
 	//DrawFormatString(1000, 1000, GetColor(255,0, 0), "HP %d", (int)playerHp);
@@ -307,6 +408,8 @@ void Player::SodaGaugeCharge()
 	if (sodaGauge > 100.0f) sodaGauge = 100.0f;
 }
 
+=======
+>>>>>>> Stashed changes
 //重力処理
 void Player::AddGravity()
 {
@@ -326,8 +429,50 @@ void Player::AddGravity()
 	//}
 }
 
+//衝突判定
+bool Player::WillCollide(int newX, int newY)
+{
+	return stage_->CheckHitWallRect(
+		newX,
+		newY,
+		width_,
+		height_
+	);
+}
+
+//マウスを振ったり、スティックを動かすと炭酸ゲージが溜まる
+void Player::SodaShake()
+{
+	//移動禁止フラグが立っているときはスキップ
+	if (!canMoveFlag) return;
+
+  	//距離
+	float dist = InputManager::GetInstance().GetActionAxis(ActionID::Shake);
+	shakeMove = dist;
+
+	//ゲージ加算
+	sodaShakeGauge += shakeMove * 0.25f;
+
+	//上限
+	if (sodaShakeGauge > SODA_SHAKE_GAUGE_MAX) sodaShakeGauge = SODA_SHAKE_GAUGE_MAX;
+}
+
+//炭酸残量ゲージを自動回復
+void Player::SodaGaugeCharge()
+{
+	sodaGauge += 0.1f;
+	//上限リミッター
+	if (sodaGauge > 100.0f) sodaGauge = 100.0f;
+}
+
 //ジャンプ処理・移動処理
 void Player::SodaMove()
+{
+	MoveX();
+	MoveY();
+}
+
+void Player::MoveX()
 {
 	//炭酸を吹き出したときにジャンプ・移動する処理
 	int signX = (velocityX > 0) ? 1 : ((velocityX < 0) ? -1 : 0);
@@ -342,7 +487,10 @@ void Player::SodaMove()
 		posX += signX;
 		loopX--;
 	}
+}
 
+void Player::MoveY()
+{
 	int signY = (velocityY > 0) ? 1 : ((velocityY < 0) ? -1 : 0);
 	int loopY = (int)std::abs(velocityY);
 	while (loopY > 0)
@@ -364,6 +512,9 @@ void Player::SodaMove()
 
 void Player::SpaceJump()
 {
+	//移動禁止フラグが立っているときはジャンプできない
+	if (!canMoveFlag) return;
+	
 	//二段ジャンプを防止
 	if (GetJumpFlag()) return;
 
@@ -378,6 +529,9 @@ void Player::SpaceJump()
 //プレイヤー回転処理
 void Player::Rotate()
 {
+	//移動禁止フラグが立っているときは回転できない
+	if (!canMoveFlag) return;
+
 	//回転速度
 	angle += rotateSpeed * (InputManager::GetInstance().GetActionValue(ActionID::Rotate));
 
@@ -394,17 +548,6 @@ void Player::RotateAxis()
 
 		angle = targetAngle;
 	}
-}
-
-//衝突判定
-bool Player::WillCollide(int newX, int newY)
-{
-	return stage_->CheckHitWallRect(
-		newX,
-		newY,
-		width_,
-		height_
-	);
 }
 
 //炭酸攻撃処理
@@ -486,7 +629,7 @@ void Player::PlayerShake()
 }
 
 //プレイヤーのノックバック処理
-void Player::PlayerKnockBack(float enemyX, float power)
+void Player::PlayerKnockBack(float enemyX, float enemyY, float power)
 {
 	//敵より右にいる
 	if (posX > enemyX)
@@ -497,8 +640,6 @@ void Player::PlayerKnockBack(float enemyX, float power)
 	{
 		velocityX = -power;
 	}
-	//上方向へ吹っ飛ばす
-	velocityY = -power;
 }
 
 //プレイヤーの矩形衝突判定
@@ -512,6 +653,30 @@ RECT Player::GetRect() const
 	rc.bottom = (LONG)(posY + height_ / 2);
 
 	return rc;
+}
+
+//プレイヤーとHPバーの衝突判定
+bool Player::CollisionHpBar()
+{
+	RECT rc = GetRect();
+
+	//ワールド座標→画面座標
+	rc.left -= stage_->GetScrollX();
+	rc.right -= stage_->GetScrollX();
+	rc.top -= stage_->GetScrollY();
+	rc.bottom -= stage_->GetScrollY();
+
+	RECT hpBar;
+	hpBar.left = 1350;
+	hpBar.top = 1000;
+	hpBar.right = 850;
+	hpBar.bottom = 1040;
+
+	return
+		rc.right > hpBar.left &&
+		rc.left < hpBar.right &&
+		rc.bottom > hpBar.top &&
+		rc.top < hpBar.bottom;
 }
 
 //横ゲージの描画

@@ -6,12 +6,14 @@ Boss1::Boss1(FileManager& fileMng, Stage* stage, float x, float y) : EnemyBase(f
 	SetImage("Resource/Image/RedBull.png");
 	enemyType_ = ENEMY_TYPE::E_TYPE_BOSS_1;
 	SetPosition(x, y);				//初期位置を設定
-	SetVelocity(1.0f, 0.0f);		//初期速度を設定
+	SetVelocity(-1.0f, 0.0f);		//初期速度を設定
+	name_ = "RedBull";				//名前を設定
 	hp_ = 200;
 	hpMax_ = 200;
 	width_ = 128;
 	height_ = 128;
 	jumpFlag = false;
+	isAppearing = true;
 }
 
 Boss1::~Boss1()
@@ -20,9 +22,21 @@ Boss1::~Boss1()
 
 void Boss1::Update()
 {
-	AddGravity();			//重力を加える
-	BossMove();				//移動
-	NoDamageCountDown();	//無敵時間のカウントダウン
+	//重力処理
+	AddGravity();
+
+	//出現処理
+	if (isAppearing)
+	{
+		BossAppear();
+		return;
+	}
+
+	//横移動
+	BossMove();
+
+	//無敵時間のカウントダウン
+	NoDamageCountDown();
 }
 
 void Boss1::Draw() const
@@ -33,14 +47,21 @@ void Boss1::Draw() const
 	if (hp_ > 0)
 	{
 		//HPゲージの描画
-		DrawGauge(1300, 100, 500, 40, hp_, hpMax_, GetColor(255, 0, 0));		//ボスのHPゲージ
+		//DrawGauge(1300, 100, 500, 40, hp_, hpMax_, GetColor(255, 0, 0));		//ボスのHPゲージ
 	}
+}
+
+//ボスの出現処理
+void Boss1::BossAppear()
+{
+	//落下だけ
+	MoveY();
 }
 
 //ボスの移動処理
 void Boss1::BossMove()
 {
-	EnemyBase::Move();		//基底クラスの移動処理を呼び出す
+	EnemyBase::Move();			//基底クラスの移動処理を呼び出す
 	if (!GetJumpFlag())
 	{
 		Jump();					//ジャンプ処理を呼び出す

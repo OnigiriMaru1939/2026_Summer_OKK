@@ -25,12 +25,15 @@ public:
 	bool SetImage(const std::string& path);			//画像のセット
 	void SetPosition(float x, float y);				//プレイヤーの位置を設定
 	bool WillCollide(int newX, int newY);			//プレイヤーのステージとの衝突判定
+	void PlayerScroll();							//プレイヤーのスクロール処理
 	void Update();
 	void Draw();
 	void SodaShake();				//マウスを振ると炭酸蓄積ゲージが溜まる
 	void SodaGaugeCharge();			//炭酸残量ゲージの自然回復
 	void AddGravity();				//重力処理
 	void SodaMove();				//炭酸移動処理
+	void MoveX();					//Xの移動
+	void MoveY();					//Yの移動
 	void SpaceJump();				//スペースジャンプ処理
 	void ClickSodaJump();           //クリックジャンプ処理
 	void Rotate();					//回転処理
@@ -38,8 +41,9 @@ public:
 	void SodaAttack(float power);	//炭酸攻撃処理
 	void Damage(float damage);		//ダメージ処理
 	void PlayerShake();				//プレイヤーの振動処理
-	void PlayerKnockBack(float enemyX, float power);			//プレイヤーのノックバック処理
+	void PlayerKnockBack(float enemyX, float enemyY, float power);			//プレイヤーのノックバック処理
 	RECT GetRect() const;			//プレイヤーの当たり判定の矩形を取得
+	bool CollisionHpBar();			//プレイヤーがHPバーに触れているか
   
 	float posX;					//プレイヤーのX座標
 	float posY;					//プレイヤーのY座標
@@ -62,7 +66,7 @@ public:
 	float GetY() const { return canvasY; }
 	int GetWidth() const { return width_; }			//プレイヤーの画像の幅を取得
 	int GetHeight() const { return height_; }		//プレイヤーの画像の高さを取得
-	void SetVelocity(float vx, float vy);							//プレイヤーのX軸の速度を設定
+	void SetVelocity(float vx, float vy);			//プレイヤーのX軸の速度を設定
 	//プレイヤーの当たり判定の座標を取得
 	int GetLeft() const { return static_cast<int>(canvasX - width_ / 2); }
 	int GetRight() const { return static_cast<int>(canvasX + width_ / 2); }
@@ -71,12 +75,23 @@ public:
 	//攻撃力を取得
 	bool GetAttakFlag() const { return sodaAttackFlag; }			//炭酸攻撃フラグを取得
 	float GetAttackDamage() const { return attackDamage; }			//攻撃のダメージを取得
+<<<<<<< Updated upstream
 	bool GetAliveFlag() const { return aliveFlag; }					//生存フラグを取得
 
 	void UpdateStageScroll();		//プレイヤーの位置に応じてステージのスクロールを更新
+=======
+	//生存フラグを取得
+	bool GetAliveFlag() const { return aliveFlag; }
+	//移動可能フラグを設定・取得
+	bool GetCanMoveFlag() const { return canMoveFlag; }
+	void SetCanMoveFlag(bool flag) { canMoveFlag = flag; }
+>>>>>>> Stashed changes
 private:
-	
 	bool GetJumpFlag() const { return jumpFlag; }					//ジャンプフラグを取得
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 	//ゲージの描画
 	void DrawGauge(int x,
 				   int y,
@@ -106,6 +121,7 @@ private:
 	
 	float sodaPower;			//炭酸攻撃の威力
 	bool aliveFlag;				//生存フラグ
+	bool canMoveFlag;			//移動可能フラグ
 	bool jumpFlag;				//ジャンプフラグ
 	bool sodaAttackFlag;		//炭酸攻撃フラグ
 	float gravity;				//重力

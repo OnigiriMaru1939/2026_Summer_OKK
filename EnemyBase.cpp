@@ -67,33 +67,46 @@ void EnemyBase::Update()
 
 void EnemyBase::Move()
 {
+	MoveX();	//X方向の移動
+	MoveY();	//Y方向の移動
+}
+
+void EnemyBase::MoveX()
+{
 	int signX = (vx_ > 0) ? 1 : ((vx_ < 0) ? -1 : 0);
 	int loopX = (int)std::abs(vx_);
+
 	while (loopX > 0)
 	{
 		if (WillCollide(x_ + signX, y_))
 		{
-			//壁に当たると反転
 			vx_ = -vx_;
 			break;
 		}
+
 		x_ += signX;
 		loopX--;
 	}
+}
 
+void EnemyBase::MoveY()
+{
 	int signY = (vy_ > 0) ? 1 : ((vy_ < 0) ? -1 : 0);
 	int loopY = (int)std::abs(vy_);
+
 	while (loopY > 0)
 	{
-		if (WillCollide(x_, signY + y_))
+		if (WillCollide(x_, y_ + signY))
 		{
 			if (signY > 0)
 			{
 				jumpFlag = false;
 			}
+
 			vy_ = 0;
 			break;
 		}
+
 		y_ += signY;
 		loopY--;
 	}
