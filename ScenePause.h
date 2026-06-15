@@ -20,7 +20,7 @@ class ScenePause :
 {
 private:
 	static constexpr int BUTTON_X = 610;
-	static constexpr int BUTTON_Y = 250;
+	static constexpr int BUTTON_Y = 210;
 	static constexpr int BUTTON_WID = 700;
 	static constexpr int BUTTON_HIG = 100;
 	static constexpr int BUTTON_MARGIN = 70;

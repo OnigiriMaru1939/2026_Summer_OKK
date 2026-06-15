@@ -76,14 +76,12 @@ void ScenePause::Draw()
 	std::string text = "PAUSE";
 	int width = GetDrawStringWidthToHandle(text.c_str(), text.size(), _fontPauseHandle);
 	int color = 0xaaebfb;
-
-	DrawStringToHandle(Application::SCREEN_WID / 2 - width / 2, 100, text.c_str(), color, _fontPauseHandle);
+	DrawStringToHandle(Application::SCREEN_WID / 2 - width / 2, 70, text.c_str(), color, _fontPauseHandle);
 
 	text = "SELECT SPACE / A";
 	width = GetDrawStringWidthToHandle(text.c_str(), text.size(), _fontExplainHandle);
 	color = 0xaaebfb;
-
-	DrawStringToHandle(Application::SCREEN_WID / 2 - width / 2, 200, text.c_str(), 0xffffff, _fontExplainHandle);
+	DrawStringToHandle(Application::SCREEN_WID / 2 - width / 2, 160, text.c_str(), 0xffffff, _fontExplainHandle);
 
 	for (int i = 0; i < static_cast<int>(NextScenePause::Max); i++)
 	{
