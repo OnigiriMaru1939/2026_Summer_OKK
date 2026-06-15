@@ -318,6 +318,10 @@ void Player::Draw()
 	DrawFormatString(1000, 1020, GetColor(255, 0, 0), "noDamageTime: %d", static_cast<int>(noDamageTime));
 	DrawFormatString(1000, 1040, GetColor(255, 0, 0), "sodaAttackFlag: %d", sodaAttackFlag);
 
+
+	DrawFormatString(0, 300, 0x00ff00, "PlayerPos X: %f,Y: %f", posX, posY);
+	DrawFormatString(0, 320, 0x00ff00, "PlayerMapChip X: %d,Y: %d", stage_->WorldToChipX(posX), stage_->WorldToChipY(posY));
+
 	//プレイヤーの振動処理
 	PlayerShake();
 }

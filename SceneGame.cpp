@@ -127,6 +127,13 @@ void SceneGame::Draw()
 	{
 		enemy->Draw();
 	}
+
+	//プレイヤーを描画
+	player_->Draw();
+
+	//ボスイベントの描画
+	BossEventDraw();
+
 	SetDrawScreen(DX_SCREEN_BACK);
 	DrawGraph(0, 0, _gameScreen, false);
 
@@ -143,11 +150,6 @@ void SceneGame::Draw()
 	}
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-	//プレイヤーを描画
-	player_->Draw();
-
-	//ボスイベントの描画
-	BossEventDraw();
 }
 
 //ボスイベントの描画
