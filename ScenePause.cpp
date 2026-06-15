@@ -8,7 +8,13 @@
 
 ScenePause::ScenePause(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(fileMng), sceneMng_(sceneMng)
 {
+	AddFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
+	_fontHandle = CreateFontToHandle("DotGothic16", 60, -1, DX_FONTTYPE_NORMAL);
+	_fontPauseHandle = CreateFontToHandle("DotGothic16", 80, -1, DX_FONTTYPE_NORMAL);
+	_fontExplainHandle = CreateFontToHandle("DotGothic16", 40, -1, DX_FONTTYPE_NORMAL);
 	_selectedIndex = 0;
+	_blockImg = fileMng_.LoadImageFM("Resource/Image/Pause/Pause_Block.png");
+	_blockSelectImg = fileMng_.LoadImageFM("Resource/Image/Pause/Pause_Block_Select.png");
 	_decideSE = fileMng_.LoadSoundFM("Resource/Sound/SE/Decide_SE.wav");
 	_cursorSE = fileMng_.LoadSoundFM("Resource/Sound/SE/Cursor_SE.wav");
 
@@ -51,6 +57,9 @@ ScenePause::ScenePause(FileManager& fileMng, SceneManager& sceneMng) : SceneSupe
 
 ScenePause::~ScenePause()
 {
+	DeleteFontToHandle(_fontHandle);
+	DeleteFontToHandle(_fontPauseHandle);
+	RemoveFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
 	InputManager::GetInstance().PopLayer();
 }
 
@@ -64,19 +73,34 @@ void ScenePause::Draw()
 	DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0x000000, true); // 黒い半透明の四角を描画
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0); // ブレンドモードを元に戻す
 
-	DrawString(500, 100, "SELECT SPACE / A", 0xffffff);
-	DrawFormatString(500, 0, 0x0000ff, "SelectedIndex = %d", _selectedIndex);
+	std::string text = "PAUSE";
+	int width = GetDrawStringWidthToHandle(text.c_str(), text.size(), _fontPauseHandle);
+	int color = 0xaaebfb;
 
+	DrawStringToHandle(Application::SCREEN_WID / 2 - width / 2, 100, text.c_str(), color, _fontPauseHandle);
+
+	text = "SELECT SPACE / A";
+	width = GetDrawStringWidthToHandle(text.c_str(), text.size(), _fontExplainHandle);
+	color = 0xaaebfb;
+
+	DrawStringToHandle(Application::SCREEN_WID / 2 - width / 2, 200, text.c_str(), 0xffffff, _fontExplainHandle);
 
 	for (int i = 0; i < static_cast<int>(NextScenePause::Max); i++)
 	{
-		std::string text = "";
 		i == 0 ? text = "BACK" : i == 1 ? text = "RETRY" : i == 2 ? text = "STAGE SELECT" : i == 3 ? text = "TITLE" : text = "EXIT";
-		DrawBox(BUTTON_X, BUTTON_Y + (BUTTON_HIG + BUTTON_MARGIN) * i, BUTTON_X + BUTTON_WID, BUTTON_Y + (BUTTON_HIG + BUTTON_MARGIN) * i + BUTTON_HIG, 0x11333333 * i, true);
-		DrawString(BUTTON_X + 20, BUTTON_Y + (BUTTON_HIG + BUTTON_MARGIN) * i + 20, text.c_str(), 0x00ff00);
+		width = GetDrawStringWidthToHandle(text.c_str(), text.size(), _fontHandle);
+		color = 0xaaebfb;
+
 		if (_selectedIndex == i)
 		{
-			DrawBox(BUTTON_X - 5, BUTTON_Y + (BUTTON_HIG + BUTTON_MARGIN) * i - 5, BUTTON_X + BUTTON_WID + 5, BUTTON_Y + (BUTTON_HIG + BUTTON_MARGIN) * i + BUTTON_HIG + 5, 0xff0000, false);
+			color = 0xf7c3ef;
+			DrawGraph(BUTTON_X, BUTTON_Y + (BUTTON_HIG + BUTTON_MARGIN) * i, _blockSelectImg->GetHandle(), true);
+			DrawStringToHandle(BUTTON_X + BUTTON_WID / 2 - width / 2, BUTTON_Y + (BUTTON_HIG + BUTTON_MARGIN) * i + BUTTON_HIG / 2 - GetFontSizeToHandle(_fontHandle) / 2, text.c_str(), color, _fontHandle);
+		}
+		else
+		{
+			DrawGraph(BUTTON_X, BUTTON_Y + (BUTTON_HIG + BUTTON_MARGIN) * i, _blockImg->GetHandle(), true);
+			DrawStringToHandle(BUTTON_X + BUTTON_WID / 2 - width / 2, BUTTON_Y + (BUTTON_HIG + BUTTON_MARGIN) * i + BUTTON_HIG / 2 - GetFontSizeToHandle(_fontHandle) / 2, text.c_str(), color, _fontHandle);
 		}
 	}
 }
