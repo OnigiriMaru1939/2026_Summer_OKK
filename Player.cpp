@@ -384,7 +384,7 @@ void Player::MoveX()
 	{
 		if (WillCollide(static_cast<int>(posX + signX), static_cast<int>(posY)))
 		{
-			velocityX = 0;
+			velocityX *= -0.3f;
 			break;
 		}
 		posX += signX;
@@ -404,8 +404,8 @@ void Player::MoveY()
 			{
 				jumpFlag = false;
 			}
-			velocityX *= 0.9;
-			velocityY = 0;
+			velocityX *= 0.9f;
+			velocityY *= -0.3f;
 			break;
 		}
 		posY += signY;
