@@ -25,7 +25,6 @@ Application::Application()
 //#endif
 
 	DxLib_Init();
-	SetMouseDispFlag(true);
 	fileMng = std::make_unique<FileManager>();
 	sceneMng = std::make_unique<SceneManager>(*fileMng);
 	// デバッグ----------------------------------------------------
