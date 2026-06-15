@@ -381,7 +381,7 @@ void SceneGame::CheckPlayerEnemyCollision()
 			//プレイヤーをノックバックさせる
 			player_->PlayerKnockBack(enemy->GetX(), enemy->GetY(), 10.0f);
 		}
-		else if (hit && player_->GetAttakFlag())
+		else if (hit && player_->GetAttakFlag() && player_->GetSpeed() >= Player::ATTACK_SPEED_THRESHOLD)
 		{
 			enemy->ApplyDamage(static_cast<int>(player_->GetAttackDamage()));
 			if (enemy->IsAlive())
@@ -448,6 +448,7 @@ std::shared_ptr<Boss1> SceneGame::GetBoss()
 	return nullptr;
 }
 
+//ボスイベント処理
 void SceneGame::BossEvent()
 {
 	auto boss = GetBoss();

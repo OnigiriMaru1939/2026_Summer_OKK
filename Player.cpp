@@ -70,6 +70,7 @@ Player::Player(FileManager& fileMng, Stage* stage, SceneGame& game) : fileManage
 	canvasX = 0;
 	canvasY = 0;
 	gravity = 0.5f;
+	playerSpeed = 0.0f;
 	velocityX = 0.0f;
 	velocityY = 0.0f;
 	shakeMove = 0.0f;
@@ -131,32 +132,40 @@ bool Player::SetImage(const std::string& path)
 //プレイヤーの位置を設定
 void Player::SetPosition(float x, float y)
 {
-	posX = x; // x座標を設定
-	posY = y; // y座標を設定
-	UpdateStageScroll(); // ステージのスクロールを更新
+	posX = x;				//x座標を設定
+	posY = y;				//y座標を設定
+	UpdateStageScroll();	//ステージのスクロールを更新
 }
 
 //プレイヤーの速度を設定
 void Player::SetVelocity(float vx, float vy)
 {
-	velocityX = vx; // x方向の速度を設定
-	velocityY = vy; // y方向の速度を設定
+	velocityX = vx;			//x方向の速度を設定
+	velocityY = vy;			//y方向の速度を設定
+}
+
+//プレイヤーの速度計算
+float Player::VelocityCalc() const
+{
+	return std::sqrt(
+		velocityX * velocityX +
+		velocityY * velocityY
+	);
 }
 
 void Player::Update()
 {
+	//プレイヤー速度
+	playerSpeed = VelocityCalc();
+
 	//無敵時間のカウントダウン
 	if (noDamageTime > 0)
 	{
 		noDamageTime--;
 	}
 
-	//攻撃時間のカウントダウン
-	if (attackTimer > 0)
-	{
-		attackTimer--;
-	}
-	else
+	//攻撃フラグの判定
+	if (playerSpeed < ATTACK_SPEED_THRESHOLD)
 	{
 		sodaAttackFlag = false;
 	}
@@ -260,7 +269,7 @@ void Player::UpdateStageScroll()
 void Player::Draw()
 {
 	//DrawFormatString(1000, 1000, GetColor(255,0, 0), "HP %d", (int)playerHp);
-//プレイヤーが死んでいる又は画像が読み込まれていないときは表示しない
+	//プレイヤーが死んでいる又は画像が読み込まれていないときは表示しない
 	if (!aliveFlag || !image_) return;
 
 	//プレイヤー画像を描画するか
@@ -324,28 +333,13 @@ void Player::Draw()
 	DrawFormatString(1000, 1000, GetColor(255, 0, 0), "SodaGauge: %d", static_cast<int>(sodaShakeGauge));
 	DrawFormatString(1000, 1020, GetColor(255, 0, 0), "noDamageTime: %d", static_cast<int>(noDamageTime));
 	DrawFormatString(1000, 1040, GetColor(255, 0, 0), "sodaAttackFlag: %d", sodaAttackFlag);
-
+	DrawFormatString(1000, 1060, GetColor(255, 0, 0), "playerSpeed: %d", static_cast<int>(playerSpeed));
 
 	DrawFormatString(0, 300, 0x00ff00, "PlayerPos X: %f,Y: %f", posX, posY);
 	DrawFormatString(0, 320, 0x00ff00, "PlayerMapChip X: %d,Y: %d", stage_->WorldToChipX(posX), stage_->WorldToChipY(posY));
 
 	//プレイヤーの振動処理
 	PlayerShake();
-}
-
-//マウスを振ったり、スティックを動かすと炭酸ゲージが溜まる
-void Player::SodaShake()
-{
-  	//距離
-	float dist = InputManager::GetInstance().GetActionAxis(ActionID::Shake);
-	//printfDx("Shake Axis: %f\n", dist);
-	shakeMove = dist;
-
-	//ゲージ加算
-	sodaShakeGauge += shakeMove * 0.45f;
-
-	//上限
-	if (sodaShakeGauge > SODA_SHAKE_GAUGE_MAX) sodaShakeGauge = SODA_SHAKE_GAUGE_MAX;
 }
 
 //炭酸残量ゲージを自動回復
@@ -363,7 +357,7 @@ void Player::AddGravity()
 	//posX += velocityX;		//速度を位置に加算
 	//posY += velocityY;
 
-	velocityX *= 0.98f;	//空気抵抗（X軸の速度を減衰）
+	velocityX *= AIR_RESUSTANCE;	//空気抵抗（X軸の速度を減衰）
 
 	// 地面判定（仮）
 	//if (posY > 500)
@@ -391,7 +385,7 @@ void Player::MoveX()
 	{
 		if (WillCollide(static_cast<int>(posX + signX), static_cast<int>(posY)))
 		{
-			velocityX *= -0.3f;
+			velocityX *= -WALL_BOUNCE_X;
 			break;
 		}
 		posX += signX;
@@ -411,8 +405,8 @@ void Player::MoveY()
 			{
 				jumpFlag = false;
 			}
-			velocityX *= 0.9f;
-			velocityY *= -0.3f;
+			velocityX *= FLOOR_FRICTION;
+			velocityY *= -FLOOR_BOUNCE_Y;
 			break;
 		}
 		posY += signY;
@@ -448,6 +442,9 @@ void Player::Rotate()
 
 void Player::RotateAxis()
 {
+	//移動禁止フラグが立っているときは回転できない
+	if (!canMoveFlag) return;
+
 	float x = InputManager::GetInstance().GetPadAxisValue(PadAxis::Pad_L_X);
 	float y = InputManager::GetInstance().GetPadAxisValue(PadAxis::Pad_L_Y);
 
@@ -495,6 +492,25 @@ void Player::Damage(float dmg)
 	noDamageTime = noDamageMaxTime; //無敵時間をリセット
 }
 
+//マウスを振ったり、スティックを動かすと炭酸ゲージが溜まる
+void Player::SodaShake()
+{
+	//移動禁止フラグが立っているときはできない
+	if (!canMoveFlag) return;
+
+	//距離
+	float dist = InputManager::GetInstance().GetActionAxis(ActionID::Shake);
+	//printfDx("Shake Axis: %f\n", dist);
+	shakeMove = dist;
+
+	//ゲージ加算
+	sodaShakeGauge += shakeMove * 0.45f;
+
+	//上限
+	if (sodaShakeGauge > SODA_SHAKE_GAUGE_MAX) sodaShakeGauge = SODA_SHAKE_GAUGE_MAX;
+}
+
+//炭酸ジャンプ・攻撃処理
 void Player::ClickSodaJump()
 {
 	//移動禁止フラグが立っているときは攻撃できない

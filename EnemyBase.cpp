@@ -123,7 +123,7 @@ void EnemyBase::NoDamageCountDown()
 
 void EnemyBase::ApplyDamage(int dmg)
 {
-	if (!isAlive_) 	return;				// 生存していない場合はダメージを受けない
+	if (!isAlive_) 	return;				//生存していない場合はダメージを受けない
 	if (noDamageTime > 0) return;		//無敵時間中はダメージを受けない
 
 	hp_ -= dmg; // ダメージを適用
@@ -190,7 +190,7 @@ void EnemyBase::Draw() const
 	}
 
 	int handle = 0;
-	handle = image_->GetHandle(); // 画像のハンドルを取得
+	handle = image_->GetHandle(); //画像のハンドルを取得
 	DrawExtendGraph(
 		x_ - width_ / 2 - stage_->GetScrollX(),
 		y_ - height_ / 2 - stage_->GetScrollY(),
