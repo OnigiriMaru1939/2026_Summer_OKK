@@ -22,6 +22,8 @@ const std::vector<StageConfig>& GetStageConfigs()
 				//scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 800.0f, 1700.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 1200.0f,1500.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 800.0f, 1200.0f);
+
+				scene.AddTeleport(500.0f, 700.0f,100.0f, 2100.0f);
 			},
 			
 

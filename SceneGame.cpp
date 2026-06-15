@@ -9,6 +9,8 @@
 #include "StageConfig.h"
 #include "StageConfigTablle.h"
 #include "SceneManager.h"
+#include "GimmickBase.h"
+#include "GimmickTeleport.h"
 
 // 静的変数の定義
 int SceneGame::selectedStageIndex_ = 1;
@@ -91,7 +93,18 @@ void SceneGame::Update()
 
 	//敵の更新
 	UpdateEnemy();
+	// ★ ギミックの更新（必要に応じて）やリストのクリーンアップ
+	for (auto& gimmick : gimmickList_)
+	{
+		// 必要なら gimmick->Update() など
+	}
 
+	// 死んだギミック（取得済みアイテムなど）を削除
+	gimmickList_.erase(
+		std::remove_if(gimmickList_.begin(), gimmickList_.end(),
+					   [](const auto& g) { return !g->IsAlive(); }),
+		gimmickList_.end()
+	);
 	//ボスの生成判定
 	CheckBossSpawn();
 
@@ -100,7 +113,7 @@ void SceneGame::Update()
 
 	//プレイヤーと敵の衝突判定
 	CheckPlayerEnemyCollision();
-
+	CheckPlayerGimmickCollision();
 	// Stageの更新
 	UpdateStage();
 }
@@ -125,13 +138,13 @@ void SceneGame::Draw()
 			0xff0000, false);
 
 	DrawString(0, 20, "GAME SCENE", 0xffffff);
-
+	for (auto& gimmick : gimmickList_) { gimmick->Draw(); }
 	//敵を描画
 	for (auto& enemy : enemyList_)
 	{
 		enemy->Draw();
 	}
-
+	
 	//プレイヤーを描画
 	player_->Draw();
 
@@ -265,6 +278,33 @@ void SceneGame::DrawGauge(
 		color,
 		TRUE
 	);
+}
+
+void SceneGame::CheckPlayerGimmickCollision()
+{
+	if (!player_->GetAliveFlag()) return;
+
+	RECT p = player_->GetRect();
+
+	for (auto& gimmick : gimmickList_)
+	{
+		if (!gimmick->IsAlive()) continue;
+
+		RECT g = gimmick->GetRect();
+
+		// 矩形交差判定
+		bool hit =
+			p.right > g.left &&
+			p.left < g.right &&
+			p.bottom > g.top &&
+			p.top < g.bottom;
+
+		if (hit)
+		{
+			// ★ ポリモーフィズムにより、型に応じた OnCollidePlayer が自動で動く！
+			gimmick->OnCollidePlayer(*player_);
+		}
+	}
 }
 
 void SceneGame::DrawClearTransition()
@@ -542,6 +582,12 @@ void SceneGame::AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y)
 	default:
 		break;
 	}
+}
+
+void SceneGame::AddTeleport(float x, float y, float targetX, float targetY)
+{
+	gimmickList_.push_back(std::make_shared<GimmickTeleport>(fileMng_, stage_.get(), x, y, targetX, targetY));
+
 }
 
 void SceneGame::TransitionOut(float t)
