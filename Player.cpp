@@ -400,7 +400,7 @@ void Player::MoveY()
 			{
 				jumpFlag = false;
 			}
-			velocityX = 0;
+			velocityX *= 0.9;
 			velocityY = 0;
 			break;
 		}

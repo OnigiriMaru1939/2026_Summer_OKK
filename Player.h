@@ -24,6 +24,7 @@ public:
 	~Player();
 	bool SetImage(const std::string& path);			//画像のセット
 	void SetPosition(float x, float y);				//プレイヤーの位置を設定
+	void SetVelocity(float vx, float vy);			//プレイヤーのX軸の速度を設定
 	bool WillCollide(int newX, int newY);			//プレイヤーのステージとの衝突判定
 	void Update();
 	void Draw();
@@ -42,7 +43,7 @@ public:
 	void PlayerShake();				//プレイヤーの振動処理
 	void PlayerKnockBack(float enemyX, float enemyY, float power);			//プレイヤーのノックバック処理
 	RECT GetRect() const;			//プレイヤーの当たり判定の矩形を取得
-	bool CollisionHpBar();            //プレイヤーがHPバーに触れているか
+	bool CollisionHpBar();          //プレイヤーがHPバーに触れているか
   
 	float posX;					//プレイヤーのX座標
 	float posY;					//プレイヤーのY座標
@@ -65,7 +66,6 @@ public:
 	float GetY() const { return canvasY; }
 	int GetWidth() const { return width_; }			//プレイヤーの画像の幅を取得
 	int GetHeight() const { return height_; }		//プレイヤーの画像の高さを取得
-	void SetVelocity(float vx, float vy);			//プレイヤーのX軸の速度を設定
 	//プレイヤーの当たり判定の座標を取得
 	int GetLeft() const { return static_cast<int>(canvasX - width_ / 2); }
 	int GetRight() const { return static_cast<int>(canvasX + width_ / 2); }
@@ -78,8 +78,8 @@ public:
 	//移動可能フラグを設定・取得
 	bool GetCanMoveFlag() const { return canMoveFlag; }
 	void SetCanMoveFlag(bool flag) { canMoveFlag = flag; }
-
-	void UpdateStageScroll();		//プレイヤーの位置に応じてステージのスクロールを更新
+	//プレイヤーの位置に応じてステージのスクロールを更新
+	void UpdateStageScroll();
 private:
 	
 	bool GetJumpFlag() const { return jumpFlag; }					//ジャンプフラグを取得
