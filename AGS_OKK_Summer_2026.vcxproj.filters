@@ -55,6 +55,12 @@
     <ClCompile Include="Enemy1.cpp" />
     <ClCompile Include="Boss1.cpp" />
     <ClCompile Include="ScenePause.cpp" />
+    <ClCompile Include="GimmickBase.cpp">
+      <Filter>GimmickBase</Filter>
+    </ClCompile>
+    <ClCompile Include="GimmickTeleport.cpp">
+      <Filter>GimmickBase\Gimmicks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Application">
@@ -128,6 +134,12 @@
     </Filter>
     <Filter Include="Scene\Super">
       <UniqueIdentifier>{87902af4-a1c4-45e4-8b3a-c0d02c7602c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GimmickBase">
+      <UniqueIdentifier>{923b7171-7e42-4618-9020-a705c57d4141}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GimmickBase\Gimmicks">
+      <UniqueIdentifier>{e06c239a-4c0a-4721-8b29-4f32e99d22b6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -210,5 +222,11 @@
     <ClInclude Include="Boss1.h" />
     <ClInclude Include="IBoss.h" />
     <ClInclude Include="ScenePause.h" />
+    <ClInclude Include="GimmickBase.h">
+      <Filter>GimmickBase</Filter>
+    </ClInclude>
+    <ClInclude Include="GimmickTeleport.h">
+      <Filter>GimmickBase\Gimmicks</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

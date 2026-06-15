@@ -5,6 +5,7 @@
 #include "Stage.h"
 #include "EnemyBase.h"
 #include "Boss1.h"
+#include "GimmickBase.h"
 
 class Player;
 class SceneManager;
@@ -41,6 +42,7 @@ public:
 				   float value,
 				   float maxValue,
 				   int color);
+	void CheckPlayerGimmickCollision();									//プレイヤーとギミックの衝突判定
 	void CheckBossSpawn();												//ボスの生成判定
 	void BossEvent();                                                   //ボスイベントの処理
 	void BossEventDraw();                                               //ボスイベントの描画
@@ -51,6 +53,7 @@ public:
 	//敵生成関数
 	void AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y);
 	void AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y);
+	void AddTeleport(float x, float y, float targetX, float targetY);
 
 	Stage* GetStage() { return stage_.get(); }
 	Player* GetPlayer() { return player_.get(); }
@@ -65,6 +68,7 @@ private:
 	std::unique_ptr<Stage> stage_;
 	std::unique_ptr<Player> player_;
 	std::vector<std::shared_ptr<EnemyBase>> enemyList_;		//敵のリスト
+	std::vector<std::shared_ptr<GimmickBase>> gimmickList_; //ギミックのリスト
 
 	//シーンマネージャーへの弱い参照
 	SceneManager& sceneMng_;

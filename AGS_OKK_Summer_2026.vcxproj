@@ -151,6 +151,7 @@
     <ClCompile Include="Enemy1.cpp" />
     <ClCompile Include="EnemyBase.cpp" />
     <ClCompile Include="Fps.cpp" />
+    <ClCompile Include="GimmickBase.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="KeyConfig.cpp" />
     <ClCompile Include="main.cpp" />
@@ -165,6 +166,7 @@
     <ClCompile Include="SceneTitle.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="StageConfigTablle.cpp" />
+    <ClCompile Include="GimmickTeleport.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActionID.h" />
@@ -176,6 +178,7 @@
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="FileSuper.h" />
     <ClInclude Include="Fps.h" />
+    <ClInclude Include="GimmickBase.h" />
     <ClInclude Include="IBoss.h" />
     <ClInclude Include="ImageFile.h" />
     <ClInclude Include="InputManager.h" />
@@ -195,6 +198,7 @@
     <ClInclude Include="Stage.h" />
     <ClInclude Include="StageConfig.h" />
     <ClInclude Include="StageConfigTablle.h" />
+    <ClInclude Include="GimmickTeleport.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
