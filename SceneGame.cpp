@@ -202,14 +202,17 @@ void SceneGame::BossEventDraw()
 
 	if (bossEventState == BossEventState::BATTLE)
 	{
-		DrawString(
-			(Application::SCREEN_WID - strWidth) / 2,
-			60,
-			boss->GetName().c_str(),
-			GetColor(255, 255, 255)
-		);
+		if (boss)
+		{
+			DrawString(
+				(Application::SCREEN_WID - strWidth) / 2,
+				60,
+				boss->GetName().c_str(),
+				GetColor(255, 255, 255)
+			);
 
-		DrawGauge(100, 90, 1720, 50, boss->GetHp(), boss->GetHpMax(), GetColor(255, 0, 0));
+			DrawGauge(100, 90, 1720, 50, boss->GetHp(), boss->GetHpMax(), GetColor(255, 0, 0));
+		}
 	}
 }
 
