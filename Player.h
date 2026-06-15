@@ -124,4 +124,6 @@ private:
 	float attackDamage;			//攻撃のダメージ
 	float shakeMove;			//振動の移動量
 	float playerShakePower;		//プレイヤーの振動量
+
+	int hpFontHandle;
 };

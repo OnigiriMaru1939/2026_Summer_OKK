@@ -61,6 +61,7 @@ public:
 	static int selectedStageIndex_;
 
 	void TransitionOut(float t) override;
+	void TransitionIn(float t) override;
 private:
 	std::unique_ptr<Stage> stage_;
 	std::unique_ptr<Player> player_;
@@ -80,6 +81,9 @@ private:
 	bool IsClear() { return _isClear; }
 
 	float _fadeAlpha;
+
+	int bossNameFontHandle;
+	int warningFontHandle;
 	// ステージクリア時演出用 ------------------
 	static constexpr int DOWN_SCALE = 8;
 	static constexpr int DOWN_SCALE_SCREEN_W = (Application::SCREEN_WID / DOWN_SCALE);	// ガウスフィルタを掛ける画像の横幅

@@ -20,7 +20,8 @@ SceneResult::SceneResult(FileManager& fileMng, bool isClear, ClearResult& result
 	_decideSE = fileMng_.LoadSoundFM("Resource/Sound/SE/Decide_SE.wav");
 	_cursorSE = fileMng_.LoadSoundFM("Resource/Sound/SE/Cursor_SE.wav");
 
-	_fadeAlpha = 255.0f;
+	_fadeInAlpha = 255.0f;
+	_fadeOutAlpha = 0.0f;
 
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Decide,
 												   [this]()
@@ -102,7 +103,7 @@ void SceneResult::Draw()
 		}
 	}
 
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(_fadeAlpha));
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(_fadeInAlpha));
 	if (_isClear)
 	{
 		DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0xffffff, true);
@@ -111,6 +112,9 @@ void SceneResult::Draw()
 	{
 		DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0x000000, true);
 	}
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(_fadeOutAlpha));
+	DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0x000000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
@@ -149,5 +153,10 @@ void SceneResult::MoveSelect(float moveValue)
 void SceneResult::TransitionIn(float t)
 {
 		float e = EaseInCubic(1 - t);
-		_fadeAlpha = e * 255.0f;
+		_fadeInAlpha = e * 255.0f;
+}
+
+void SceneResult::TransitionOut(float t)
+{
+	_fadeOutAlpha = EaseOutCubic(t) * 255.0f;
 }

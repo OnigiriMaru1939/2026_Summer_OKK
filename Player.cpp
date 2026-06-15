@@ -16,6 +16,8 @@
 constexpr auto WATER_PARTICLE_PATH = "Resource/ParticleJsonData/waterParameter.json";
 Player::Player(FileManager& fileMng, Stage* stage, SceneGame& game) : fileManager(fileMng), stage_(stage), sceneGame(game)
 {
+	AddFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
+	hpFontHandle = CreateFontToHandle("DotGothic16", 30, -1, DX_FONTTYPE_EDGE);
 	SetImage("Resource/Image/Cider_Player.png");
 
 	pMng = std::make_unique<ParticleManager>(fileMng);
@@ -102,6 +104,8 @@ Player::Player(FileManager& fileMng, Stage* stage, SceneGame& game) : fileManage
 
 Player::~Player()
 {
+	DeleteFontToHandle(hpFontHandle);
+	RemoveFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
 	InputManager::GetInstance().StopVibration();
 }
 
@@ -305,7 +309,10 @@ void Player::Draw()
 	{
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
 	}
+
+	DrawStringToHandle(1350, 965, "HP", 0x00ff00, hpFontHandle);
 	DrawGauge(1350, 1000, 500, 40, playerHp, playerHpMax, GetColor(0, 255, 0), 0);        //プレイヤーのHPゲージ
+
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	//炭酸蓄積ゲージが0以上の場合のみ描画
 	if (sodaShakeGauge > 0 && canMoveFlag)

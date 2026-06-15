@@ -14,11 +14,13 @@
 
 SceneManager::SceneManager(FileManager& fileMng) : fileMng_(fileMng)
 {
-	scenes.push_back(CreateScene(SceneSuper::SceneID::TITLE));
+	transition_.state = TransitionState::SwitchScene;
+	transition_.timer = 0.0f;
+	transition_.duration = 45.0f;
+	transition_.nextSceneID = SceneSuper::SceneID::TITLE;
+	ChangeScene(transition_.nextSceneID);
 	isExit = false;
 	_isClear = false;
-
-	transition_.state = TransitionState::None;
 }
 
 SceneManager::~SceneManager()
@@ -49,7 +51,7 @@ void SceneManager::Update()
 		if (currentScene->IsEnd())
 		{
 			currentScene->SetIsTransition(true);
-			// のちのち、シーン切り替えの演出を入れる際に、currentSceneからフェードアウトとフェードインのTimerやDurationを取得して、Transition構造体にセットする形にする
+
 			transition_.state = TransitionState::FadeOutCurrent;
 			transition_.timer = 0.0f;
 			transition_.duration = 45.0f; // フェードの総時間（フレーム数）

@@ -12,7 +12,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 			"Resource/MapJson/stage_01.json",
 			[](SceneGame& scene)
 			{
-				scene.GetStage()->SetBgImage("Resource/Image/Stage1_bg.png");
+				scene.GetStage()->SetBgImage("Resource/Image/Game/Stage1_bg.png");
 				scene.GetStage()->SetMchipImage("Resource/MapChip/Mapchip_neon.png");
 				//プレイヤーの初期化
 				scene.GetPlayer()->SetPosition(100.0f, 2100.0f);
@@ -31,6 +31,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 			"Resource/MapJson/stage_02.json",
 			[](SceneGame& scene)
 			{
+			scene.GetStage()->SetBgImage("Resource/Image/Game/Stage1_bg.png");
 			scene.GetStage()->SetMchipImage("Resource/MapChip/Mapchip_neon.png");
 			//プレイヤーの初期化
       scene.GetPlayer()->SetPosition(100.0f, 3480.0f);
@@ -46,7 +47,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 			"Resource/MapJson/stage_03.json",
 			[](SceneGame& scene)
 			{
-			
+				scene.GetStage()->SetBgImage("Resource/Image/Game/Stage1_bg.png");
 			},
 
 		},
@@ -55,7 +56,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 			"Resource/MapJson/stage_04.json",
 			[](SceneGame& scene)
 			{
-
+				scene.GetStage()->SetBgImage("Resource/Image/Game/Stage1_bg.png");
 			},
 
 		}

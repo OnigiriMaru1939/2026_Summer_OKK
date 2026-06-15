@@ -5,6 +5,7 @@
 
 SceneTitle::SceneTitle(FileManager& fileMng) : SceneSuper(fileMng)
 {
+	_fadeAlpha = 255.0f;
 	_bgImg = fileMng_.LoadImageFM("Resource/Image/Title/Title_bg.png");
 	_TitleLogoImg = fileMng_.LoadImageFM("Resource/Image/Title/Title_Logo.png");
 	_TitleStartImg = fileMng_.LoadImageFM("Resource/Image/Title/Title_Start.png");
@@ -52,4 +53,19 @@ void SceneTitle::Draw()
 	std::string TitleEndText = "Press Escape/Back to Exit";
 	int textWidth = GetDrawStringWidth(TitleEndText.c_str(), TitleEndText.length());
 	DrawString((Application::SCREEN_WID / 2) - (textWidth / 2), Application::SCREEN_HIG - 100, TitleEndText.c_str(), GetColor(255, 255, 255));
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(_fadeAlpha));
+	DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0x000000, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+}
+
+void SceneTitle::TransitionIn(float t)
+{
+	float e = EaseInCubic(1 - t);
+	_fadeAlpha = e * 255.0f;
+}
+
+void SceneTitle::TransitionOut(float t)
+{
+	_fadeAlpha = EaseOutCubic(t) * 255.0f;
 }
