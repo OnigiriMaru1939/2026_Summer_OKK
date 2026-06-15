@@ -2,7 +2,7 @@
 
 Enemy1::Enemy1(FileManager& fileMng, Stage* stage, float x, float y) : EnemyBase(fileMng, stage, x, y)
 {
-	SetImage("Resource/Image/WingBull.png");
+	SetImage("Resource/Image/Hope.png");
 	enemyType_ = ENEMY_TYPE::E_TYPE_1;
 	SetPosition(x, y);				//初期位置を設定
 	SetVelocity(2.0f, 0.0f);		//初期速度を設定
