@@ -67,6 +67,12 @@ void EnemyBase::Update()
 
 void EnemyBase::Move()
 {
+	MoveX();
+	MoveY();
+}
+
+void EnemyBase::MoveX()
+{
 	int signX = (vx_ > 0) ? 1 : ((vx_ < 0) ? -1 : 0);
 	int loopX = (int)std::abs(vx_);
 	while (loopX > 0)
@@ -80,7 +86,10 @@ void EnemyBase::Move()
 		x_ += signX;
 		loopX--;
 	}
+}
 
+void EnemyBase::MoveY()
+{
 	int signY = (vy_ > 0) ? 1 : ((vy_ < 0) ? -1 : 0);
 	int loopY = (int)std::abs(vy_);
 	while (loopY > 0)

@@ -32,6 +32,8 @@ public:
 	void SetPosition(float x, float y);
 	void SetVelocity(float vx, float vy);
 	void Move();
+	void MoveX();
+	void MoveY();
 	void AddGravity();
 	void NoDamageCountDown(); //無敵時間のカウントダウン
 
@@ -44,6 +46,7 @@ public:
 	RECT GetRect() const;
 	
 	// 情報取得
+	std::string GetName() const { return name_; }
 	float GetX() const { return x_; }
 	float GetY() const { return y_; }
 	int GetWidth() const { return width_; }
@@ -85,10 +88,10 @@ protected:
 	int canvasX;	//敵の描画位置X
 	int canvasY;	//敵の描画位置Y
 
-	int hp_; //HP
-	int hpMax_; //HPの最大値
-	bool isAlive_; // 生存フラグ
-	bool jumpFlag;		//ジャンプフラグ
-
+	int hp_;				//HP
+	int hpMax_;				//HPの最大値
+	bool isAlive_;			//生存フラグ
+	bool jumpFlag;			//ジャンプフラグ
+	std::string name_;		//敵の名前
 };
 

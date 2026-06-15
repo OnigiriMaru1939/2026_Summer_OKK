@@ -1,8 +1,10 @@
 ﻿#pragma once
+#include <memory>
 #include "SceneSuper.h"
 #include "Application.h"
 #include "Stage.h"
 #include "EnemyBase.h"
+#include "Boss1.h"
 
 class Player;
 class SceneManager;
@@ -11,6 +13,16 @@ class SceneGame :
     public SceneSuper
 {
 public:
+	//ボスイベントの状態
+	enum class BossEventState
+	{
+		NONE,
+		WARNING,
+		APPEAR,
+		UIDRAW,
+		BATTLE,
+	};
+
 	SceneGame(FileManager& fileMng, SceneManager& sceneMng);
 
 	~SceneGame() override;
@@ -22,9 +34,24 @@ public:
 	void UpdateStage();
 	void UpdateDuringTransition() override; // トランジション中の更新処理
 	void CheckPlayerEnemyCollision();
+	void DrawGauge(int x,
+				   int y,
+				   int width,
+				   int height,
+				   float value,
+				   float maxValue,
+				   int color);
+	void CheckBossSpawn();												//ボスの生成判定
+	void BossEvent();                                                   //ボスイベントの処理
+	void BossEventDraw();                                               //ボスイベントの描画
+	void SetBossArea(int left, int top, int right, int bottom);         //ボスエリアの矩形を設定
+	RECT GetBossArea() const;                                           //ボスエリアの矩形を取得
+	std::shared_ptr<Boss1> GetBoss();                                   //ボスの取得
+
 	//敵生成関数
 	void AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y);
 	void AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y);
+
 	Stage* GetStage() { return stage_.get(); }
 	Player* GetPlayer() { return player_.get(); }
 	auto& GetEnemyList() { return enemyList_; }
@@ -39,9 +66,13 @@ private:
 	std::unique_ptr<Player> player_;
 	std::vector<std::shared_ptr<EnemyBase>> enemyList_;		//敵のリスト
 
-	SceneManager& sceneMng_; // シーンマネージャーへの弱い参照
+	//シーンマネージャーへの弱い参照
+	SceneManager& sceneMng_;
 
-	float clearTime; // クリアタイム
+	float clearTime;		//クリアタイム
+	int bossTimer;			//ボスイベントのタイマー
+	float bossHpGauge;      //ボスのHP
+	float bossHpGaugeMax;   //ボスのHPの最大値
 
 	int _gameScreen;
 
@@ -61,5 +92,12 @@ private:
 
 	void DrawClearTransition();
 	// -------------------------------------
+
+	//ボスが出現したかどうかのフラグ
+	bool isBossSpawned_;
+	//ボスエリアの矩形
+	RECT bossArea;
+	//ボスイベントの状態
+	BossEventState bossEventState;
 };
 
