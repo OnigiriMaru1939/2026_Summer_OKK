@@ -15,6 +15,9 @@ int SceneGame::selectedStageIndex_ = 1;
 
 SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(fileMng), sceneMng_(sceneMng)
 {
+	AddFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
+	bossNameFontHandle = CreateFontToHandle("DotGothic16", 60, -1, DX_FONTTYPE_NORMAL);
+	warningFontHandle = CreateFontToHandle("DotGothic16", 160, -1, DX_FONTTYPE_NORMAL);
 	stage_ = std::make_unique<Stage>(fileMng);
 	player_ = std::make_unique<Player>(fileMng, stage_.get(), *this);
 
@@ -40,6 +43,7 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(
 
 	gaussRatio = 0;
 	filterRatio = 200;
+	_fadeAlpha = 255.0f;
 
 	// デバッグ
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Cancel, 
@@ -73,6 +77,9 @@ SceneGame::~SceneGame()
 	DeleteGraph(highBrightScreen);
 	DeleteGraph(downScaleScreen);
 	DeleteGraph(gaussScreen);
+	DeleteFontToHandle(bossNameFontHandle);
+	DeleteFontToHandle(warningFontHandle);
+	RemoveFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
 }
 
 void SceneGame::Update()
@@ -107,9 +114,6 @@ void SceneGame::Draw()
 
 	// Stageを描画
 	if (stage_) stage_->Draw();
-
-	//プレイヤーを描画
-	player_->Draw();
 
 	//ボスエリアを描画
 	RECT area = bossArea;
@@ -161,12 +165,42 @@ void SceneGame::BossEventDraw()
 
 	if (boss)
 	{
-		strWidth = GetDrawStringWidth(
+		strWidth = GetDrawStringWidthToHandle(
 			boss->GetName().c_str(),
-			strlen(boss->GetName().c_str())
+			strlen(boss->GetName().c_str()),
+			bossNameFontHandle
 		);
 	}
 
+	if (bossEventState == BossEventState::UIDRAW)
+	{
+		DrawStringToHandle(
+			(Application::SCREEN_WID - strWidth) / 2,
+			20,
+			boss->GetName().c_str(),
+			GetColor(255, 255, 255),
+			bossNameFontHandle
+		);
+
+		DrawGauge(100, 90, 1720, 50, bossHpGauge, bossHpGaugeMax, GetColor(255, 0, 0));
+
+	}
+
+	if (bossEventState == BossEventState::BATTLE)
+	{
+		if (boss)
+		{
+			DrawStringToHandle(
+				(Application::SCREEN_WID - strWidth) / 2,
+				20,
+				boss->GetName().c_str(),
+				GetColor(255, 255, 255),
+				bossNameFontHandle
+			);
+
+			DrawGauge(100, 90, 1720, 50, boss->GetHp(), boss->GetHpMax(), GetColor(255, 0, 0));
+		}
+	}
 
 	if (bossEventState == BossEventState::WARNING)
 	{
@@ -182,40 +216,22 @@ void SceneGame::BossEventDraw()
 			Application::SCREEN_HIG / 2 + 100,
 			GetColor(255, 0, 0),
 			true);
-		DrawFormatString(
-			900,
-			Application::SCREEN_HIG / 2 - 20,
-			GetColor(255, 255, 255),
-			"WARNING !!");
-	}
 
-	if (bossEventState == BossEventState::UIDRAW)
-	{
-		DrawString(
-			(Application::SCREEN_WID - strWidth) / 2,
-			60,
-			boss->GetName().c_str(),
-			GetColor(255, 255, 255)
+		strWidth = GetDrawStringWidthToHandle(
+			"WARNING !!",
+			strlen("WARNING !!"),
+			warningFontHandle
 		);
-
-		DrawGauge(100, 90, 1720, 50, bossHpGauge, bossHpGaugeMax, GetColor(255, 0, 0));
-
-	}
-
-	if (bossEventState == BossEventState::BATTLE)
-	{
-		if (boss)
-		{
-			DrawString(
-				(Application::SCREEN_WID - strWidth) / 2,
-				60,
-				boss->GetName().c_str(),
-				GetColor(255, 255, 255)
+		DrawStringToHandle(
+			(Application::SCREEN_WID - strWidth) / 2,
+			(Application::SCREEN_HIG - GetFontSizeToHandle(warningFontHandle)) / 2,
+			"WARNING !!",
+			GetColor(255, 255, 255),
+			warningFontHandle
 			);
-
-			DrawGauge(100, 90, 1720, 50, boss->GetHp(), boss->GetHpMax(), GetColor(255, 0, 0));
-		}
 	}
+
+
 }
 
 //ゲージの描画
@@ -539,4 +555,10 @@ void SceneGame::TransitionOut(float t)
 	{
 		_fadeAlpha = EaseOutCubic(t) * 255.0f;
 	}
+}
+
+void SceneGame::TransitionIn(float t)
+{
+	float e = EaseInCubic(1 - t);
+	_fadeAlpha = e * 255.0f;
 }

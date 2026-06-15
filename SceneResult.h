@@ -37,6 +37,7 @@ public:
 	void Draw() override;
 
 	void TransitionIn(float t) override;
+	void TransitionOut(float t) override;
 private:
 	bool _isClear;
 	std::shared_ptr<ImageFile> _bgImg;
@@ -52,7 +53,8 @@ private:
 	ClearResult _clearResult;
 	int _selectedNext;
 
-	float _fadeAlpha;
+	float _fadeInAlpha;
+	float _fadeOutAlpha;
 
 	void MoveSelect(float moveValue);
 };

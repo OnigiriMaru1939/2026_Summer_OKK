@@ -11,7 +11,7 @@
 Stage::Stage(FileManager& fileMng):fileMng_(fileMng)
 {
 	// マップチップ画像の読み込み
-	bgImg_ = fileMng_.LoadImageFM("Resource/Image/Stage1_bg.png"); 
+	bgImg_ = fileMng_.LoadImageFM("Resource/Image/Game/Stage1_bg.png"); 
 	if (!bgImg_)
 	{
 		printfDx("背景画像の読み込みに失敗しました\n");

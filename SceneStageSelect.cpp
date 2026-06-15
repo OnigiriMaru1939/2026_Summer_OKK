@@ -4,9 +4,11 @@
 #include "SceneStageSelect.h"
 #include "InputManager.h"
 #include "SceneGame.h"
+#include "Application.h"
 
 SceneStageSelect::SceneStageSelect(FileManager& fileMng) : SceneSuper(fileMng)
 {
+	_fadeAlpha = 255.0f;
 	//AddFontResourceExA("Resource/fonts/KumarOneOutline-Regular.ttf", FR_PRIVATE, NULL);
 	//stageFontHandle = CreateFontToHandle("Kumar One Outline", 60, -1, DX_FONTTYPE_NORMAL);
 	AddFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
@@ -118,6 +120,10 @@ void SceneStageSelect::Draw()
 	{
 		DrawBox(TITLE_X - 5, TITLE_Y - 5, TITLE_X + TITLE_W + 5, TITLE_Y + TITLE_H + 5, GetColor(255, 0, 0), false);
 	}
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(_fadeAlpha));
+	DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0x000000, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
 void SceneStageSelect::MoveSelect(float moveValue, bool isHorizontal)
@@ -177,4 +183,15 @@ void SceneStageSelect::MoveSelect(float moveValue, bool isHorizontal)
 	}
 	// ステージは0～4の範囲でループ
 	_selectedIndex = std::max(0, std::min(4, _selectedIndex));
+}
+
+void SceneStageSelect::TransitionIn(float t)
+{
+	float e = EaseInCubic(1 - t);
+	_fadeAlpha = e * 255.0f;
+}
+
+void SceneStageSelect::TransitionOut(float t)
+{
+	_fadeAlpha = EaseOutCubic(t) * 255.0f;
 }

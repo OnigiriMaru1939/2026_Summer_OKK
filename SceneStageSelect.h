@@ -35,6 +35,8 @@ public:
 
 	void MoveSelect(float moveValue, bool isHorizontal);
 
+	void TransitionIn(float t) override;
+	void TransitionOut(float t) override;
 private:
 	std::shared_ptr<ImageFile> _bgImg;
 	std::shared_ptr<ImageFile> _stageSelectH1Img;
@@ -49,5 +51,7 @@ private:
 	int stageFontHandle;
 	int titleFontHandle;
 	int stageNumFontHandle;
+
+	int _fadeAlpha;
 };
 

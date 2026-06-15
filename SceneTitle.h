@@ -18,6 +18,9 @@ public:
 
 	void Update() override;
 	void Draw() override;
+
+	void TransitionIn(float t) override;
+	void TransitionOut(float t) override;
 private:
 	std::shared_ptr<ImageFile> _bgImg;
 	std::shared_ptr<ImageFile> _TitleLogoImg;
@@ -25,5 +28,7 @@ private:
 
 	std::shared_ptr<SoundFile> _mainBgm;
 	std::shared_ptr<SoundFile> _decideSE;
+
+	float _fadeAlpha;
 };
 
