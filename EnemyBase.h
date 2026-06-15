@@ -37,7 +37,7 @@ public:
 	void AddGravity();
 	void NoDamageCountDown(); //無敵時間のカウントダウン
 
-	// ダメージ管理
+	//ダメージ管理
 	void ApplyDamage(int dmg);
 	bool IsAlive() const;
 
