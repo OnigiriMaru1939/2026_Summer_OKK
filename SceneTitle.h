@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "ImageFile.h"
 #include "SoundFile.h"
+#include "SceneManager.h"
 #include <memory>
 
 class SceneTitle :
@@ -12,7 +13,7 @@ private:
 	static constexpr int LOGO_Y = 400;
 	static constexpr int START_Y = 880;
 public:
-	SceneTitle(FileManager& fileMng);
+	SceneTitle(FileManager& fileMng, SceneManager& sceneMng);
 
 	~SceneTitle() override;
 

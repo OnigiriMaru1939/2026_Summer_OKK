@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "ImageFile.h"
 #include "SoundFile.h"
+#include "FontFile.h"
 #include "SceneManager.h"
 enum class NextScene
 {
@@ -29,7 +30,7 @@ private:
 	static constexpr int NEXT_BUTTON_HIG = 150;
 	static constexpr int NEXT_BUTTON_MARGIN = 50;
 public:
-	SceneResult(FileManager& fileMng, bool isClear, ClearResult& result);
+	SceneResult(FileManager& fileMng, bool isClear, ClearResult& result, SceneManager& sceneMng);
 
 	~SceneResult() override;
 
@@ -47,8 +48,8 @@ private:
 	std::shared_ptr<SoundFile> _decideSE;
 	std::shared_ptr<SoundFile> _cursorSE;
 
-	int resultFontHandle;
-	int nextButtonFontHandle;
+	std::shared_ptr<FontFile> _resultFont;
+	std::shared_ptr<FontFile> _nextButtonFont;
 
 	ClearResult _clearResult;
 	int _selectedNext;

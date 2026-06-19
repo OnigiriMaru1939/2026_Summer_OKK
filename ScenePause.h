@@ -2,6 +2,7 @@
 #include "SceneSuper.h"
 #include "SoundFile.h"
 #include "ImageFile.h"
+#include "FontFile.h"
 #include <memory>
 class SceneManager;
 
@@ -37,12 +38,10 @@ private:
 	std::shared_ptr<SoundFile> _decideSE;
 	std::shared_ptr<SoundFile> _cursorSE;
 
-	int _fontHandle;
-	int _fontPauseHandle;
-	int _fontExplainHandle;
+	std::shared_ptr<FontFile> _textFont;
+	std::shared_ptr<FontFile> _pauseFont;
+	std::shared_ptr<FontFile> _explainFont;
 
 	int _selectedIndex;
-
-	SceneManager& sceneMng_; // シーンマネージャーへの弱い参照
 };
 

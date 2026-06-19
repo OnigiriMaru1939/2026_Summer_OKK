@@ -1,17 +1,24 @@
 ﻿#define NOMINMAX
+#include <DxLib.h>
+
 #include "ScenePause.h"
 #include "FileManager.h"
-#include <DxLib.h>
 #include "Application.h"
 #include "InputManager.h"
 #include "SceneManager.h"
+#include "Fonts.h"
 
-ScenePause::ScenePause(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(fileMng), sceneMng_(sceneMng)
+ScenePause::ScenePause(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(fileMng, sceneMng)
 {
-	AddFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
-	_fontHandle = CreateFontToHandle("DotGothic16", 60, -1, DX_FONTTYPE_NORMAL);
-	_fontPauseHandle = CreateFontToHandle("DotGothic16", 80, -1, DX_FONTTYPE_NORMAL);
-	_fontExplainHandle = CreateFontToHandle("DotGothic16", 40, -1, DX_FONTTYPE_NORMAL);
+	_textFont = fileMng_.CreateFontFM(Fonts::DotGothic16::PATH,
+									  Fonts::DotGothic16::NAME,
+									  60);
+	_pauseFont = fileMng_.CreateFontFM(Fonts::DotGothic16::PATH,
+									   Fonts::DotGothic16::NAME,
+									   80);
+	_explainFont = fileMng_.CreateFontFM(Fonts::DotGothic16::PATH,
+									   Fonts::DotGothic16::NAME,
+									   40);
 	_selectedIndex = 0;
 	_blockImg = fileMng_.LoadImageFM("Resource/Image/Pause/Pause_Block.png");
 	_blockSelectImg = fileMng_.LoadImageFM("Resource/Image/Pause/Pause_Block_Select.png");
@@ -53,13 +60,11 @@ ScenePause::ScenePause(FileManager& fileMng, SceneManager& sceneMng) : SceneSupe
 														   DecidePauseScene();
 													   }
 												   });
+	sceneMng.SetTransitionDuration(45.0f);
 }
 
 ScenePause::~ScenePause()
 {
-	DeleteFontToHandle(_fontHandle);
-	DeleteFontToHandle(_fontPauseHandle);
-	RemoveFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
 	InputManager::GetInstance().PopLayer();
 }
 
@@ -74,31 +79,31 @@ void ScenePause::Draw()
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0); // ブレンドモードを元に戻す
 
 	std::string text = "PAUSE";
-	int width = GetDrawStringWidthToHandle(text.c_str(), text.size(), _fontPauseHandle);
+	int width = GetDrawStringWidthToHandle(text.c_str(), text.size(), _pauseFont->GetHandle());
 	int color = 0xaaebfb;
-	DrawStringToHandle(Application::SCREEN_WID / 2 - width / 2, 70, text.c_str(), color, _fontPauseHandle);
+	DrawStringToHandle(Application::SCREEN_WID / 2 - width / 2, 70, text.c_str(), color, _pauseFont->GetHandle());
 
 	text = "SELECT SPACE / A";
-	width = GetDrawStringWidthToHandle(text.c_str(), text.size(), _fontExplainHandle);
+	width = GetDrawStringWidthToHandle(text.c_str(), text.size(), _explainFont->GetHandle());
 	color = 0xaaebfb;
-	DrawStringToHandle(Application::SCREEN_WID / 2 - width / 2, 160, text.c_str(), 0xffffff, _fontExplainHandle);
+	DrawStringToHandle(Application::SCREEN_WID / 2 - width / 2, 160, text.c_str(), 0xffffff, _explainFont->GetHandle());
 
 	for (int i = 0; i < static_cast<int>(NextScenePause::Max); i++)
 	{
 		i == 0 ? text = "BACK" : i == 1 ? text = "RETRY" : i == 2 ? text = "STAGE SELECT" : i == 3 ? text = "TITLE" : text = "EXIT";
-		width = GetDrawStringWidthToHandle(text.c_str(), text.size(), _fontHandle);
+		width = GetDrawStringWidthToHandle(text.c_str(), text.size(), _textFont->GetHandle());
 		color = 0xaaebfb;
 
 		if (_selectedIndex == i)
 		{
 			color = 0xf7c3ef;
 			DrawGraph(BUTTON_X, BUTTON_Y + (BUTTON_HIG + BUTTON_MARGIN) * i, _blockSelectImg->GetHandle(), true);
-			DrawStringToHandle(BUTTON_X + BUTTON_WID / 2 - width / 2, BUTTON_Y + (BUTTON_HIG + BUTTON_MARGIN) * i + BUTTON_HIG / 2 - GetFontSizeToHandle(_fontHandle) / 2, text.c_str(), color, _fontHandle);
+			DrawStringToHandle(BUTTON_X + BUTTON_WID / 2 - width / 2, BUTTON_Y + (BUTTON_HIG + BUTTON_MARGIN) * i + BUTTON_HIG / 2 - GetFontSizeToHandle(_textFont->GetHandle()) / 2, text.c_str(), color, _textFont->GetHandle());
 		}
 		else
 		{
 			DrawGraph(BUTTON_X, BUTTON_Y + (BUTTON_HIG + BUTTON_MARGIN) * i, _blockImg->GetHandle(), true);
-			DrawStringToHandle(BUTTON_X + BUTTON_WID / 2 - width / 2, BUTTON_Y + (BUTTON_HIG + BUTTON_MARGIN) * i + BUTTON_HIG / 2 - GetFontSizeToHandle(_fontHandle) / 2, text.c_str(), color, _fontHandle);
+			DrawStringToHandle(BUTTON_X + BUTTON_WID / 2 - width / 2, BUTTON_Y + (BUTTON_HIG + BUTTON_MARGIN) * i + BUTTON_HIG / 2 - GetFontSizeToHandle(_textFont->GetHandle()) / 2, text.c_str(), color, _textFont->GetHandle());
 		}
 	}
 }

@@ -179,6 +179,8 @@
     <ClInclude Include="EnemyBase.h" />
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="FileSuper.h" />
+    <ClInclude Include="FontFile.h" />
+    <ClInclude Include="Fonts.h" />
     <ClInclude Include="Fps.h" />
     <ClInclude Include="GimmickBase.h" />
     <ClInclude Include="IBoss.h" />
@@ -198,6 +200,7 @@
     <ClInclude Include="SceneStageSelect.h" />
     <ClInclude Include="SceneSuper.h" />
     <ClInclude Include="SceneTitle.h" />
+    <ClInclude Include="ScreenFile.h" />
     <ClInclude Include="SoundFile.h" />
     <ClInclude Include="Stage.h" />
     <ClInclude Include="StageConfig.h" />

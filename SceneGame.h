@@ -1,10 +1,11 @@
-﻿#pragma once
+#pragma once
 #include <memory>
 #include "SceneSuper.h"
 #include "Application.h"
 #include "Stage.h"
 #include "EnemyBase.h"
 #include "Boss1.h"
+#include "FontFile.h"
 #include "GimmickBase.h"
 #include "ItemBase.h"
 
@@ -76,9 +77,6 @@ private:
 	std::vector<std::shared_ptr<GimmickBase>> gimmickList_; //ギミックのリスト
 	std::vector<std::shared_ptr<ItemBase>> itemList_;		//アイテムのリスト
 
-	//シーンマネージャーへの弱い参照
-	SceneManager& sceneMng_;
-
 	float clearTime;		//クリアタイム
 	int bossTimer;			//ボスイベントのタイマー
 	float bossHpGauge;      //ボスのHP
@@ -91,8 +89,8 @@ private:
 
 	float _fadeAlpha;
 
-	int bossNameFontHandle;
-	int warningFontHandle;
+	std::shared_ptr<FontFile> _bossNameFont;
+	std::shared_ptr<FontFile> _warningFont;
 	// ステージクリア時演出用 ------------------
 	static constexpr int DOWN_SCALE = 8;
 	static constexpr int DOWN_SCALE_SCREEN_W = (Application::SCREEN_WID / DOWN_SCALE);	// ガウスフィルタを掛ける画像の横幅
@@ -112,5 +110,10 @@ private:
 	RECT bossArea;
 	//ボスイベントの状態
 	BossEventState bossEventState;
+
+	bool _isBossDefeatedSequence = false;
+	int _sequenceTimer = 0;
+
+	int _offScreen = -1;
 };
 
