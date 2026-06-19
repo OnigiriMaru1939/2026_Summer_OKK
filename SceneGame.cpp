@@ -1,16 +1,20 @@
-﻿#define NOMINMAX
+#define NOMINMAX
 #include "SceneGame.h"
 #include "InputManager.h"
 #include "Player.h"
 #include "EnemyBase.h"
 #include "Enemy1.h"
 #include "Boss1.h"
+#include "ItemBase.h"
+#include "Mentos.h"
 #include "Stage.h"
 #include "FileManager.h"
 #include "StageConfig.h"
 #include "StageConfigTablle.h"
 #include "SceneManager.h"
 #include "Fonts.h"
+#include "GimmickBase.h"
+#include "GimmickTeleport.h"
 #include <algorithm>
 
 // 静的変数の定義
@@ -115,12 +119,34 @@ void SceneGame::Update()
 	UpdatePlayer();
 	//敵の更新
 	UpdateEnemy();
+
+	// ★ ギミックの更新（必要に応じて）やリストのクリーンアップ
+	for (auto& gimmick : gimmickList_)
+	{
+		// 必要なら gimmick->Update() など
+	}
+
+	// 死んだギミック（取得済みアイテムなど）を削除
+	gimmickList_.erase(
+		std::remove_if(gimmickList_.begin(), gimmickList_.end(),
+					   [](const auto& g) { return !g->IsAlive(); }),
+		gimmickList_.end()
+	);
+
+	//アイテムの更新
+	UpdateItem();
+
 	//ボスの生成判定
 	CheckBossSpawn();
 	//ボスイベントの処理
 	BossEvent();
 	//プレイヤーと敵の衝突判定
 	CheckPlayerEnemyCollision();
+	//プレイヤーとギミックの衝突判定
+	CheckPlayerGimmickCollision();
+	//プレイヤーとアイテムの衝突判定
+	CheckPlayerItemCollision();
+
 	// Stageの更新
 	UpdateStage();
 }
@@ -144,12 +170,15 @@ void SceneGame::Draw()
 			area.bottom - stage_->GetScrollY(),
 			0xff0000, false);
 
+
+	DrawString(0, 20, "GAME SCENE", 0xffffff);
+	for (auto& gimmick : gimmickList_) { gimmick->Draw(); }
 	//敵を描画
 	for (auto& enemy : enemyList_)
 	{
 		enemy->Draw();
 	}
-
+	
 	//プレイヤーを描画
 	player_->Draw();
 	DrawClearTransition();
@@ -157,6 +186,12 @@ void SceneGame::Draw()
 	ClearDrawScreen();
 
 	// 画面揺れなどの影響を受けないものはこっちへ描画
+
+	//アイテムを描画
+	for (auto& item : itemList_)
+	{
+		item->Draw();
+	}
 
 	//ボスイベントの描画
 	BossEventDraw();
@@ -416,6 +451,24 @@ void SceneGame::UpdateStage()
 	if (stage_) stage_->Update();
 }
 
+//アイテムの更新
+void SceneGame::UpdateItem()
+{
+	for (auto& item : itemList_)
+	{
+		if (item->IsAlive())
+		{
+			item->Update();
+		}
+		else
+		{
+			//アイテムがなくなったらリストから削除
+			item = nullptr;
+		}
+	}
+	itemList_.erase(std::remove(itemList_.begin(), itemList_.end(), nullptr), itemList_.end());
+}
+
 void SceneGame::UpdateDuringTransition()
 {
 	// プレイヤーの更新
@@ -449,7 +502,7 @@ void SceneGame::CheckPlayerEnemyCollision()
 			//プレイヤーをノックバックさせる
 			player_->PlayerKnockBack(enemy->GetX(), enemy->GetY(), 10.0f);
 		}
-		else if (hit && player_->GetAttakFlag())
+		else if (hit && player_->GetAttakFlag() && player_->GetSpeed() >= Player::ATTACK_SPEED_THRESHOLD)
 		{
 			enemy->ApplyDamage(static_cast<int>(player_->GetAttackDamage()));
 			if (enemy->IsAlive())
@@ -457,6 +510,59 @@ void SceneGame::CheckPlayerEnemyCollision()
 				//プレイヤーをノックバックさせる
 				player_->PlayerKnockBack(enemy->GetX(), enemy->GetY(), 10.0f);
 			}
+		}
+	}
+}
+
+//プレイヤーとギミックの衝突判定
+void SceneGame::CheckPlayerGimmickCollision()
+{
+	if (!player_->GetAliveFlag()) return;
+
+	RECT p = player_->GetRect();
+
+	for (auto& gimmick : gimmickList_)
+	{
+		if (!gimmick->IsAlive()) continue;
+
+		RECT g = gimmick->GetRect();
+
+		// 矩形交差判定
+		bool hit =
+			p.right > g.left &&
+			p.left < g.right &&
+			p.bottom > g.top &&
+			p.top < g.bottom;
+
+		if (hit)
+		{
+			// ★ ポリモーフィズムにより、型に応じた OnCollidePlayer が自動で動く！
+			gimmick->OnCollidePlayer(*player_);
+		}
+	}
+}
+
+//プレイヤーとアイテムの衝突判定
+void SceneGame::CheckPlayerItemCollision()
+{
+	RECT p = player_->GetRect();
+
+	for (auto& item : itemList_)
+	{
+		if (!item->IsAlive())
+			continue;
+
+		RECT i = item->GetRect();
+
+		bool hit =
+			p.right > i.left &&
+			p.left < i.right &&
+			p.bottom > i.top &&
+			p.top < i.bottom;
+
+		if (hit)
+		{
+			item->OnGet(*player_);
 		}
 	}
 }
@@ -516,6 +622,7 @@ std::shared_ptr<Boss1> SceneGame::GetBoss()
 	return nullptr;
 }
 
+//ボスイベント処理
 void SceneGame::BossEvent()
 {
 	auto boss = GetBoss();
@@ -608,6 +715,30 @@ void SceneGame::AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y)
 		break;
 	default:
 		break;
+	}
+}
+
+//テレポートギミック生成関数
+void SceneGame::AddTeleport(float x, float y, float targetX, float targetY)
+{
+	gimmickList_.push_back(std::make_shared<GimmickTeleport>(fileMng_, stage_.get(), x, y, targetX, targetY));
+
+
+
+}
+
+//アイテム生成関数
+void SceneGame::AddItem(ItemBase::ITEM_TYPE type, float x, float y)
+{
+	switch (type)
+	{
+		case ItemBase::ITEM_TYPE::MENTOS:
+			itemList_.push_back(std::make_shared<Mentos>(fileMng_, stage_.get(), x, y));
+			break;
+		case ItemBase::ITEM_TYPE::I_TYPE_MAX:
+			break;
+		default:
+			break;
 	}
 }
 

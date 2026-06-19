@@ -151,9 +151,12 @@
     <ClCompile Include="Enemy1.cpp" />
     <ClCompile Include="EnemyBase.cpp" />
     <ClCompile Include="Fps.cpp" />
+    <ClCompile Include="GimmickBase.cpp" />
     <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="ItemBase.cpp" />
     <ClCompile Include="KeyConfig.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mentos.cpp" />
     <ClCompile Include="ParticleEmitter.cpp" />
     <ClCompile Include="ParticleManager.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -165,6 +168,7 @@
     <ClCompile Include="SceneTitle.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="StageConfigTablle.cpp" />
+    <ClCompile Include="GimmickTeleport.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActionID.h" />
@@ -178,10 +182,13 @@
     <ClInclude Include="FontFile.h" />
     <ClInclude Include="Fonts.h" />
     <ClInclude Include="Fps.h" />
+    <ClInclude Include="GimmickBase.h" />
     <ClInclude Include="IBoss.h" />
     <ClInclude Include="ImageFile.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="ItemBase.h" />
     <ClInclude Include="KeyConfig.h" />
+    <ClInclude Include="Mentos.h" />
     <ClInclude Include="ParticleEmitter.h" />
     <ClInclude Include="ParticleManager.h" />
     <ClInclude Include="Player.h" />
@@ -198,6 +205,7 @@
     <ClInclude Include="Stage.h" />
     <ClInclude Include="StageConfig.h" />
     <ClInclude Include="StageConfigTablle.h" />
+    <ClInclude Include="GimmickTeleport.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

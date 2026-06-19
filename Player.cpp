@@ -18,7 +18,7 @@ Player::Player(FileManager& fileMng, Stage* stage, SceneGame& game) : fileManage
 {
 	AddFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
 	hpFontHandle = CreateFontToHandle("DotGothic16", 30, -1, DX_FONTTYPE_EDGE);
-	SetImage("Resource/Image/Cider_Player.png");
+	SetImage("Resource/Image/Player/Cider_Player.png");
 
 	pMng = std::make_unique<ParticleManager>(fileMng);
 	pMng->RegisterConfig(WATER_PARTICLE_PATH);
@@ -69,7 +69,9 @@ Player::Player(FileManager& fileMng, Stage* stage, SceneGame& game) : fileManage
 	posY = 200.0f;
 	canvasX = 0;
 	canvasY = 0;
+	scale = 1.0f;
 	gravity = 0.5f;
+	playerSpeed = 0.0f;
 	velocityX = 0.0f;
 	velocityY = 0.0f;
 	shakeMove = 0.0f;
@@ -79,6 +81,7 @@ Player::Player(FileManager& fileMng, Stage* stage, SceneGame& game) : fileManage
 	sodaRatio = 0.0f;
 	rotateSpeed = 0.05f;
 	jumpPower = 15.0f;
+	playerJumpMag = 1.5f;
 
 	//体力を初期化
 	playerHpMax = 100.0f;
@@ -131,32 +134,40 @@ bool Player::SetImage(const std::string& path)
 //プレイヤーの位置を設定
 void Player::SetPosition(float x, float y)
 {
-	posX = x; // x座標を設定
-	posY = y; // y座標を設定
-	UpdateStageScroll(); // ステージのスクロールを更新
+	posX = x;				//x座標を設定
+	posY = y;				//y座標を設定
+	UpdateStageScroll();	//ステージのスクロールを更新
 }
 
 //プレイヤーの速度を設定
 void Player::SetVelocity(float vx, float vy)
 {
-	velocityX = vx; // x方向の速度を設定
-	velocityY = vy; // y方向の速度を設定
+	velocityX = vx;			//x方向の速度を設定
+	velocityY = vy;			//y方向の速度を設定
+}
+
+//プレイヤーの速度計算
+float Player::VelocityCalc() const
+{
+	return std::sqrt(
+		velocityX * velocityX +
+		velocityY * velocityY
+	);
 }
 
 void Player::Update()
 {
+	//プレイヤー速度
+	playerSpeed = VelocityCalc();
+
 	//無敵時間のカウントダウン
 	if (noDamageTime > 0)
 	{
 		noDamageTime--;
 	}
 
-	//攻撃時間のカウントダウン
-	if (attackTimer > 0)
-	{
-		attackTimer--;
-	}
-	else
+	//攻撃フラグの判定
+	if (playerSpeed < ATTACK_SPEED_THRESHOLD)
 	{
 		sodaAttackFlag = false;
 	}
@@ -260,7 +271,7 @@ void Player::UpdateStageScroll()
 void Player::Draw()
 {
 	//DrawFormatString(1000, 1000, GetColor(255,0, 0), "HP %d", (int)playerHp);
-//プレイヤーが死んでいる又は画像が読み込まれていないときは表示しない
+	//プレイヤーが死んでいる又は画像が読み込まれていないときは表示しない
 	if (!aliveFlag || !image_) return;
 
 	//プレイヤー画像を描画するか
@@ -282,7 +293,7 @@ void Player::Draw()
 		DrawRotaGraph(
 			(int)canvasX + (int)shakeOffsetX,
 			(int)canvasY + (int)shakeOffsetY,
-			1.0,
+			scale,
 			angle,
 			handle,
 			TRUE
@@ -324,28 +335,14 @@ void Player::Draw()
 	DrawFormatString(1000, 1000, GetColor(255, 0, 0), "SodaGauge: %d", static_cast<int>(sodaShakeGauge));
 	DrawFormatString(1000, 1020, GetColor(255, 0, 0), "noDamageTime: %d", static_cast<int>(noDamageTime));
 	DrawFormatString(1000, 1040, GetColor(255, 0, 0), "sodaAttackFlag: %d", sodaAttackFlag);
-
+	DrawFormatString(1000, 1060, GetColor(255, 0, 0), "playerSpeed: %d", static_cast<int>(playerSpeed));
+	DrawFormatString(1150, 1000, GetColor(255, 0, 0), "playerJumpMag: %.2f", playerJumpMag);
 
 	DrawFormatString(0, 300, 0x00ff00, "PlayerPos X: %f,Y: %f", posX, posY);
 	DrawFormatString(0, 320, 0x00ff00, "PlayerMapChip X: %d,Y: %d", stage_->WorldToChipX(posX), stage_->WorldToChipY(posY));
 
 	//プレイヤーの振動処理
 	PlayerShake();
-}
-
-//マウスを振ったり、スティックを動かすと炭酸ゲージが溜まる
-void Player::SodaShake()
-{
-  	//距離
-	float dist = InputManager::GetInstance().GetActionAxis(ActionID::Shake);
-	//printfDx("Shake Axis: %f\n", dist);
-	shakeMove = dist;
-
-	//ゲージ加算
-	sodaShakeGauge += shakeMove * 0.45f;
-
-	//上限
-	if (sodaShakeGauge > SODA_SHAKE_GAUGE_MAX) sodaShakeGauge = SODA_SHAKE_GAUGE_MAX;
 }
 
 //炭酸残量ゲージを自動回復
@@ -363,7 +360,7 @@ void Player::AddGravity()
 	//posX += velocityX;		//速度を位置に加算
 	//posY += velocityY;
 
-	velocityX *= 0.98f;	//空気抵抗（X軸の速度を減衰）
+	velocityX *= AIR_RESUSTANCE;	//空気抵抗（X軸の速度を減衰）
 
 	// 地面判定（仮）
 	//if (posY > 500)
@@ -391,7 +388,7 @@ void Player::MoveX()
 	{
 		if (WillCollide(static_cast<int>(posX + signX), static_cast<int>(posY)))
 		{
-			velocityX *= -0.3f;
+			velocityX *= -WALL_BOUNCE_X;
 			break;
 		}
 		posX += signX;
@@ -411,8 +408,8 @@ void Player::MoveY()
 			{
 				jumpFlag = false;
 			}
-			velocityX *= 0.9f;
-			velocityY *= -0.3f;
+			velocityX *= FLOOR_FRICTION;
+			velocityY *= -FLOOR_BOUNCE_Y;
 			break;
 		}
 		posY += signY;
@@ -448,6 +445,9 @@ void Player::Rotate()
 
 void Player::RotateAxis()
 {
+	//移動禁止フラグが立っているときは回転できない
+	if (!canMoveFlag) return;
+
 	float x = InputManager::GetInstance().GetPadAxisValue(PadAxis::Pad_L_X);
 	float y = InputManager::GetInstance().GetPadAxisValue(PadAxis::Pad_L_Y);
 
@@ -465,8 +465,8 @@ bool Player::WillCollide(int newX, int newY)
 	return stage_->CheckHitWallRect(
 		newX,
 		newY,
-		width_,
-		height_
+		(int)(width_ * scale),
+		(int)(height_ * scale)
 	);
 }
 
@@ -495,6 +495,25 @@ void Player::Damage(float dmg)
 	noDamageTime = noDamageMaxTime; //無敵時間をリセット
 }
 
+//マウスを振ったり、スティックを動かすと炭酸ゲージが溜まる
+void Player::SodaShake()
+{
+	//移動禁止フラグが立っているときはできない
+	if (!canMoveFlag) return;
+
+	//距離
+	float dist = InputManager::GetInstance().GetActionAxis(ActionID::Shake);
+	//printfDx("Shake Axis: %f\n", dist);
+	shakeMove = dist;
+
+	//ゲージ加算
+	sodaShakeGauge += shakeMove * 0.45f;
+
+	//上限
+	if (sodaShakeGauge > SODA_SHAKE_GAUGE_MAX) sodaShakeGauge = SODA_SHAKE_GAUGE_MAX;
+}
+
+//炭酸ジャンプ・攻撃処理
 void Player::ClickSodaJump()
 {
 	//移動禁止フラグが立っているときは攻撃できない
@@ -506,19 +525,15 @@ void Player::ClickSodaJump()
 	if (sodaShakeGauge > 0)
 	{
 		//炭酸蓄積ゲージの割合を炭酸攻撃の威力に変換
-		sodaPower = sodaRatio * 20.0f;
-		float sodaMoveDist = sodaPower * 1.5f; //移動距離を攻撃力の1.5倍に設定
+		sodaPower = sodaRatio * POWER_CONVERSION;
+		float sodaMoveDist = sodaPower * playerJumpMag; //移動距離を攻撃力の1.5倍に設定
 
 		//プレイヤーが向いている方向に移動する
 		velocityX += cos(angle - DX_PI_F / 2) * sodaMoveDist;
 		velocityY += sin(angle - DX_PI_F / 2) * sodaMoveDist;
 		//炭酸攻撃処理
 		SodaAttack(sodaPower);
-		sodaGauge -= 20.0f;
 		sodaShakeGauge = 0;
-		//下限リミッター
-		if (sodaGauge < 0) sodaGauge = 0;
-
 		//ParticleConfig::acceleration = 0;
 		const ParticleConfig* masterCfg = pMng->GetConfig(WATER_PARTICLE_PATH);
 		if (masterCfg)
@@ -572,10 +587,13 @@ RECT Player::GetRect() const
 {
 	RECT rc;
 
-	rc.left = (LONG)(posX - width_ / 2);
-	rc.right = (LONG)(posX + width_ / 2);
-	rc.top = (LONG)(posY - height_ / 2);
-	rc.bottom = (LONG)(posY + height_ / 2);
+	int hitWidth = static_cast<int>(width_ * scale);
+	int hitHeight = static_cast<int>(height_ * scale);
+
+	rc.left = (LONG)(posX - hitWidth / 2);
+	rc.right = (LONG)(posX + hitHeight / 2);
+	rc.top = (LONG)(posY - hitWidth / 2);
+	rc.bottom = (LONG)(posY + hitHeight / 2);
 
 	return rc;
 }
