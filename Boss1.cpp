@@ -3,7 +3,7 @@
 
 Boss1::Boss1(FileManager& fileMng, Stage* stage, float x, float y) : EnemyBase(fileMng, stage, x, y)
 {
-	SetImage("Resource/Image/RedBull.png");
+	SetImage("Resource/Image/Enemys/RedBull.png");
 	enemyType_ = ENEMY_TYPE::E_TYPE_BOSS_1;
 	SetPosition(x, y);				//初期位置を設定
 	SetVelocity(-1.0f, 0.0f);        //初期速度を設定

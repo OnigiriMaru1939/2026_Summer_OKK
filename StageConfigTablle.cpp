@@ -25,7 +25,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 				//アイテムの生成
 				scene.AddItem(ItemBase::ITEM_TYPE::MENTOS, 1200.0f,1600.0f);
 
-				scene.AddTeleport(500.0f, 700.0f,100.0f, 2100.0f);
+			
 			},
 			
 
@@ -38,10 +38,13 @@ const std::vector<StageConfig>& GetStageConfigs()
 			scene.GetStage()->SetBgImage("Resource/Image/Game/Stage1_bg.png");
 			scene.GetStage()->SetMchipImage("Resource/MapChip/Mapchip_neon.png");
 			//プレイヤーの初期化
-      scene.GetPlayer()->SetPosition(100.0f, 3480.0f);
+			 scene.GetPlayer()->SetPosition(100.0f, 3450.0f);
 			//敵の生成
 			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 500.0f, 200.0f);
 			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 800.0f, 1700.0f);
+
+			//テレポートギミックの生成
+			scene.AddTeleport(960.0f, 250.0f, 960.0f, 5500.0f);
 			
 			},
 

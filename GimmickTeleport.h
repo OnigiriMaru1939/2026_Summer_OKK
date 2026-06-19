@@ -13,6 +13,7 @@ public:
 		: GimmickBase(fileMng, stage, x, y, GIMMICK_TYPE::TELEPORT)
 		, targetX_(targetX), targetY_(targetY)
 	{
+		SetImage("Resource/Image/Gimmicks/Telepoter.png");
 	}
 	~GimmickTeleport() override = default;
 	void Update() override; // 更新処理
