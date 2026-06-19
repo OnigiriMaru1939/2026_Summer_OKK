@@ -10,8 +10,7 @@ Boss1::Boss1(FileManager& fileMng, Stage* stage, float x, float y) : EnemyBase(f
 	name_ = "RedBull";                //名前を設定
 	hp_ = 200;
 	hpMax_ = 200;
-	width_ = 128;
-	height_ = 128;
+	scale = 2.0f;
 	jumpFlag = false;
 	isAppearing = true;
 }

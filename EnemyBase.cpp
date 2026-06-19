@@ -14,6 +14,8 @@ EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, float x, float y)
 	, vy_(0.0f)
 	, canvasX(0)
 	, canvasY(0)
+	, scale(1.0f)
+	,angle(0.0f)
 	, gravity(0.5f)
 	, AttckDamage(20)
 	, noDamageTime(0)
@@ -23,6 +25,7 @@ EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, float x, float y)
 	, hp_(1)
 	, hpMax_(200)
 	, isAlive_(true)
+	,jumpFlag(false)
 {
 }
 
@@ -148,8 +151,8 @@ bool EnemyBase::WillCollide(int newX, int newY)
 	return stage_->CheckHitWallRect(
 		newX,
 		newY,
-		width_,
-		height_
+		(int)(width_ * scale),
+		(int)(height_ * scale)
 	);
 }
 
@@ -157,10 +160,14 @@ bool EnemyBase::WillCollide(int newX, int newY)
 RECT EnemyBase::GetRect() const
 {
 	RECT rect;
-	rect.left = static_cast<LONG>(x_ - width_ / 2);
-	rect.top = static_cast<LONG>(y_ - height_ / 2);
-	rect.right = static_cast<LONG>(x_ + width_ / 2);
-	rect.bottom = static_cast<LONG>(y_ + height_ / 2);
+	int hitWidth = static_cast<int>(width_ * scale);
+	int hitHeight = static_cast<int>(height_ * scale);
+
+	rect.left = static_cast<LONG>(x_ - hitWidth / 2);
+	rect.top = static_cast<LONG>(y_ - hitHeight / 2);
+	rect.right = static_cast<LONG>(x_ + hitWidth / 2);
+	rect.bottom = static_cast<LONG>(y_ + hitHeight / 2);
+
 	return rect;
 }
 
@@ -191,11 +198,11 @@ void EnemyBase::Draw() const
 
 	int handle = 0;
 	handle = image_->GetHandle(); //画像のハンドルを取得
-	DrawExtendGraph(
-		x_ - width_ / 2 - stage_->GetScrollX(),
-		y_ - height_ / 2 - stage_->GetScrollY(),
-		x_ + width_ / 2 - stage_->GetScrollX(),
-		y_ + height_ / 2 - stage_->GetScrollY(),
+	DrawRotaGraph(
+		x_ - stage_->GetScrollX(),
+		y_ - stage_->GetScrollY(),
+		scale,
+		angle,
 		handle,
 		TRUE
 	);

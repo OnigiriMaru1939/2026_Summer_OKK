@@ -69,6 +69,7 @@ Player::Player(FileManager& fileMng, Stage* stage, SceneGame& game) : fileManage
 	posY = 200.0f;
 	canvasX = 0;
 	canvasY = 0;
+	scale = 1.0f;
 	gravity = 0.5f;
 	playerSpeed = 0.0f;
 	velocityX = 0.0f;
@@ -80,6 +81,7 @@ Player::Player(FileManager& fileMng, Stage* stage, SceneGame& game) : fileManage
 	sodaRatio = 0.0f;
 	rotateSpeed = 0.05f;
 	jumpPower = 15.0f;
+	playerJumpMag = 1.5f;
 
 	//体力を初期化
 	playerHpMax = 100.0f;
@@ -291,7 +293,7 @@ void Player::Draw()
 		DrawRotaGraph(
 			(int)canvasX + (int)shakeOffsetX,
 			(int)canvasY + (int)shakeOffsetY,
-			1.0,
+			scale,
 			angle,
 			handle,
 			TRUE
@@ -334,6 +336,7 @@ void Player::Draw()
 	DrawFormatString(1000, 1020, GetColor(255, 0, 0), "noDamageTime: %d", static_cast<int>(noDamageTime));
 	DrawFormatString(1000, 1040, GetColor(255, 0, 0), "sodaAttackFlag: %d", sodaAttackFlag);
 	DrawFormatString(1000, 1060, GetColor(255, 0, 0), "playerSpeed: %d", static_cast<int>(playerSpeed));
+	DrawFormatString(1150, 1000, GetColor(255, 0, 0), "playerJumpMag: %.2f", playerJumpMag);
 
 	DrawFormatString(0, 300, 0x00ff00, "PlayerPos X: %f,Y: %f", posX, posY);
 	DrawFormatString(0, 320, 0x00ff00, "PlayerMapChip X: %d,Y: %d", stage_->WorldToChipX(posX), stage_->WorldToChipY(posY));
@@ -462,8 +465,8 @@ bool Player::WillCollide(int newX, int newY)
 	return stage_->CheckHitWallRect(
 		newX,
 		newY,
-		width_,
-		height_
+		(int)(width_ * scale),
+		(int)(height_ * scale)
 	);
 }
 
@@ -522,19 +525,15 @@ void Player::ClickSodaJump()
 	if (sodaShakeGauge > 0)
 	{
 		//炭酸蓄積ゲージの割合を炭酸攻撃の威力に変換
-		sodaPower = sodaRatio * 20.0f;
-		float sodaMoveDist = sodaPower * 1.5f; //移動距離を攻撃力の1.5倍に設定
+		sodaPower = sodaRatio * POWER_CONVERSION;
+		float sodaMoveDist = sodaPower * playerJumpMag; //移動距離を攻撃力の1.5倍に設定
 
 		//プレイヤーが向いている方向に移動する
 		velocityX += cos(angle - DX_PI_F / 2) * sodaMoveDist;
 		velocityY += sin(angle - DX_PI_F / 2) * sodaMoveDist;
 		//炭酸攻撃処理
 		SodaAttack(sodaPower);
-		sodaGauge -= 20.0f;
 		sodaShakeGauge = 0;
-		//下限リミッター
-		if (sodaGauge < 0) sodaGauge = 0;
-
 		//ParticleConfig::acceleration = 0;
 		const ParticleConfig* masterCfg = pMng->GetConfig(WATER_PARTICLE_PATH);
 		if (masterCfg)
@@ -588,10 +587,13 @@ RECT Player::GetRect() const
 {
 	RECT rc;
 
-	rc.left = (LONG)(posX - width_ / 2);
-	rc.right = (LONG)(posX + width_ / 2);
-	rc.top = (LONG)(posY - height_ / 2);
-	rc.bottom = (LONG)(posY + height_ / 2);
+	int hitWidth = static_cast<int>(width_ * scale);
+	int hitHeight = static_cast<int>(height_ * scale);
+
+	rc.left = (LONG)(posX - hitWidth / 2);
+	rc.right = (LONG)(posX + hitHeight / 2);
+	rc.top = (LONG)(posY - hitWidth / 2);
+	rc.bottom = (LONG)(posY + hitHeight / 2);
 
 	return rc;
 }

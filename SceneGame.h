@@ -6,6 +6,7 @@
 #include "EnemyBase.h"
 #include "Boss1.h"
 #include "GimmickBase.h"
+#include "ItemBase.h"
 
 class Player;
 class SceneManager;
@@ -33,6 +34,7 @@ public:
 	void UpdatePlayer();
 	void UpdateEnemy();
 	void UpdateStage();
+	void UpdateItem();
 	void UpdateDuringTransition() override; // トランジション中の更新処理
 	void CheckPlayerEnemyCollision();
 	void DrawGauge(int x,
@@ -43,6 +45,7 @@ public:
 				   float maxValue,
 				   int color);
 	void CheckPlayerGimmickCollision();									//プレイヤーとギミックの衝突判定
+	void CheckPlayerItemCollision();									//プレイヤーとアイテムの衝突判定
 	void CheckBossSpawn();												//ボスの生成判定
 	void BossEvent();                                                   //ボスイベントの処理
 	void BossEventDraw();                                               //ボスイベントの描画
@@ -54,6 +57,7 @@ public:
 	void AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y);
 	void AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y);
 	void AddTeleport(float x, float y, float targetX, float targetY);
+	void AddItem(ItemBase::ITEM_TYPE type, float x, float y);
 
 	Stage* GetStage() { return stage_.get(); }
 	Player* GetPlayer() { return player_.get(); }
@@ -70,6 +74,7 @@ private:
 	std::unique_ptr<Player> player_;
 	std::vector<std::shared_ptr<EnemyBase>> enemyList_;		//敵のリスト
 	std::vector<std::shared_ptr<GimmickBase>> gimmickList_; //ギミックのリスト
+	std::vector<std::shared_ptr<ItemBase>> itemList_;		//アイテムのリスト
 
 	//シーンマネージャーへの弱い参照
 	SceneManager& sceneMng_;
