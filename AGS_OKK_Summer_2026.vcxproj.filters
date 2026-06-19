@@ -50,11 +50,15 @@
       <Filter>Enemy\Base</Filter>
     </ClCompile>
     <ClCompile Include="Enemy1.cpp">
-      <Filter>Enemy\One%28仮名称%29</Filter>
+      <Filter>Enemy\Nope</Filter>
     </ClCompile>
     <ClCompile Include="Enemy1.cpp" />
-    <ClCompile Include="Boss1.cpp" />
-    <ClCompile Include="ScenePause.cpp" />
+    <ClCompile Include="ScenePause.cpp">
+      <Filter>Scene\Pause</Filter>
+    </ClCompile>
+    <ClCompile Include="Boss1.cpp">
+      <Filter>Enemy\Boss1</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Application">
@@ -123,11 +127,20 @@
     <Filter Include="Enemy\Base">
       <UniqueIdentifier>{60a20722-207c-4cef-a2fe-55f78200170d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Enemy\One%28仮名称%29">
-      <UniqueIdentifier>{837c6821-a963-4225-96d0-57155655ac89}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scene\Super">
       <UniqueIdentifier>{87902af4-a1c4-45e4-8b3a-c0d02c7602c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Pause">
+      <UniqueIdentifier>{4fcdc4c7-5d35-4651-ba49-3391e90b2a23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Enemy\Boss1">
+      <UniqueIdentifier>{6bf6c1ca-c9ef-4b75-bc8e-45273240bd1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Enemy\Nope">
+      <UniqueIdentifier>{837c6821-a963-4225-96d0-57155655ac89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager\File\Resource\Font">
+      <UniqueIdentifier>{74725412-b6c3-4a95-8e6c-412b4e40d955}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -201,14 +214,29 @@
       <Filter>Enemy\Base</Filter>
     </ClInclude>
     <ClInclude Include="Enemy1.h">
-      <Filter>Enemy\One%28仮名称%29</Filter>
+      <Filter>Enemy\Nope</Filter>
     </ClInclude>
     <ClInclude Include="SceneSuper.h">
       <Filter>Scene\Super</Filter>
     </ClInclude>
     <ClInclude Include="Enemy1.h" />
-    <ClInclude Include="Boss1.h" />
-    <ClInclude Include="IBoss.h" />
-    <ClInclude Include="ScenePause.h" />
+    <ClInclude Include="ScenePause.h">
+      <Filter>Scene\Pause</Filter>
+    </ClInclude>
+    <ClInclude Include="Boss1.h">
+      <Filter>Enemy\Boss1</Filter>
+    </ClInclude>
+    <ClInclude Include="IBoss.h">
+      <Filter>Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenFile.h">
+      <Filter>Manager\File\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="FontFile.h">
+      <Filter>Manager\File\Resource\Font</Filter>
+    </ClInclude>
+    <ClInclude Include="Fonts.h">
+      <Filter>Manager\File\Resource\Font</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

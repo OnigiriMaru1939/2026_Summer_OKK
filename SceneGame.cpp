@@ -1,4 +1,5 @@
-﻿#include "SceneGame.h"
+﻿#define NOMINMAX
+#include "SceneGame.h"
 #include "InputManager.h"
 #include "Player.h"
 #include "EnemyBase.h"
@@ -9,15 +10,20 @@
 #include "StageConfig.h"
 #include "StageConfigTablle.h"
 #include "SceneManager.h"
+#include "Fonts.h"
+#include <algorithm>
 
 // 静的変数の定義
 int SceneGame::selectedStageIndex_ = 1;
 
-SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(fileMng), sceneMng_(sceneMng)
+SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(fileMng, sceneMng)
 {
-	AddFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
-	bossNameFontHandle = CreateFontToHandle("DotGothic16", 60, -1, DX_FONTTYPE_NORMAL);
-	warningFontHandle = CreateFontToHandle("DotGothic16", 160, -1, DX_FONTTYPE_NORMAL);
+	_bossNameFont = fileMng.CreateFontFM(Fonts::DotGothic16::PATH,
+										 Fonts::DotGothic16::NAME,
+										 60);
+	_warningFont = fileMng.CreateFontFM(Fonts::DotGothic16::PATH,
+										 Fonts::DotGothic16::NAME,
+										 160);
 	stage_ = std::make_unique<Stage>(fileMng);
 	player_ = std::make_unique<Player>(fileMng, stage_.get(), *this);
 
@@ -69,38 +75,52 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(
 														   sceneMng_.PushScene(SceneID::PAUSE);
 													   }
 												   });
+	_offScreen = MakeScreen(Application::SCREEN_WID, Application::SCREEN_HIG, true);
+	sceneMng_.SetTransitionDuration(45.0f);
 }
 
 SceneGame::~SceneGame()
 {
+	enemyList_.clear();
+	DeleteGraph(_offScreen);
 	DeleteGraph(_gameScreen);
 	DeleteGraph(highBrightScreen);
 	DeleteGraph(downScaleScreen);
 	DeleteGraph(gaussScreen);
-	DeleteFontToHandle(bossNameFontHandle);
-	DeleteFontToHandle(warningFontHandle);
-	RemoveFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
 }
 
 void SceneGame::Update()
 {
+	if (_isBossDefeatedSequence)
+	{
+		_sequenceTimer++;
+
+		if (_sequenceTimer > 90)
+		{
+			_isClear = true;
+			ClearResult result;
+			result.time = clearTime;
+			result.stageIndex = selectedStageIndex_;
+			sceneMng_.SetTransitionDuration(60.0f);
+			sceneMng_.SetClearResult(result);
+			sceneMng_.SetGameResult(_isClear); // クリア
+			SetNextScene(SceneID::RESULT);
+			isEnd = true;
+		}
+		return;
+	}
 	clearTime += 1.0f / 60.0f; // クリアタイムの更新
 
 	// プレイヤーの更新
 	UpdatePlayer();
-
 	//敵の更新
 	UpdateEnemy();
-
 	//ボスの生成判定
 	CheckBossSpawn();
-
 	//ボスイベントの処理
 	BossEvent();
-
 	//プレイヤーと敵の衝突判定
 	CheckPlayerEnemyCollision();
-
 	// Stageの更新
 	UpdateStage();
 }
@@ -109,7 +129,7 @@ void SceneGame::Draw()
 {
 	SetDrawScreen(_gameScreen);
 	ClearDrawScreen();
-
+	// 様々な画面エフェクトを受けるものはこっちに描画
 	DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0x00aa00, true);
 
 	// Stageを描画
@@ -124,8 +144,6 @@ void SceneGame::Draw()
 			area.bottom - stage_->GetScrollY(),
 			0xff0000, false);
 
-	DrawString(0, 20, "GAME SCENE", 0xffffff);
-
 	//敵を描画
 	for (auto& enemy : enemyList_)
 	{
@@ -134,14 +152,65 @@ void SceneGame::Draw()
 
 	//プレイヤーを描画
 	player_->Draw();
+	DrawClearTransition();
+	SetDrawScreen(_offScreen);
+	ClearDrawScreen();
+
+	// 画面揺れなどの影響を受けないものはこっちへ描画
 
 	//ボスイベントの描画
 	BossEventDraw();
 
 	SetDrawScreen(DX_SCREEN_BACK);
-	DrawGraph(0, 0, _gameScreen, false);
+	if (_isBossDefeatedSequence)
+	{
+		float t = std::min(1.0f, _sequenceTimer / 90.0f);
+		float easeT = t * t * (3.0f - 2.0f * t); // Clamp
 
-	DrawClearTransition();
+
+		float targetScale = 2.0f;
+		float scale = 1.0f + (targetScale - 1.0f) * easeT;
+
+		int shakeX = 0, shakeY = 0;
+		if (_sequenceTimer < 150)
+		{
+			shakeX = GetRand(_sequenceTimer) - _sequenceTimer / 2;
+			shakeY = GetRand(_sequenceTimer) - _sequenceTimer / 2;
+		}
+
+		RECT pRect = player_->GetRect();
+		// 目標注視点
+		float targetFocusX = static_cast<float>(pRect.left + (pRect.right - pRect.left) / 2 - stage_->GetScrollX());
+		float targetFocusY = static_cast<float>(pRect.top + (pRect.bottom - pRect.top) / 2 - stage_->GetScrollY());
+		
+		// 初期注視点
+		float startFocusX = Application::SCREEN_WID / 2;
+		float startFocusY = Application::SCREEN_HIG / 2;
+
+		// 現在の注視点
+		float currentFocusX = startFocusX + (targetFocusX - startFocusX) * easeT;
+		float currentFocusY = startFocusY + (targetFocusY - startFocusY) * easeT;
+
+		float minFocusX = Application::SCREEN_WID / (2.0f * scale);
+		float maxFocusX = Application::SCREEN_WID - minFocusX;
+		float minFocusY = Application::SCREEN_HIG / (2.0f * scale);
+		float maxFocusY = Application::SCREEN_HIG - minFocusY;
+
+		currentFocusX = std::clamp(currentFocusX, minFocusX, maxFocusX);
+		currentFocusY = std::clamp(currentFocusY, minFocusY, maxFocusY);
+
+		DrawRotaGraph3(Application::SCREEN_WID / 2 + shakeX,
+					   Application::SCREEN_HIG / 2 + shakeY,
+					   static_cast<int>(currentFocusX),
+					   static_cast<int>(currentFocusY), scale, scale, 0.0f, _gameScreen, TRUE);
+	}
+	else
+	{
+		DrawGraph(0, 0, _gameScreen, false);
+	}
+	
+	DrawGraph(0, 0, _offScreen, TRUE);
+
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(_fadeAlpha));
 	if (IsClear())
@@ -168,7 +237,7 @@ void SceneGame::BossEventDraw()
 		strWidth = GetDrawStringWidthToHandle(
 			boss->GetName().c_str(),
 			strlen(boss->GetName().c_str()),
-			bossNameFontHandle
+			_bossNameFont->GetHandle()
 		);
 	}
 
@@ -179,7 +248,7 @@ void SceneGame::BossEventDraw()
 			20,
 			boss->GetName().c_str(),
 			GetColor(255, 255, 255),
-			bossNameFontHandle
+			_bossNameFont->GetHandle()
 		);
 
 		DrawGauge(100, 90, 1720, 50, bossHpGauge, bossHpGaugeMax, GetColor(255, 0, 0));
@@ -195,7 +264,7 @@ void SceneGame::BossEventDraw()
 				20,
 				boss->GetName().c_str(),
 				GetColor(255, 255, 255),
-				bossNameFontHandle
+				_bossNameFont->GetHandle()
 			);
 
 			DrawGauge(100, 90, 1720, 50, boss->GetHp(), boss->GetHpMax(), GetColor(255, 0, 0));
@@ -220,14 +289,14 @@ void SceneGame::BossEventDraw()
 		strWidth = GetDrawStringWidthToHandle(
 			"WARNING !!",
 			strlen("WARNING !!"),
-			warningFontHandle
+			_warningFont->GetHandle()
 		);
 		DrawStringToHandle(
 			(Application::SCREEN_WID - strWidth) / 2,
-			(Application::SCREEN_HIG - GetFontSizeToHandle(warningFontHandle)) / 2,
+			(Application::SCREEN_HIG - GetFontSizeToHandle(_warningFont->GetHandle())) / 2,
 			"WARNING !!",
 			GetColor(255, 255, 255),
-			warningFontHandle
+			_warningFont->GetHandle()
 			);
 	}
 
@@ -301,6 +370,7 @@ void SceneGame::UpdatePlayer()
 		ClearResult result;
 		result.time = 0.0f;
 		result.stageIndex = selectedStageIndex_;
+		sceneMng_.SetTransitionDuration(45.0f);
 		sceneMng_.SetClearResult(result);
 		sceneMng_.SetGameResult(_isClear); // ゲームオーバー
 		SetNextScene(SceneID::RESULT);
@@ -321,21 +391,19 @@ void SceneGame::UpdateEnemy()
 		{
 			// 敵が死んでいる場合はリストから削除
 			// ボスを倒したらトランジション
-			if (std::dynamic_pointer_cast<IBoss>(enemy))
+			if (std::dynamic_pointer_cast<IBoss>(enemy) && !_isBossDefeatedSequence)
 			{
-				_isClear = true;
-				ClearResult result;
-				result.time = clearTime;
-				result.stageIndex = selectedStageIndex_;
-				sceneMng_.SetClearResult(result);
-				sceneMng_.SetGameResult(_isClear); // クリア
-				SetNextScene(SceneID::RESULT);
-				isEnd = true;
+				_isBossDefeatedSequence = true;
+				_sequenceTimer = 0;
 			}
-			enemy = nullptr; // shared_ptrをnullptrに設定して削除
+			else
+			{
+				enemy.reset(); // shared_ptrをメモリ解放+nullptrに設定
+			}
 		}
 	}
 
+	// nullPtrを削除
 	enemyList_.erase(
 		std::remove(enemyList_.begin(), enemyList_.end(), nullptr),
 		enemyList_.end()

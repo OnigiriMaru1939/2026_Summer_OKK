@@ -3,7 +3,8 @@
 #include "Application.h"
 #include "ImageFile.h"
 #include "SoundFile.h"
-
+#include "FontFile.h"
+#include "SceneManager.h"
 #include <memory>
 class SceneStageSelect :
     public SceneSuper
@@ -26,7 +27,7 @@ private:
 	static constexpr int TITLE_W = 400;	// 仮タイトルボタン幅
 	static constexpr int TITLE_H = 150;	// 仮タイトルボタン高さ
 public:
-	SceneStageSelect(FileManager& fileMng);
+	SceneStageSelect(FileManager& fileMng, SceneManager& sceneMng);
 
 	~SceneStageSelect() override;
 
@@ -46,11 +47,11 @@ private:
 	std::shared_ptr<SoundFile> _decideSE;
 	std::shared_ptr<SoundFile> _cursorSE;
 
-	int _selectedIndex; // 0がタイトル、1～4がステージ選択
+	std::shared_ptr<FontFile> _stageFont;
+	std::shared_ptr<FontFile> _titleFont;
+	std::shared_ptr<FontFile> _stageNumFont;
 
-	int stageFontHandle;
-	int titleFontHandle;
-	int stageNumFontHandle;
+	int _selectedIndex; // 0がタイトル、1～4がステージ選択
 
 	int _fadeAlpha;
 };

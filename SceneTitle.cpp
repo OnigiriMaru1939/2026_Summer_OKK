@@ -3,7 +3,7 @@
 #include "Application.h"
 #include "BGMManager.h"
 
-SceneTitle::SceneTitle(FileManager& fileMng) : SceneSuper(fileMng)
+SceneTitle::SceneTitle(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(fileMng, sceneMng)
 {
 	_fadeAlpha = 255.0f;
 	_bgImg = fileMng_.LoadImageFM("Resource/Image/Title/Title_bg.png");
@@ -34,6 +34,9 @@ SceneTitle::SceneTitle(FileManager& fileMng) : SceneSuper(fileMng)
 														   isEnd = true;
 													   }
 												   });
+
+
+	sceneMng_.SetTransitionDuration(45.0f);
 }
 
 SceneTitle::~SceneTitle()
