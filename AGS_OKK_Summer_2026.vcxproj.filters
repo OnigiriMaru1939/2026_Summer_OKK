@@ -61,6 +61,8 @@
     <ClCompile Include="GimmickTeleport.cpp">
       <Filter>GimmickBase\Gimmicks</Filter>
     </ClCompile>
+    <ClCompile Include="ItemBase.cpp" />
+    <ClCompile Include="Mentos.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Application">
@@ -228,5 +230,7 @@
     <ClInclude Include="GimmickTeleport.h">
       <Filter>GimmickBase\Gimmicks</Filter>
     </ClInclude>
+    <ClInclude Include="ItemBase.h" />
+    <ClInclude Include="Mentos.h" />
   </ItemGroup>
 </Project>

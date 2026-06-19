@@ -11,6 +11,7 @@ class EnemyBase
 public:
 	enum class ENEMY_TYPE
 	{
+		E_TYPE_NON,
 		E_TYPE_1,
 		E_TYPE_2,
 		E_TYPE_3,
@@ -78,6 +79,8 @@ protected:
 	float y_;			//y座標
 	float vx_;			//x方向の速度
 	float vy_;			//y方向の速度
+	float scale;		//敵の大きさ
+	float angle;		//回転角度
 	float gravity;		//重力加速度
 	int AttckDamage;	//攻撃力
 	int noDamageTime;	//無敵時間

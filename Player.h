@@ -24,6 +24,7 @@ public:
 	static constexpr float WALL_BOUNCE_X = 0.3f;			//横壁の反動係数
 	static constexpr float FLOOR_BOUNCE_Y = 0.3f;			//床の反動係数
 	static constexpr float FLOOR_FRICTION = 0.9f;			//床の摩擦係数
+	static constexpr float POWER_CONVERSION = 20.0f;		//威力変換定数
 	
 	Player(FileManager& fileMng, Stage* stage, SceneGame& game);
 	~Player();
@@ -88,6 +89,8 @@ public:
 	void SetCanMoveFlag(bool flag) { canMoveFlag = flag; }
 	//プレイヤーの位置に応じてステージのスクロールを更新
 	void UpdateStageScroll();
+	//プレイヤージャンプ倍率を設定
+	void SetPlayerJumpMag(float mag) { playerJumpMag = mag; }
 private:
 	
 	bool GetJumpFlag() const { return jumpFlag; }					//ジャンプフラグを取得
@@ -117,6 +120,7 @@ private:
 	int height_;				//プレイヤーの画像の高さ
 	float canvasX;				//プレイヤーの描画位置X
 	float canvasY;				//プレイヤーの描画位置Y
+	float scale;				//プレイヤーの大きさ
 	
 	float sodaPower;			//炭酸攻撃の威力
 	bool aliveFlag;				//生存フラグ
@@ -130,6 +134,7 @@ private:
 	float angle;				//回転角度
 	float rotateSpeed;			//回転速度
 	float jumpPower;			//ジャンプ力
+	float playerJumpMag;		//ジャンプ倍率
 	float attackDamage;			//攻撃のダメージ
 	float shakeMove;			//振動の移動量
 	float playerShakePower;		//プレイヤーの振動量
