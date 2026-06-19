@@ -584,9 +584,12 @@ void SceneGame::AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y)
 	}
 }
 
+//テレポートギミック生成関数
 void SceneGame::AddTeleport(float x, float y, float targetX, float targetY)
 {
 	gimmickList_.push_back(std::make_shared<GimmickTeleport>(fileMng_, stage_.get(), x, y, targetX, targetY));
+
+
 
 }
 

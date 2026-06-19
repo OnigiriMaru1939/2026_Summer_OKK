@@ -18,7 +18,7 @@ Player::Player(FileManager& fileMng, Stage* stage, SceneGame& game) : fileManage
 {
 	AddFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
 	hpFontHandle = CreateFontToHandle("DotGothic16", 30, -1, DX_FONTTYPE_EDGE);
-	SetImage("Resource/Image/Cider_Player.png");
+	SetImage("Resource/Image/Player/Cider_Player.png");
 
 	pMng = std::make_unique<ParticleManager>(fileMng);
 	pMng->RegisterConfig(WATER_PARTICLE_PATH);
