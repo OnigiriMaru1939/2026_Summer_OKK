@@ -5,16 +5,26 @@
 #include "InputManager.h"
 #include "SceneGame.h"
 #include "Application.h"
+#include "Fonts.h"
 
-SceneStageSelect::SceneStageSelect(FileManager& fileMng) : SceneSuper(fileMng)
+SceneStageSelect::SceneStageSelect(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(fileMng, sceneMng)
 {
 	_fadeAlpha = 255.0f;
+	// 仮別フォント
 	//AddFontResourceExA("Resource/fonts/KumarOneOutline-Regular.ttf", FR_PRIVATE, NULL);
 	//stageFontHandle = CreateFontToHandle("Kumar One Outline", 60, -1, DX_FONTTYPE_NORMAL);
-	AddFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
-	stageFontHandle = CreateFontToHandle("DotGothic16", 80, -1, DX_FONTTYPE_NORMAL);
-	stageNumFontHandle = CreateFontToHandle("DotGothic16", 120, -1, DX_FONTTYPE_NORMAL);
-	titleFontHandle = CreateFontToHandle("DotGothic16", 100, -1, DX_FONTTYPE_NORMAL);
+	_stageFont = fileMng.CreateFontFM(Fonts::DotGothic16::PATH,
+									  Fonts::DotGothic16::NAME,
+									  80);
+	_stageFont = fileMng.CreateFontFM(Fonts::DotGothic16::PATH,
+									  Fonts::DotGothic16::NAME,
+									  80);
+	_stageNumFont = fileMng.CreateFontFM(Fonts::DotGothic16::PATH,
+									  Fonts::DotGothic16::NAME,
+									  120);
+	_titleFont = fileMng.CreateFontFM(Fonts::DotGothic16::PATH,
+									  Fonts::DotGothic16::NAME,
+									  100);
 	_selectedIndex = 1; // 初期選択ステージは1
 
 	_bgImg = fileMng.LoadImageFM("Resource/Image/StageSelect/StageSelect_bg.png");
@@ -65,15 +75,13 @@ SceneStageSelect::SceneStageSelect(FileManager& fileMng) : SceneSuper(fileMng)
 														   isEnd = true;
 													   }
 												   });
+
+	sceneMng.SetTransitionDuration(45.0f);
 }
 
 SceneStageSelect::~SceneStageSelect()
 {
-	DeleteFontToHandle(stageFontHandle);
-	DeleteFontToHandle(stageNumFontHandle);
-	DeleteFontToHandle(titleFontHandle);
-	RemoveFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
-	//RemoveFontResourceExA("Resource/fonts/KumarOneOutline-Regular.ttf", FR_PRIVATE, NULL);
+
 }
 
 void SceneStageSelect::Update()
@@ -92,30 +100,30 @@ void SceneStageSelect::Draw()
 		int y = BLOCK_Y + (i / BLOCK_NUM_ROW) * (_stageSelectBlockImg->GetHeight() + BLOCK_SPACING_Y);
 
 		std::string stageText = "STAGE";
-		int width = GetDrawStringWidthToHandle(stageText.c_str(), stageText.length(), stageFontHandle);
+		int width = GetDrawStringWidthToHandle(stageText.c_str(), stageText.length(), _stageFont->GetHandle());
 		int color = 0xaaebfb;
 		if (_selectedIndex == i + 1)
 		{
 			DrawGraph(x, y, _stageSelectBlockSelectedImg->GetHandle(), true);
 			color = 0xf7c3ef;
-			DrawStringToHandle(x + (_stageSelectBlockImg->GetWidth() / 2) - (width / 2), y + 40, stageText.c_str(), color, stageFontHandle);
+			DrawStringToHandle(x + (_stageSelectBlockImg->GetWidth() / 2) - (width / 2), y + 40, stageText.c_str(), color, _stageFont->GetHandle());
 		}
 		else
 		{
 			DrawGraph(x, y, _stageSelectBlockImg->GetHandle(), true);
-			DrawStringToHandle(x + (_stageSelectBlockImg->GetWidth() / 2) - (width / 2), y + 40, stageText.c_str(), color, stageFontHandle);
+			DrawStringToHandle(x + (_stageSelectBlockImg->GetWidth() / 2) - (width / 2), y + 40, stageText.c_str(), color, _stageFont->GetHandle());
 		}
 		
 		std::string stageNumStr = std::to_string(i + 1);
-		int numWidth = GetDrawStringWidthToHandle(stageNumStr.c_str(), stageNumStr.length(), stageNumFontHandle);
-		DrawFormatStringToHandle(x + (_stageSelectBlockImg->GetWidth() / 2) - (numWidth / 2), y + 140, 0xffffff, stageNumFontHandle, "%d", i + 1);
+		int numWidth = GetDrawStringWidthToHandle(stageNumStr.c_str(), stageNumStr.length(), _stageNumFont->GetHandle());
+		DrawFormatStringToHandle(x + (_stageSelectBlockImg->GetWidth() / 2) - (numWidth / 2), y + 140, 0xffffff, _stageNumFont->GetHandle(), "%d", i + 1);
 
 	}
 	DrawBox(TITLE_X, TITLE_Y, TITLE_X + TITLE_W, TITLE_Y + TITLE_H, GetColor(255, 0, 255), true);
 	std::string titleText = "TITLE";
-	int titleWidth = GetDrawStringWidthToHandle(titleText.c_str(), titleText.length(), titleFontHandle);
-	int titleHeight = GetFontSizeToHandle(titleFontHandle);
-	DrawStringToHandle(TITLE_X + (TITLE_W / 2) - (titleWidth / 2), TITLE_Y + (TITLE_H / 2) - (titleHeight / 2), titleText.c_str(), GetColor(255, 255, 255), titleFontHandle);
+	int titleWidth = GetDrawStringWidthToHandle(titleText.c_str(), titleText.length(), _titleFont->GetHandle());
+	int titleHeight = GetFontSizeToHandle(_titleFont->GetHandle());
+	DrawStringToHandle(TITLE_X + (TITLE_W / 2) - (titleWidth / 2), TITLE_Y + (TITLE_H / 2) - (titleHeight / 2), titleText.c_str(), GetColor(255, 255, 255), _titleFont->GetHandle());
 	if (_selectedIndex == 0)
 	{
 		DrawBox(TITLE_X - 5, TITLE_Y - 5, TITLE_X + TITLE_W + 5, TITLE_Y + TITLE_H + 5, GetColor(255, 0, 0), false);

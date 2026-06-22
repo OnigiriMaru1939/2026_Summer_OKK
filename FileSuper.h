@@ -21,10 +21,6 @@ public:
 
 	int GetHandle() const
 	{
-
-
-
- 
  		return handle_;
    	}
 

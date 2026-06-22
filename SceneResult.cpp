@@ -2,16 +2,19 @@
 #include "SceneResult.h"
 #include "SceneGame.h"
 #include "InputManager.h"
+#include "Fonts.h"
 #include <string>
 #include <algorithm>
 
-SceneResult::SceneResult(FileManager& fileMng, bool isClear, ClearResult& result) : SceneSuper(fileMng), _isClear(isClear), _clearResult(result)
+SceneResult::SceneResult(FileManager& fileMng, bool isClear, ClearResult& result, SceneManager& sceneMng) : SceneSuper(fileMng, sceneMng), _isClear(isClear), _clearResult(result)
 {
 	SceneGame::selectedStageIndex_ == 4 ? _selectedNext = 1 : _selectedNext = 0;
-
-	AddFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
-	resultFontHandle = CreateFontToHandle("DotGothic16", 80, -1, DX_FONTTYPE_NORMAL);
-	nextButtonFontHandle = CreateFontToHandle("DotGothic16", 40, -1, DX_FONTTYPE_NORMAL);
+	_resultFont = fileMng_.CreateFontFM(Fonts::DotGothic16::PATH,
+									  Fonts::DotGothic16::NAME,
+									  80);
+	_nextButtonFont = fileMng_.CreateFontFM(Fonts::DotGothic16::PATH,
+										Fonts::DotGothic16::NAME,
+										60);
 
 	_bgImg = fileMng.LoadImageFM("Resource/Image/Result/Result_bg.png");
 	_resultClearLogoImg = fileMng.LoadImageFM("Resource/Image/Result/Result_Clear_Logo.png");
@@ -58,12 +61,13 @@ SceneResult::SceneResult(FileManager& fileMng, bool isClear, ClearResult& result
 														   MoveSelect(moveValue);
 													   }
 												   });
+
+	sceneMng.SetTransitionDuration(45.0f);
 }
 
 SceneResult::~SceneResult()
 {
-	DeleteFontToHandle(resultFontHandle);
-	RemoveFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
+
 }
 
 void SceneResult::Update()
@@ -77,7 +81,7 @@ void SceneResult::Draw()
 	if (_isClear)
 	{
 		DrawRotaGraph(LOGO_X, LOGO_Y, 1.0f, -5.0f * (DX_PI_F / 180.0f), _resultClearLogoImg->GetHandle(), true);
-		DrawFormatStringToHandle(RESULT_TIME_X, RESULT_TIME_Y, 0xffffff, resultFontHandle, "CLEAR TIME: %.2f", _clearResult.time);
+		DrawFormatStringToHandle(RESULT_TIME_X, RESULT_TIME_Y, 0xffffff, _resultFont->GetHandle(), "CLEAR TIME: %.2f", _clearResult.time);
 	}
 	else
 	{
@@ -93,10 +97,10 @@ void SceneResult::Draw()
 		std::string text = "";
 		i == 0 ? text = "NEXT STAGE" : i == 1 ? text = "RETRY" : i == 2 ? text = "STAGE SELECT" : text = "TITLE";
 
-		int textWidth = GetDrawStringWidthToHandle(text.c_str(), static_cast<int>(strlen(text.c_str())), nextButtonFontHandle);
+		int textWidth = GetDrawStringWidthToHandle(text.c_str(), static_cast<int>(strlen(text.c_str())), _nextButtonFont->GetHandle());
 		int x = NEXT_BUTTON_X + (NEXT_BUTTON_MARGIN + NEXT_BUTTON_WID) * i;
 		DrawBox(x, NEXT_BUTTON_Y, x + NEXT_BUTTON_WID, NEXT_BUTTON_Y + NEXT_BUTTON_HIG, 0x114444 * i, true);
-		DrawStringToHandle((x + NEXT_BUTTON_WID / 2) - (textWidth / 2), (NEXT_BUTTON_Y + NEXT_BUTTON_HIG / 2) - (GetFontSizeToHandle(nextButtonFontHandle) / 2), text.c_str(), 0xffffff, nextButtonFontHandle);
+		DrawStringToHandle((x + NEXT_BUTTON_WID / 2) - (textWidth / 2), (NEXT_BUTTON_Y + NEXT_BUTTON_HIG / 2) - (GetFontSizeToHandle(_nextButtonFont->GetHandle()) / 2), text.c_str(), 0xffffff, _nextButtonFont->GetHandle());
 		if (_selectedNext == i)
 		{
 			DrawBox(x - 5, NEXT_BUTTON_Y - 5, x + NEXT_BUTTON_WID + 5, NEXT_BUTTON_Y + NEXT_BUTTON_HIG + 5, 0xff0000, false);

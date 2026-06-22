@@ -54,7 +54,7 @@ void SceneManager::Update()
 
 			transition_.state = TransitionState::FadeOutCurrent;
 			transition_.timer = 0.0f;
-			transition_.duration = 45.0f; // フェードの総時間（フレーム数）
+
 			transition_.nextSceneID = currentScene->GetNextScene();
 		}
 	}
@@ -114,13 +114,13 @@ std::unique_ptr<SceneSuper> SceneManager::CreateScene(SceneSuper::SceneID sceneI
 	switch (sceneID)
 	{
 		case SceneSuper::SceneID::TITLE:
-			return std::make_unique<SceneTitle>(fileMng_);
+			return std::make_unique<SceneTitle>(fileMng_, *this);
 		case SceneSuper::SceneID::STAGE_SELECT:
-			return std::make_unique<SceneStageSelect>(fileMng_);
+			return std::make_unique<SceneStageSelect>(fileMng_, *this);
 		case SceneSuper::SceneID::GAME:
 			return std::make_unique<SceneGame>(fileMng_, *this);
 		case SceneSuper::SceneID::RESULT:
-			return std::make_unique<SceneResult>(fileMng_, _isClear, _clearResult);
+			return std::make_unique<SceneResult>(fileMng_, _isClear, _clearResult, *this);
 		case SceneSuper::SceneID::PAUSE:
 			return std::make_unique<ScenePause>(fileMng_, *this);
 		default:
@@ -189,4 +189,9 @@ bool SceneManager::GetExit() const
 void SceneManager::SetClearResult(const ClearResult& result)
 {
 	_clearResult = result;
+}
+
+void SceneManager::SetTransitionDuration(float duration)
+{
+	transition_.duration = duration;
 }

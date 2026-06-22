@@ -39,6 +39,7 @@ public:
 	bool GetExit() const;
 	void SetGameResult(bool isClear) { _isClear = isClear; }
 	void SetClearResult(const ClearResult& result);
+	void SetTransitionDuration(float duration);
 
 	void PushScene(SceneSuper::SceneID sceneID);
 	void PopScene();

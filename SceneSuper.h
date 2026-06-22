@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <DxLib.h>
 #include "FileManager.h"
+class SceneManager;
 
 class SceneSuper
 {
@@ -17,7 +18,7 @@ public:
 	};
 
 	// SceneからFileManagerを消さないようにポインタ参照
-	SceneSuper(FileManager& fileMng) : fileMng_(fileMng) {};
+	SceneSuper(FileManager& fileMng, SceneManager& sceneMng) : fileMng_(fileMng), sceneMng_(sceneMng) {};
 	virtual ~SceneSuper() = default;
 	virtual void Update() = 0;
 	virtual void Draw() = 0;
@@ -45,6 +46,7 @@ public:
 	bool GetIsTransition() { return isTransition; }
 protected:
 	FileManager& fileMng_;
+	SceneManager& sceneMng_;
 	bool isEnd = false;
 	bool isTransition = false;
 	SceneID nextSceneID = SceneID::NONE;
