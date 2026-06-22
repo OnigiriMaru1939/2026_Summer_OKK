@@ -4,6 +4,7 @@
 #include "EnemyBase.h"
 #include "Enemy1.h"
 #include "Boss1.h"
+#include "Boss2.h"
 #include "ItemBase.h"
 #include "Mentos.h"
 #include "Stage.h"
@@ -212,7 +213,6 @@ void SceneGame::BossEventDraw()
 		);
 
 		DrawGauge(100, 90, 1720, 50, bossHpGauge, bossHpGaugeMax, GetColor(255, 0, 0));
-
 	}
 
 	if (bossEventState == BossEventState::BATTLE)
@@ -533,15 +533,19 @@ void SceneGame::CheckBossSpawn()
 	}
 }
 
-std::shared_ptr<Boss1> SceneGame::GetBoss()
+std::shared_ptr<EnemyBase> SceneGame::GetBoss()
 {
 	for (auto& enemy : enemyList_)
 	{
-		auto boss = std::dynamic_pointer_cast<Boss1>(enemy);
-
-		if (boss)
+		switch (enemy->GetEnemyType())
 		{
-			return boss;
+			case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1:
+			case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2:
+			case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_3:
+				return enemy;
+
+			default:
+				break;
 		}
 	}
 
@@ -562,11 +566,24 @@ void SceneGame::BossEvent()
 			bossTimer++;
 			if (bossTimer > 180)
 			{
-				AddBoss(
-					EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1,
-					1800.0f,
-					200.0f
-				);
+				switch (selectedStageIndex_)
+				{
+					case 1:
+						AddBoss(
+							EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1,
+							1800.0f,
+							200.0f
+						);
+						break;
+
+					case 2:
+						AddBoss(
+							EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2,
+							1100.0f,
+							3200.0f
+						);
+						break;
+				}
 				bossEventState = BossEventState::APPEAR;
 				bossTimer = 0;
 			}
@@ -638,6 +655,9 @@ void SceneGame::AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y)
 	{
 	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1:
 		enemyList_.push_back(std::make_shared<Boss1>(fileMng_, stage_.get(), x, y));
+		break;
+	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2:
+		enemyList_.push_back(std::make_shared<Boss2>(fileMng_, stage_.get(), x, y));
 		break;
 	default:
 		break;

@@ -51,7 +51,7 @@ public:
 	void BossEventDraw();                                               //ボスイベントの描画
 	void SetBossArea(int left, int top, int right, int bottom);         //ボスエリアの矩形を設定
 	RECT GetBossArea() const;                                           //ボスエリアの矩形を取得
-	std::shared_ptr<Boss1> GetBoss();                                   //ボスの取得
+	std::shared_ptr<EnemyBase> GetBoss();                                   //ボス1の取得
 
 	//敵生成関数
 	void AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y);

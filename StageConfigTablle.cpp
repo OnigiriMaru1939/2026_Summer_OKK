@@ -35,14 +35,16 @@ const std::vector<StageConfig>& GetStageConfigs()
 			"Resource/MapJson/stage_02.json",
 			[](SceneGame& scene)
 			{
-			scene.GetStage()->SetBgImage("Resource/Image/Game/Stage1_bg.png");
-			scene.GetStage()->SetMchipImage("Resource/MapChip/Mapchip_neon.png");
-			//プレイヤーの初期化
-      scene.GetPlayer()->SetPosition(100.0f, 3480.0f);
-			//敵の生成
-			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 500.0f, 200.0f);
-			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 800.0f, 1700.0f);
-			
+				scene.GetStage()->SetBgImage("Resource/Image/Game/Stage1_bg.png");
+				scene.GetStage()->SetMchipImage("Resource/MapChip/Mapchip_neon.png");
+				//プレイヤーの初期化
+				scene.GetPlayer()->SetPosition(100.0f, 3480.0f);
+				//ボスエリアの初期設定
+				scene.SetBossArea(500, 3000, 700, 3500);
+				//敵の生成
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 500.0f, 200.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 800.0f, 1700.0f);
+				
 			},
 
 		},
