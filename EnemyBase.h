@@ -66,6 +66,7 @@ public:
 	//フラグを取得
 	bool GetJumpFlag() const { return jumpFlag; }
 	bool GetAliveFlag() const { return isAlive_; }
+	void SetAppearFlag(bool flag) { isAppearing = flag; } //出現フラグを設定する関数
 protected:
 	FileManager& fileManager_;
 	std::shared_ptr<ImageFile> image_;	//画像データ
@@ -95,6 +96,7 @@ protected:
 	int hpMax_;				//HPの最大値
 	bool isAlive_;			//生存フラグ
 	bool jumpFlag;			//ジャンプフラグ
+	bool isAppearing;       //ボスが出現中かどうかのフラグ
 	std::string name_;		//敵の名前
 };
 

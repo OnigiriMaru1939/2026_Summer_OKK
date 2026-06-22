@@ -38,7 +38,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 			scene.GetStage()->SetBgImage("Resource/Image/Game/Stage1_bg.png");
 			scene.GetStage()->SetMchipImage("Resource/MapChip/Mapchip_neon.png");
 			//プレイヤーの初期化
-			 scene.GetPlayer()->SetPosition(100.0f, 3450.0f);
+			scene.GetPlayer()->SetPosition(100.0f, 3450.0f);
 			//ボスエリアの初期設定
 			scene.SetBossArea(80, 4600, 1900, 6500);
 			//敵の生成

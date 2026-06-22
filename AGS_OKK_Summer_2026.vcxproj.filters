@@ -66,6 +66,7 @@
     </ClCompile>
     <ClCompile Include="ItemBase.cpp" />
     <ClCompile Include="Mentos.cpp" />
+    <ClCompile Include="Boss2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Application">
@@ -258,5 +259,6 @@
     </ClInclude>
     <ClInclude Include="ItemBase.h" />
     <ClInclude Include="Mentos.h" />
+    <ClInclude Include="Boss2.h" />
   </ItemGroup>
 </Project>

@@ -15,7 +15,7 @@ EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, float x, float y)
 	, canvasX(0)
 	, canvasY(0)
 	, scale(1.0f)
-	,angle(0.0f)
+	, angle(0.0f)
 	, gravity(0.5f)
 	, AttckDamage(20)
 	, noDamageTime(0)
@@ -25,7 +25,7 @@ EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, float x, float y)
 	, hp_(1)
 	, hpMax_(200)
 	, isAlive_(true)
-	,jumpFlag(false)
+	, jumpFlag(false)
 {
 }
 
