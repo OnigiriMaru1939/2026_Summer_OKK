@@ -258,15 +258,23 @@ bool Stage::CheckHitWallRect(int x, int y, int width, int height)
 	int top = y - height / 2;
 	int right = x + width / 2 - 1;
 	int bottom = y + height / 2 - 1;
-	// 四隅の座標で壁をチェック
+	// 四隅＋辺の中央＋さらに半分の座標で壁をチェック
 	if (CheckWall(left, top)) return true;
+	if (CheckWall((left + right) / 4, top)) return true;
 	if (CheckWall((left + right) / 2, top)) return true;
+	if (CheckWall((left + right) / 4 * 3, top)) return true;
 	if (CheckWall(right, top)) return true;
+	if (CheckWall(left, (top + bottom) / 4)) return true;
 	if (CheckWall(left, (top + bottom) / 2)) return true;
+	if (CheckWall(left, (top + bottom) / 4 * 3)) return true;
 	if (CheckWall(left, bottom)) return true;
+	if (CheckWall((left + right) / 4, bottom)) return true;
 	if (CheckWall((left + right) / 2, bottom)) return true;
+	if (CheckWall((left + right) / 4 * 3, bottom)) return true;
 	if (CheckWall(right, bottom)) return true;
+	if (CheckWall(right, (top + bottom) / 4)) return true;
 	if (CheckWall(right, (top + bottom) / 2)) return true;
+	if (CheckWall(right, (top + bottom) / 4 * 3)) return true;
 
 	return false;
 }

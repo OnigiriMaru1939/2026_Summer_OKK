@@ -46,11 +46,11 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(
 
 	_isClear = false;
 
-	_gameScreen = MakeScreen(Application::SCREEN_WID, Application::SCREEN_HIG);
+	_gameScreen = fileMng.CreateScreenFM("gameScreen", Application::SCREEN_WID, Application::SCREEN_HIG, true);
 
-	highBrightScreen = MakeScreen(Application::SCREEN_WID, Application::SCREEN_HIG, false);
-	downScaleScreen = MakeScreen(DOWN_SCALE_SCREEN_W, DOWN_SCALE_SCREEN_H, FALSE);
-	gaussScreen = MakeScreen(DOWN_SCALE_SCREEN_W, DOWN_SCALE_SCREEN_H, FALSE);
+	highBrightScreen = fileMng.CreateScreenFM("highBrightScreen", Application::SCREEN_WID, Application::SCREEN_HIG, false);
+	downScaleScreen = fileMng.CreateScreenFM("downScaleScreen", DOWN_SCALE_SCREEN_W, DOWN_SCALE_SCREEN_H, false);
+	gaussScreen = fileMng.CreateScreenFM("gaussScreen", DOWN_SCALE_SCREEN_W, DOWN_SCALE_SCREEN_H, false);
 
 	gaussRatio = 0;
 	filterRatio = 200;
@@ -80,18 +80,13 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(
 														   sceneMng_.PushScene(SceneID::PAUSE);
 													   }
 												   });
-	_offScreen = MakeScreen(Application::SCREEN_WID, Application::SCREEN_HIG, true);
+	_offScreen = fileMng.CreateScreenFM("offScreen", Application::SCREEN_WID, Application::SCREEN_HIG, true);
 	sceneMng_.SetTransitionDuration(45.0f);
 }
 
 SceneGame::~SceneGame()
 {
 	enemyList_.clear();
-	DeleteGraph(_offScreen);
-	DeleteGraph(_gameScreen);
-	DeleteGraph(highBrightScreen);
-	DeleteGraph(downScaleScreen);
-	DeleteGraph(gaussScreen);
 }
 
 void SceneGame::Update()
@@ -154,7 +149,7 @@ void SceneGame::Update()
 
 void SceneGame::Draw()
 {
-	SetDrawScreen(_gameScreen);
+	SetDrawScreen(_gameScreen->GetHandle());
 	ClearDrawScreen();
 	// 様々な画面エフェクトを受けるものはこっちに描画
 	DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0x00aa00, true);
@@ -183,7 +178,7 @@ void SceneGame::Draw()
 	//プレイヤーを描画
 	player_->Draw();
 	DrawClearTransition();
-	SetDrawScreen(_offScreen);
+	SetDrawScreen(_offScreen->GetHandle());
 	ClearDrawScreen();
 
 	// 画面揺れなどの影響を受けないものはこっちへ描画
@@ -238,14 +233,14 @@ void SceneGame::Draw()
 		DrawRotaGraph3(Application::SCREEN_WID / 2 + shakeX,
 					   Application::SCREEN_HIG / 2 + shakeY,
 					   static_cast<int>(currentFocusX),
-					   static_cast<int>(currentFocusY), scale, scale, 0.0f, _gameScreen, TRUE);
+					   static_cast<int>(currentFocusY), scale, scale, 0.0f, _gameScreen->GetHandle(), TRUE);
 	}
 	else
 	{
-		DrawGraph(0, 0, _gameScreen, false);
+		DrawGraph(0, 0, _gameScreen->GetHandle(), false);
 	}
 	
-	DrawGraph(0, 0, _offScreen, TRUE);
+	DrawGraph(0, 0, _offScreen->GetHandle(), TRUE);
 
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(_fadeAlpha));
@@ -376,18 +371,18 @@ void SceneGame::DrawClearTransition()
 	if (IsClear())
 	{
 		// 描画結果から高輝度部分のみを抜き出した画像を得る
-		GraphFilterBlt(_gameScreen, highBrightScreen, DX_GRAPH_FILTER_BRIGHT_CLIP, DX_CMP_LESS, filterRatio, TRUE, GetColor(0, 0, 0), 255);
+		GraphFilterBlt(_gameScreen->GetHandle(), highBrightScreen->GetHandle(), DX_GRAPH_FILTER_BRIGHT_CLIP, DX_CMP_LESS, filterRatio, TRUE, GetColor(0, 0, 0), 255);
 		// 高輝度部分を８分の１に縮小した画像を得る
-		GraphFilterBlt(highBrightScreen, downScaleScreen, DX_GRAPH_FILTER_DOWN_SCALE, DOWN_SCALE);
+		GraphFilterBlt(highBrightScreen->GetHandle(), downScaleScreen->GetHandle(), DX_GRAPH_FILTER_DOWN_SCALE, DOWN_SCALE);
 		// ８分の１に縮小した画像をガウスフィルタでぼかす
-		GraphFilterBlt(downScaleScreen, gaussScreen, DX_GRAPH_FILTER_GAUSS, 16, gaussRatio);
+		GraphFilterBlt(downScaleScreen->GetHandle(), gaussScreen->GetHandle(), DX_GRAPH_FILTER_GAUSS, 16, gaussRatio);
 		// 描画モードをバイリニアフィルタリングにする(拡大したときにドットがぼやけるようにする)
 		SetDrawMode(DX_DRAWMODE_BILINEAR);
 		// 描画ブレンドモードを加算にする
 		SetDrawBlendMode(DX_BLENDMODE_ADD, 255);
 		// 高輝度部分を縮小してぼかした画像を画面いっぱいに数回描画する( 数回描画するのはより明るくみえるようにするため )
-		DrawExtendGraph(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, gaussScreen, FALSE);
-		DrawExtendGraph(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, gaussScreen, FALSE);
+		DrawExtendGraph(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, gaussScreen->GetHandle(), FALSE);
+		DrawExtendGraph(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, gaussScreen->GetHandle(), FALSE);
 		// 描画ブレンドモードをブレンド無しに戻す
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 		// 描画モードを二アレストに戻す

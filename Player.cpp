@@ -598,7 +598,7 @@ RECT Player::GetRect() const
 	return rc;
 }
 
-//プレイヤーとHPバーの衝突判定
+//プレイヤーとHPバーの重なり判定
 bool Player::CollisionHpBar()
 {
 	RECT rc = GetRect();
