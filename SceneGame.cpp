@@ -1,4 +1,4 @@
-#define NOMINMAX
+﻿#define NOMINMAX
 #include "SceneGame.h"
 #include "InputManager.h"
 #include "Player.h"
@@ -653,8 +653,8 @@ void SceneGame::BossEvent()
 					case 2:
 						AddBoss(
 							EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2,
-							1100.0f,
-							3200.0f
+							950.0f,
+							5000.0f
 						);
 						break;
 				}

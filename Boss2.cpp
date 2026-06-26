@@ -3,16 +3,18 @@
 
 Boss2::Boss2(FileManager& fileMng, Stage* stage, float x, float y) : EnemyBase(fileMng, stage, x, y)
 {
-	SetImage("Resource/Image/Monster.png");
+	SetImage("Resource/Image/Enemys/Monster.png");
 	enemyType_ = ENEMY_TYPE::E_TYPE_BOSS_2;
 	SetPosition(x, y);				//初期位置を設定
-	SetVelocity(-1.0f, 0.0f);        //初期速度を設定
-	name_ = "Monster";                //名前を設定
+	SetVelocity(-5.0f, 0.0f);		//初期速度を設定
+	name_ = "Monster";              //名前を設定
 	hp_ = 200;
 	hpMax_ = 200;
 	scale = 2.0f;
 	jumpFlag = false;
 	bossState_ = BOSS_STATE::NON;
+	stateChangeTimer = 0;
+	rotateSpeed = 0.0f;
 }
 
 Boss2::~Boss2()
@@ -31,6 +33,8 @@ void Boss2::Update()
 	if (isAppearing)
 	{
 		BossAppear();
+		bossState_ = BOSS_STATE::MOVE;
+		stateChangeTimer = 0;
 		return;
 	}
 
@@ -38,13 +42,22 @@ void Boss2::Update()
 	{
 		case Boss2::NON:
 			break;
+		case Boss2::WAIT:
+			Wait();
+			break;
 		case Boss2::MOVE:
 			//横移動
-			BossMove();
+			Move();
 			break;
 		case Boss2::JUMP:
+			if (!GetJumpFlag())
+			{
+				Jump();
+			}
+			Move();
 			break;
 		case Boss2::DASH:
+			Dash();
 			break;
 		default:
 			break;
@@ -64,6 +77,7 @@ void Boss2::Draw() const
 		//HPゲージの描画
 		//DrawGauge(1300, 100, 500, 40, hp_, hpMax_, GetColor(255, 0, 0));		//ボスのHPゲージ
 	}
+	DrawFormatString(100, 1000, GetColor(255, 0, 0), "stateChangeTimer: %d", stateChangeTimer);
 }
 
 //ボスの出現処理
@@ -79,33 +93,113 @@ void Boss2::BossStateChange()
 	//ボス状態ステータスタイマーを進める
 	stateChangeTimer++;
 
-	if (stateChangeTimer > 180)
+	switch (bossState_)
 	{
+		case BOSS_STATE::WAIT:
 
+			if (stateChangeTimer > 90)
+			{
+				SelectNextState();
+			}
+			break;
+
+		case BOSS_STATE::MOVE:
+
+			if (stateChangeTimer > 120)
+			{
+				bossState_ = BOSS_STATE::WAIT;
+				stateChangeTimer = 0;
+			}
+
+			break;
+
+		case BOSS_STATE::JUMP:
+
+			if (stateChangeTimer > 240)
+			{
+				bossState_ = BOSS_STATE::MOVE;
+				stateChangeTimer = 0;
+			}
+
+			break;
+
+		case BOSS_STATE::DASH:
+
+			if (stateChangeTimer > 180)
+			{
+				vx_ = (vx_ > 0) ? 5.0f : -5.0f;
+				angle = 0.0f;
+
+				bossState_ = BOSS_STATE::MOVE;
+				stateChangeTimer = 0;
+			}
+
+			break;
 	}
 }
 
+//次の行動パターンを決める関数
+void Boss2::SelectNextState()
+{
+	int randomStateNum_ = rand() % 2;
+
+	switch (randomStateNum_)
+	{
+		case 0:
+			bossState_ = BOSS_STATE::JUMP;
+			break;
+		case 1:
+			bossState_ = BOSS_STATE::DASH;
+			break;
+		default:
+			break;
+	}
+
+	//ボス状態ステータスタイマーリセット
+	stateChangeTimer = 0;
+}
+
+//ボス待機
+void Boss2::Wait()
+{
+	MoveY();
+	EnemyShake();
+}
+
 //ボスの移動処理
-void Boss2::BossMove()
+void Boss2::Move()
 {
 	EnemyBase::Move();		//基底クラスの移動処理を呼び出す
-	if (!GetJumpFlag())
-	{
-		Jump();					//ジャンプ処理を呼び出す
-	}
 }
 
 //ジャンプ処理
 void Boss2::Jump()
 {
+	EnemyResetShake();
 	if (GetJumpFlag()) return;		//二段ジャンプを防止
 
-	vy_ = -10.0f;		//ジャンプの初速度を設定
+	vy_ = -25.0f;		//ジャンプの初速度を設定
 	jumpFlag = true;	//ジャンプフラグを立てる
 }
 
 //ダッシュ処理
 void Boss2::Dash()
 {
+	EnemyResetShake();
 
+	rotateSpeed = 0.2f;
+
+	angle += rotateSpeed;
+
+	Move();
+
+	//高速移動
+	if (vx_ > 0)
+	{
+		vx_ = 20.0f;
+	}
+	else
+	{
+		vx_ = -20.0f;
+	}
 }
