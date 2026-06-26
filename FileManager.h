@@ -53,12 +53,14 @@ public:
 	std::shared_ptr<ScreenFile> CreateScreenFM(
 		const std::string& name,
 		int width,
-		int height)
+		int height,
+		int useAlphaChannel)
 	{
 		std::string key =
 			name + "_" +
 			std::to_string(width) + "x" +
-			std::to_string(height);
+			std::to_string(height) + "_useAlpha" + 
+			(useAlphaChannel ? "true" : "false");
 
 		return screen_.Load(
 			key,
@@ -67,7 +69,7 @@ public:
 				return MakeScreen(
 					width,
 					height,
-					TRUE);
+					useAlphaChannel);
 			});
 	}
 

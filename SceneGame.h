@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <memory>
 #include "SceneSuper.h"
 #include "Application.h"
@@ -6,6 +6,7 @@
 #include "EnemyBase.h"
 #include "Boss1.h"
 #include "FontFile.h"
+#include "ScreenFile.h"
 #include "GimmickBase.h"
 #include "ItemBase.h"
 
@@ -82,7 +83,7 @@ private:
 	float bossHpGauge;      //ボスのHP
 	float bossHpGaugeMax;   //ボスのHPの最大値
 
-	int _gameScreen;
+	std::shared_ptr<ScreenFile> _gameScreen;
 
 	bool _isClear;
 	bool IsClear() { return _isClear; }
@@ -95,9 +96,9 @@ private:
 	static constexpr int DOWN_SCALE = 8;
 	static constexpr int DOWN_SCALE_SCREEN_W = (Application::SCREEN_WID / DOWN_SCALE);	// ガウスフィルタを掛ける画像の横幅
 	static constexpr int DOWN_SCALE_SCREEN_H = (Application::SCREEN_HIG / DOWN_SCALE);	// ガウスフィルタを掛ける画像の縦幅
-	int highBrightScreen;	// 普通の描画結果から高輝度部分を抜き出した結果を書き込むスクリーン
-	int downScaleScreen;	// 高輝度部分を縮小した結果を書き込むスクリーン
-	int gaussScreen;	// 縮小画像をガウスフィルタでぼかした結果を書き込むスクリーン
+	std::shared_ptr<ScreenFile> highBrightScreen;	// 普通の描画結果から高輝度部分を抜き出した結果を書き込むスクリーン
+	std::shared_ptr<ScreenFile> downScaleScreen;	// 高輝度部分を縮小した結果を書き込むスクリーン
+	std::shared_ptr<ScreenFile> gaussScreen;	// 縮小画像をガウスフィルタでぼかした結果を書き込むスクリーン
 	int gaussRatio;
 	int filterRatio;
 
@@ -114,6 +115,6 @@ private:
 	bool _isBossDefeatedSequence = false;
 	int _sequenceTimer = 0;
 
-	int _offScreen = -1;
+	std::shared_ptr<ScreenFile> _offScreen = -1;
 };
 
