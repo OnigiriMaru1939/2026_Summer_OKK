@@ -4,7 +4,7 @@
 
 Mentos::Mentos(FileManager& fileMng, Stage* stage, float x, float y):ItemBase(fileMng, stage, x, y)
 {
-	SetImage("Resource/Image/Cider_Player_NoWeapon.png");
+	SetImage("Resource/Image/Gimmicks/Mentos.png");
 	itemTypp_ = ITEM_TYPE::MENTOS;
 	SetPosition(x, y);
 }
