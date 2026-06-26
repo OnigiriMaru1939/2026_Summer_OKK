@@ -36,7 +36,9 @@ public:
 	void MoveX();
 	void MoveY();
 	void AddGravity();
-	void NoDamageCountDown(); //無敵時間のカウントダウン
+	void NoDamageCountDown();	//無敵時間のカウントダウン
+	void EnemyShake();			//敵の振動処理
+	void EnemyResetShake();		//敵の振動リセット処理
 
 	//ダメージ管理
 	void ApplyDamage(int dmg);
@@ -87,10 +89,12 @@ protected:
 	int noDamageTime;	//無敵時間
 	int noDamageMaxTime;//無敵時間の最大値
 
-	int width_;		//画像の幅
-	int height_;	//画像の高さ
-	int canvasX;	//敵の描画位置X
-	int canvasY;	//敵の描画位置Y
+	int width_;			//画像の幅
+	int height_;		//画像の高さ
+	int canvasX;		//敵の描画位置X
+	int canvasY;		//敵の描画位置Y
+	int shakeOffsetX;	//振動時の描画座標X
+	int shakeOffsetY;	//振動時の描画座標Y
 
 	int hp_;				//HP
 	int hpMax_;				//HPの最大値

@@ -10,6 +10,7 @@ public:
 	{
 		NON,
 
+		WAIT,
 		MOVE,
 		JUMP,
 		DASH,
@@ -21,11 +22,14 @@ public:
 	void Update() override;
 	void Draw() const override;
 	void BossAppear();
-	void BossMove();
+	void Wait();
+	void Move();
 	void Jump();
 	void Dash();
 	void BossStateChange();
+	void SelectNextState();
 private:
 	BOSS_STATE bossState_;
 	int stateChangeTimer;
+	float rotateSpeed;
 };

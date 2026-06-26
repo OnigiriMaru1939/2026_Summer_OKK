@@ -14,6 +14,8 @@ EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, float x, float y)
 	, vy_(0.0f)
 	, canvasX(0)
 	, canvasY(0)
+	, shakeOffsetX(0)
+	, shakeOffsetY(0)
 	, scale(1.0f)
 	, angle(0.0f)
 	, gravity(0.5f)
@@ -124,6 +126,20 @@ void EnemyBase::NoDamageCountDown()
 	}
 }
 
+//敵の振動処理
+void EnemyBase::EnemyShake()
+{
+	shakeOffsetX = (GetRand(20) - 10);
+	shakeOffsetY = (GetRand(20) - 10);
+}
+
+//敵の振動リセット処理
+void EnemyBase::EnemyResetShake()
+{
+	shakeOffsetX = 0;
+	shakeOffsetY = 0;
+}
+
 void EnemyBase::ApplyDamage(int dmg)
 {
 	if (!isAlive_) 	return;				//生存していない場合はダメージを受けない
@@ -199,8 +215,8 @@ void EnemyBase::Draw() const
 	int handle = 0;
 	handle = image_->GetHandle(); //画像のハンドルを取得
 	DrawRotaGraph(
-		x_ - stage_->GetScrollX(),
-		y_ - stage_->GetScrollY(),
+		x_ - stage_->GetScrollX() + shakeOffsetX,
+		y_ - stage_->GetScrollY() + shakeOffsetY,
 		scale,
 		angle,
 		handle,
