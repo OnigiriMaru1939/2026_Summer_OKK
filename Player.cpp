@@ -104,6 +104,7 @@ Player::Player(FileManager& fileMng, Stage* stage, SceneGame& game) : fileManage
 	jumpFlag = false;
 	sodaAttackFlag = false;
 	canMoveFlag = true;
+	stunFlag = false;
 }
 
 Player::~Player()
@@ -181,6 +182,13 @@ void Player::Update()
 	if (playerSpeed < ATTACK_SPEED_THRESHOLD)
 	{
 		sodaAttackFlag = false;
+	}
+
+	//気絶からの復帰
+	if (stunFlag && noDamageTime <= 0)
+	{
+		stunFlag = false;
+		canMoveFlag = true;
 	}
 
 	//重力処理
@@ -600,6 +608,11 @@ void Player::PlayerExplosion()
 {
 	Damage(10.0f);
 	velocityY = -15.0f;
+
+	//気絶時間２秒
+	noDamageTime = 120;
+	stunFlag = true;
+	canMoveFlag = false;
 }
 
 //プレイヤーのノックバック処理

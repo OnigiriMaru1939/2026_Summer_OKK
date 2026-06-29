@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "EnemyBase.h"
 #include "Enemy1.h"
+#include "Enemy2.h"
 #include "Boss1.h"
 #include "Boss2.h"
 #include "ItemBase.h"
@@ -711,6 +712,9 @@ void SceneGame::AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y)
 	{
 	case EnemyBase::ENEMY_TYPE::E_TYPE_1:
 		enemyList_.push_back(std::make_shared<Enemy1>(fileMng_, stage_.get(), x, y));
+		break;
+	case EnemyBase::ENEMY_TYPE::E_TYPE_2:
+		enemyList_.push_back(std::make_shared<Enemy2>(fileMng_, stage_.get(), x, y));
 		break;
 	default:
 		break;
