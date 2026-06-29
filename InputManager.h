@@ -130,6 +130,20 @@ public:
 	// 振動機能
 	void StartVibration(int Power, int Time = -1, int EffectIndex = -1, int padNo = 0);
 	void StopVibration(int padNo = 0);
+
+	// キー入力
+	bool IsKeyPressed(int keyCode) const;
+	bool IsKeyTriggered(int keyCode) const;
+	bool IsKeyReleased(int keyCode) const;
+
+	// マウス入力
+	bool IsMousePressed(int button) const;
+	bool IsMouseTriggered(int button) const;
+	bool IsMouseReleased(int button) const;
+	// パッド入力
+	bool IsPadPressed(int no, PadButton btn) const;
+	bool IsPadTriggered(int no, PadButton btn) const;
+	bool IsPadReleased(int no, PadButton btn) const;
 private:
 	struct InputLayer
 	{
@@ -179,19 +193,7 @@ private:
 	bool IsInputTriggered(int current, int previous) const { return current == 1; }
 	bool IsInputPressed(int current) const { return current > 0; }
 	bool IsInputReleased(int current, int previous) const { return current == 0 && previous > 0; }
-	// キー入力
-	bool IsKeyPressed(int keyCode) const;
-	bool IsKeyTriggered(int keyCode) const;
-	bool IsKeyReleased(int keyCode) const;
 
-	// マウス入力
-	bool IsMousePressed(int button) const;
-	bool IsMouseTriggered(int button) const;
-	bool IsMouseReleased(int button) const;
-	// パッド入力
-	bool IsPadPressed(int no, PadButton btn) const;
-	bool IsPadTriggered(int no, PadButton btn) const;
-	bool IsPadReleased(int no, PadButton btn) const;
 
 	// 登録されたコールバックを呼び出す関数
 	void DispatchCallbacks();

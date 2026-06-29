@@ -9,6 +9,12 @@ class ImageFile;
 class EnemyBase
 {
 public:
+	int _networkId;
+
+	int GetNetworkId() const { return _networkId; }
+	void SetNetworkId(int id) { _networkId = id; }
+	void SyncNetworkState(float x, float y, int hp, bool isAlive, int noDamageTime);
+
 	enum class ENEMY_TYPE
 	{
 		E_TYPE_NON,
@@ -68,6 +74,7 @@ public:
 	//フラグを取得
 	bool GetJumpFlag() const { return jumpFlag; }
 	bool GetAliveFlag() const { return isAlive_; }
+	int GetNoDamageTime() const { return _noDamageTime; }
 	void SetAppearFlag(bool flag) { isAppearing = flag; } //出現フラグを設定する関数
 protected:
 	FileManager& fileManager_;
@@ -86,7 +93,7 @@ protected:
 	float angle;		//回転角度
 	float gravity;		//重力加速度
 	int AttckDamage;	//攻撃力
-	int noDamageTime;	//無敵時間
+	int _noDamageTime;	//無敵時間
 	int noDamageMaxTime;//無敵時間の最大値
 
 	int width_;			//画像の幅

@@ -66,13 +66,19 @@ public:
 	float sodaHeatRatio;		//炭酸ヒートゲージの割合
 	float sodaShakeGauge;		//炭酸蓄積ゲージ
 	float sodaHeatShakeGauge;	//炭酸ヒートゲージ
-	int noDamageTime;			//無敵時間
+  
+	int _noDamageTime;			//無敵時間
 	int noDamageMaxTime;		//無敵時間の最大値
 	int sodaGaugeDecayTime;		//炭酸ゲージ減衰待機タイマー
 	int attackTimer;			//攻撃時間
 
+	static constexpr float SODA_SHAKE_GAUGE_MAX = 1000.0f;	//炭酸蓄積ゲージの最大値
+	float GetWorldX() const { return posX; }
+	float GetWorldY() const { return posY; }
 	float GetX() const { return canvasX; }
 	float GetY() const { return canvasY; }
+	float GetVX() const { return velocityX; }
+	float GetVY() const { return velocityY; }
 	int GetWidth() const { return width_; }				//プレイヤーの画像の幅を取得
 	int GetHeight() const { return height_; }			//プレイヤーの画像の高さを取得
 	float GetSpeed() const { return playerSpeed; };		//プレイヤーの速度を取得

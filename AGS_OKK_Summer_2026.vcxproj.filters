@@ -59,14 +59,18 @@
       <Filter>Enemy\Boss1</Filter>
     </ClCompile>
     <ClCompile Include="GimmickBase.cpp">
-      <Filter>GimmickBase</Filter>
+      <Filter>Gimmick</Filter>
     </ClCompile>
     <ClCompile Include="GimmickTeleport.cpp">
-      <Filter>GimmickBase\Gimmicks</Filter>
+      <Filter>Gimmick\Teleport</Filter>
     </ClCompile>
     <ClCompile Include="ItemBase.cpp" />
     <ClCompile Include="Mentos.cpp" />
-    <ClCompile Include="Boss2.cpp" />
+    <ClCompile Include="Boss2.cpp">
+      <Filter>Enemy\Boss2</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkManager.cpp" />
+    <ClCompile Include="RemotePlayer.cpp" />
     <ClCompile Include="Enemy2.cpp" />
     <ClCompile Include="Enemy3.cpp" />
   </ItemGroup>
@@ -152,10 +156,13 @@
     <Filter Include="Manager\File\Resource\Font">
       <UniqueIdentifier>{74725412-b6c3-4a95-8e6c-412b4e40d955}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GimmickBase">
+    <Filter Include="Enemy\Boss2">
+      <UniqueIdentifier>{efc01749-120e-405c-bb3e-8917d138e092}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Gimmick">
       <UniqueIdentifier>{923b7171-7e42-4618-9020-a705c57d4141}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GimmickBase\Gimmicks">
+    <Filter Include="Gimmick\Teleport">
       <UniqueIdentifier>{e06c239a-4c0a-4721-8b29-4f32e99d22b6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -254,14 +261,19 @@
       <Filter>Manager\File\Resource\Font</Filter>
     </ClInclude>
     <ClInclude Include="GimmickBase.h">
-      <Filter>GimmickBase</Filter>
+      <Filter>Gimmick</Filter>
     </ClInclude>
     <ClInclude Include="GimmickTeleport.h">
-      <Filter>GimmickBase\Gimmicks</Filter>
+      <Filter>Gimmick\Teleport</Filter>
     </ClInclude>
     <ClInclude Include="ItemBase.h" />
     <ClInclude Include="Mentos.h" />
-    <ClInclude Include="Boss2.h" />
+    <ClInclude Include="Boss2.h">
+      <Filter>Enemy\Boss2</Filter>
+    </ClInclude>
+    <ClInclude Include="Protocol.h" />
+    <ClInclude Include="NetworkManager.h" />
+    <ClInclude Include="RemotePlayer.h" />
     <ClInclude Include="Enemy2.h" />
     <ClInclude Include="Enemy3.h" />
   </ItemGroup>

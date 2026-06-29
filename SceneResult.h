@@ -5,12 +5,15 @@
 #include "SoundFile.h"
 #include "FontFile.h"
 #include "SceneManager.h"
+#include "NetworkManager.h"
+
 enum class NextScene
 {
 	Next = 0,
 	Retry,
 	StageSelect,
 	Title,
+	Result,
 	Max
 };
 
@@ -56,6 +59,8 @@ private:
 
 	float _fadeInAlpha;
 	float _fadeOutAlpha;
+
+	NetworkManager _networkMng;
 
 	void MoveSelect(float moveValue);
 };

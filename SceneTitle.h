@@ -11,7 +11,7 @@ class SceneTitle :
 {
 private:
 	static constexpr int LOGO_Y = 400;
-	static constexpr int START_Y = 880;
+	static constexpr int START_Y = 840;
 public:
 	SceneTitle(FileManager& fileMng, SceneManager& sceneMng);
 
@@ -31,5 +31,7 @@ private:
 	std::shared_ptr<SoundFile> _decideSE;
 
 	float _fadeAlpha;
+
+	int _selectedIndex = 0;
 };
 

@@ -93,7 +93,7 @@ Player::Player(FileManager& fileMng, Stage* stage, SceneGame& game) : fileManage
 	sodaHeatShakeGauge = 0.0f;
 	playerShakePower = 0.0f;
 	sodaPower = 20.0f;
-	noDamageTime = 0;
+	_noDamageTime = 0;
 	noDamageMaxTime = 180;
 	sodaGaugeDecayTime = 30;
 	attackTimer = 0;
@@ -167,9 +167,9 @@ void Player::Update()
 	sodaHeatRatio = sodaHeatShakeGauge / SODA_HEAT_SHAKE_GAUGE_MAX;
 
 	//無敵時間のカウントダウン
-	if (noDamageTime > 0)
+	if (_noDamageTime > 0)
 	{
-		noDamageTime--;
+		_noDamageTime--;
 	}
 
 	//炭酸ゲージ減衰待機タイマー
@@ -310,9 +310,9 @@ void Player::Draw()
 	bool drawPlayer = true;
 
 	//無敵時間中は点滅させる
-	if (noDamageTime > 0)
+	if (_noDamageTime > 0)
 	{
-		if ((noDamageTime / 4) % 2 == 0)
+		if ((_noDamageTime / 4) % 2 == 0)
 		{
 			drawPlayer = false;
 		}
@@ -377,9 +377,10 @@ void Player::Draw()
 	DrawCircle(static_cast<int>(canvasX), static_cast<int>(canvasY), 3, 0X0000ff);
 	// デバッグ
 	DrawFormatString(1000, 1000, GetColor(255, 0, 0), "SodaGauge: %d", static_cast<int>(sodaShakeGauge));
-	DrawFormatString(1000, 1020, GetColor(255, 0, 0), "HeatGauge: %d", static_cast<int>(sodaHeatShakeGauge));
-	DrawFormatString(1000, 1040, GetColor(255, 0, 0), "noDamageTime: %d", noDamageTime);
-	DrawFormatString(1000, 1060, GetColor(255, 0, 0), "playerSpeed: %d", static_cast<int>(playerSpeed));
+	DrawFormatString(1000, 1020, GetColor(255, 0, 0), "_noDamageTime: %d", static_cast<int>(_noDamageTime));
+	DrawFormatString(1000, 1040, GetColor(255, 0, 0), "sodaAttackFlag: %d", sodaAttackFlag);
+	DrawFormatString(1000, 1060, GetColor(255, 0, 0), "HeatGauge: %d", static_cast<int>(sodaHeatShakeGauge));
+	DrawFormatString(1000, 1080, GetColor(255, 0, 0), "playerSpeed: %d", static_cast<int>(playerSpeed));
 	DrawFormatString(1150, 1000, GetColor(255, 0, 0), "playerJumpMag: %.2f", playerJumpMag);
 	DrawFormatString(1150, 1020, GetColor(255, 0, 0), "sodaAttackFlag: %d", sodaAttackFlag);
 
@@ -510,7 +511,7 @@ void Player::SodaAttack(float power)
 void Player::Damage(float dmg)
 {
 	//無敵時間中はダメージを受けない
-	if (noDamageTime > 0)return;
+	if (_noDamageTime > 0)return;
 
 	playerHp -= dmg;
 	if (playerHp <= 0)
@@ -519,7 +520,7 @@ void Player::Damage(float dmg)
 		aliveFlag = false; //プレイヤーが死んだ
 	}
 
-	noDamageTime = noDamageMaxTime; //無敵時間をリセット
+	_noDamageTime = noDamageMaxTime; //無敵時間をリセット
 }
 
 //マウスを振ったり、スティックを動かすと炭酸ゲージが溜まる

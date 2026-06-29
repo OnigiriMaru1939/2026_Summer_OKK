@@ -15,6 +15,7 @@
 #include "StageConfig.h"
 #include "StageConfigTablle.h"
 #include "SceneManager.h"
+#include "SceneResult.h"
 #include "Fonts.h"
 #include "GimmickBase.h"
 #include "GimmickTeleport.h"
@@ -23,7 +24,7 @@
 // 静的変数の定義
 int SceneGame::selectedStageIndex_ = 1;
 
-SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(fileMng, sceneMng)
+SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng, bool isHost) : SceneSuper(fileMng, sceneMng), isHost_(isHost)
 {
 	_bossNameFont = fileMng.CreateFontFM(Fonts::DotGothic16::PATH,
 										 Fonts::DotGothic16::NAME,
@@ -49,6 +50,7 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(
 	_isClear = false;
 
 	_gameScreen = fileMng.CreateScreenFM("gameScreen", Application::SCREEN_WID, Application::SCREEN_HIG, true);
+	_offScreen = fileMng.CreateScreenFM("offScreen", Application::SCREEN_WID, Application::SCREEN_HIG, true);
 
 	highBrightScreen = fileMng.CreateScreenFM("highBrightScreen", Application::SCREEN_WID, Application::SCREEN_HIG, false);
 	downScaleScreen = fileMng.CreateScreenFM("downScaleScreen", DOWN_SCALE_SCREEN_W, DOWN_SCALE_SCREEN_H, false);
@@ -58,22 +60,7 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(
 	filterRatio = 200;
 	_fadeAlpha = 255.0f;
 
-	// デバッグ
-	InputManager::GetInstance().SetTriggerCallback(ActionID::Cancel, 
-												   [this]()
-												   {
-													   if (!isTransition)
-													   {
-														   _isClear = false;
-														   ClearResult result;
-														   result.time = 0.0f;
-														   result.stageIndex = selectedStageIndex_;
-														   sceneMng_.SetClearResult(result);
-														   sceneMng_.SetGameResult(_isClear); // ゲームオーバー
-														   SetNextScene(SceneID::RESULT);
-														   isEnd = true;
-													   }
-												   });
+
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Pause,
 												   [this]()
 												   {
@@ -82,8 +69,10 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(
 														   sceneMng_.PushScene(SceneID::PAUSE);
 													   }
 												   });
-	_offScreen = fileMng.CreateScreenFM("offScreen", Application::SCREEN_WID, Application::SCREEN_HIG, true);
+
 	sceneMng_.SetTransitionDuration(45.0f);
+	std::string ip = GetConfigValue("remote_ip");
+	networkManager_.Initialize(isHost, ip);
 }
 
 SceneGame::~SceneGame()
@@ -113,10 +102,57 @@ void SceneGame::Update()
 	}
 	clearTime += 1.0f / 60.0f; // クリアタイムの更新
 
+
+
+	networkManager_.ReceiveData(&remotePlayer_, &enemyList_, this);
+	int outNextScene;
+	if (networkManager_.ReceiveChangeScene(outNextScene) && outNextScene == 4)
+	{
+		_isClear = false;
+		ClearResult result;
+		result.time = 0.0f;
+		result.stageIndex = selectedStageIndex_;
+		sceneMng_.SetTransitionDuration(45.0f);
+		sceneMng_.SetClearResult(result);
+		sceneMng_.SetGameResult(_isClear); // ゲームオーバー
+		SetNextScene(SceneID::RESULT);
+		isEnd = true;
+	}
+
 	// プレイヤーの更新
 	UpdatePlayer();
+
+	PlayerPacket p;
+	p.type = PACKET_SYNC_PLAYER;
+	p.posX = player_->GetWorldX();
+	p.posY = player_->GetWorldY();
+	p.vx = player_->GetVX();
+	p.vy = player_->GetVY();
+	p.isAttack = player_->GetAliveFlag();
+	networkManager_.SendPlayerState(p);
+
 	//敵の更新
 	UpdateEnemy();
+
+	if (isHost_)
+	{
+		for (auto& enemy : enemyList_)
+		{
+			if (enemy && enemy->IsAlive())
+			{
+				EnemyPacket ep;
+				ep.type = PACKET_SYNC_ENEMY;
+				ep.enemyID = enemy->GetNetworkId();
+				ep.enemyType = static_cast<int>(enemy->GetEnemyType());
+				ep.posX = enemy->GetX();
+				ep.posY = enemy->GetY();
+				ep.hp = enemy->GetHp();
+				ep.isAlive = enemy->IsAlive();
+				ep.noDamageTime = enemy->GetNoDamageTime();
+				networkManager_.SendEnemyState(ep);
+			}
+		}
+	}
 
 	// ★ ギミックの更新（必要に応じて）やリストのクリーンアップ
 	for (auto& gimmick : gimmickList_)
@@ -138,6 +174,15 @@ void SceneGame::Update()
 	CheckBossSpawn();
 	//ボスイベントの処理
 	BossEvent();
+	// ボスイベントの状態に応じた制限
+	if (bossEventState == BossEventState::WARNING)
+	{
+		player_->SetCanMoveFlag(false);
+	}
+	else if (bossEventState == BossEventState::BATTLE)
+	{
+		player_->SetCanMoveFlag(true);
+	}
 	//プレイヤーと敵の衝突判定
 	CheckPlayerEnemyCollision();
 	//プレイヤーとギミックの衝突判定
@@ -179,6 +224,7 @@ void SceneGame::Draw()
 	
 	//プレイヤーを描画
 	player_->Draw();
+	remotePlayer_.Draw(stage_->GetScrollX(), stage_->GetScrollY());
 	DrawClearTransition();
 	SetDrawScreen(_offScreen->GetHandle());
 	ClearDrawScreen();
@@ -243,7 +289,7 @@ void SceneGame::Draw()
 	}
 	
 	DrawGraph(0, 0, _offScreen->GetHandle(), TRUE);
-
+	DrawFormatString(500, 500, 0x00ff00, isHost_ ? "Host" : "not Host");
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(_fadeAlpha));
 	if (IsClear())
@@ -262,7 +308,6 @@ void SceneGame::Draw()
 void SceneGame::BossEventDraw()
 {
 	auto boss = GetBoss();
-
 	int strWidth = 0;
 
 	if (boss)
@@ -276,14 +321,16 @@ void SceneGame::BossEventDraw()
 
 	if (bossEventState == BossEventState::UIDRAW)
 	{
-		DrawStringToHandle(
-			(Application::SCREEN_WID - strWidth) / 2,
-			20,
-			boss->GetName().c_str(),
-			GetColor(255, 255, 255),
-			_bossNameFont->GetHandle()
-		);
-
+		if (boss)
+		{
+			DrawStringToHandle(
+				(Application::SCREEN_WID - strWidth) / 2,
+				20,
+				boss->GetName().c_str(),
+				GetColor(255, 255, 255),
+				_bossNameFont->GetHandle()
+			);
+		}
 		DrawGauge(100, 90, 1720, 50, bossHpGauge, bossHpGaugeMax, GetColor(255, 0, 0));
 	}
 
@@ -331,8 +378,6 @@ void SceneGame::BossEventDraw()
 			_warningFont->GetHandle()
 			);
 	}
-
-
 }
 
 //ゲージの描画
@@ -407,6 +452,11 @@ void SceneGame::UpdatePlayer()
 		sceneMng_.SetGameResult(_isClear); // ゲームオーバー
 		SetNextScene(SceneID::RESULT);
 		isEnd = true;
+
+		ChangeScenePacket csp;
+		csp.type = PACKET_CHANGE_SCENE;
+		csp.nextScene = static_cast<int>(NextScene::Result);
+		networkManager_.SendChangeScene(csp);
 	}
 }
 
@@ -417,10 +467,20 @@ void SceneGame::UpdateEnemy()
 	{
 		if (enemy->IsAlive())
 		{
-			enemy->Update();
+			if (isHost_)
+			{
+				enemy->Update();
+			}
 		}
 		if (!enemy->IsAlive())
 		{
+			if (isHost_)
+			{
+				EnemyDeathPacket edp;
+				edp.type = PACKET_ENEMY_DEATH;
+				edp.enemyID = enemy->GetNetworkId();
+				networkManager_.SendEnemyDeath(edp);
+			}
 			// 敵が死んでいる場合はリストから削除
 			// ボスを倒したらトランジション
 			if (std::dynamic_pointer_cast<IBoss>(enemy) && !_isBossDefeatedSequence)
@@ -501,12 +561,47 @@ void SceneGame::CheckPlayerEnemyCollision()
 		}
 		else if (hit && player_->GetAttakFlag() && player_->GetSpeed() >= Player::ATTACK_SPEED_THRESHOLD)
 		{
-			enemy->ApplyDamage(static_cast<int>(player_->GetAttackDamage()));
+			if (isHost_)
+			{
+				enemy->ApplyDamage(static_cast<int>(player_->GetAttackDamage()));
+				if (enemy->IsAlive())
+				{
+					player_->PlayerKnockBack(enemy->GetX(), enemy->GetY(), 10.0f);
+				}
+			}
+			else
+			{
+				DamagePacket dp;
+				dp.type = PACKET_APPLY_DAMAGE;
+				dp.enemyID = enemy->GetNetworkId();
+				dp.damage = static_cast<int>(player_->GetAttackDamage());
+				networkManager_.SendDamage(dp);
+			}
+
+		}
+	}
+}
+
+void SceneGame::ApplyDamageToEnemy(int enemyID, int damage)
+{
+	for (auto& enemy : enemyList_)
+	{
+		if (enemy && enemy->GetNetworkId() == enemyID)
+		{
+			enemy->ApplyDamage(damage);
+			// ダメージを与えたら、自動的に次のフレームの同期で 
+			// 敵のHPがクライアントに伝わります
 			if (enemy->IsAlive())
 			{
-				//プレイヤーをノックバックさせる
-				player_->PlayerKnockBack(enemy->GetX(), enemy->GetY(), 10.0f);
+				// ホストからクライアントへヒット通知
+				HitConfirmedPacket hcp;
+				hcp.type = PACKET_HIT_CONFIRMED;
+				hcp.enemyID = enemyID;
+				hcp.enemyX = enemy->GetX();
+				hcp.enemyY = enemy->GetY();
+				networkManager_.SendHitConfirmed(hcp);
 			}
+			break;
 		}
 	}
 }
@@ -581,6 +676,7 @@ RECT SceneGame::GetBossArea() const
 }
 
 //ボスの生成判定
+//ボスの生成判定
 void SceneGame::CheckBossSpawn()
 {
 	if (isBossSpawned_) return;
@@ -590,17 +686,25 @@ void SceneGame::CheckBossSpawn()
 	float x = player_->GetX();
 	float y = player_->GetY();
 
-	if (x >= bossArea.left - stage_->GetScrollX() &&
-		x <= bossArea.right - stage_->GetScrollX() &&
-		y >= bossArea.top - stage_->GetScrollY() &&
-		y <= bossArea.bottom - stage_->GetScrollY())
+	// プレイヤーがボスエリアに入ったかどうかの判定
+	bool isEnterBossArea = (x >= bossArea.left - stage_->GetScrollX() &&
+							x <= bossArea.right - stage_->GetScrollX() &&
+							y >= bossArea.top - stage_->GetScrollY() &&
+							y <= bossArea.bottom - stage_->GetScrollY());
+
+	if (isEnterBossArea)
 	{
-		bossEventState = BossEventState::WARNING;
-		bossTimer = 0;
-
-		player_->SetCanMoveFlag(false); // プレイヤーの移動を制限
-
-		isBossSpawned_ = true;
+		if (isHost_)
+		{
+			StartBossEvent();
+		}
+		else
+		{
+			// クライアントはホストに開始を通知
+			BossRequestPacket req;
+			req.type = PACKET_REQUEST_BOSS_START;
+			networkManager_.SendBossRequest(req);
+		}
 	}
 }
 
@@ -628,91 +732,166 @@ void SceneGame::BossEvent()
 {
 	auto boss = GetBoss();
 
-	switch (bossEventState)
+	if (isHost_)
 	{
-		case SceneGame::BossEventState::NONE:
-			break;
+		BossEventState previousState = bossEventState;
 
-		case SceneGame::BossEventState::WARNING:
-			bossTimer++;
-			if (bossTimer > 180)
-			{
-				switch (selectedStageIndex_)
+		switch (bossEventState)
+		{
+			case SceneGame::BossEventState::NONE:
+				break;
+
+			case SceneGame::BossEventState::WARNING:
+				bossTimer++;
+				if (bossTimer > 180)
 				{
-					case 1:
-						AddBoss(
-							EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1,
-							1800.0f,
-							3300.0f
-						);
-						break;
+					switch (selectedStageIndex_)
+					{
+						case 1:
+							AddBoss(
+								EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1,
+								1800.0f,
+								3300.0f
+							);
+							break;
 
-					case 2:
-						AddBoss(
-							EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2,
-							950.0f,
-							5000.0f
-						);
-						break;
+						case 2:
+							AddBoss(
+								EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2,
+								950.0f,
+								5000.0f
+							);
+							break;
+					}
+					bossEventState = BossEventState::APPEAR;
+					bossTimer = 0;
 				}
-				bossEventState = BossEventState::APPEAR;
-				bossTimer = 0;
-			}
-			break;
+				break;
 
-		case SceneGame::BossEventState::APPEAR:
-			bossTimer++;
-			//2秒後にUIを表示
-			if (bossTimer > 120)
-			{
-				bossEventState = BossEventState::UIDRAW;
-
-				if (boss)
+			case SceneGame::BossEventState::APPEAR:
+				bossTimer++;
+				//2秒後にUIを表示
+				if (bossTimer > 120)
 				{
-					bossHpGauge = 0;
-					bossHpGaugeMax = boss->GetHpMax();
-				}
-				bossTimer = 0;
-			}
-			break;
+					bossEventState = BossEventState::UIDRAW;
 
-		case SceneGame::BossEventState::UIDRAW:
+					if (boss)
+					{
+						bossHpGauge = 0;
+						bossHpGaugeMax = boss->GetHpMax();
+					}
+					bossTimer = 0;
+				}
+				break;
+
+			case SceneGame::BossEventState::UIDRAW:
+				if (bossHpGauge < bossHpGaugeMax)
+				{
+					bossHpGauge += 2.0f;
+				}
+
+				if (bossHpGauge >= bossHpGaugeMax)
+				{
+					bossHpGauge = bossHpGaugeMax;
+					//player_->SetCanMoveFlag(true);
+
+					if (boss)
+					{
+						boss->SetAppearFlag(false);
+					}
+
+					bossEventState = BossEventState::BATTLE;
+				}
+
+				break;
+
+			case SceneGame::BossEventState::BATTLE:
+				break;
+
+			default:
+				break;
+		}
+
+		if (previousState != bossEventState)
+		{
+			BossEventPacket packet;
+			packet.type = PACKET_SYNC_EVENT;
+			packet.eventState = static_cast<int>(bossEventState);
+			networkManager_.SendBossEvent(packet);
+		}
+	}
+	else
+	{
+		int hostEventState = remotePlayer_.GetBossEventState();
+		BossEventState newBossState = static_cast<BossEventState>(hostEventState);
+
+		if (bossEventState != newBossState)
+		{
+			switch (newBossState)
+			{
+				case SceneGame::BossEventState::WARNING:
+					bossTimer = 0;
+					break;
+				case SceneGame::BossEventState::APPEAR:
+					switch (selectedStageIndex_)
+					{
+						case 1:
+							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1, 1800.0f,200.0f);
+							break;
+						case 2:
+							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2, 950.0f,5000.0f);
+							break;
+					}
+					bossTimer = 0;
+					break;
+				case SceneGame::BossEventState::UIDRAW:
+					// ホストがUIDRAWに移行したタイミングでHPゲージの準備
+					boss = GetBoss(); // 生成された直後なので再取得
+					if (boss)
+					{
+						bossHpGauge = 0;
+						bossHpGaugeMax = boss->GetHpMax();
+					}
+					bossTimer = 0;
+					break;
+
+				case SceneGame::BossEventState::BATTLE:
+					// ホストがBATTLEに移行したタイミング
+					bossHpGauge = bossHpGaugeMax; // 念のためMAXで固定
+					//player_->SetCanMoveFlag(true);
+					boss = GetBoss();
+					if (boss)
+					{
+						boss->SetAppearFlag(false);
+					}
+					break;
+			}
+			bossEventState = newBossState;
+		}
+
+		if (bossEventState == SceneGame::BossEventState::WARNING || bossEventState == SceneGame::BossEventState::APPEAR)
+		{
+			bossTimer++;
+		}
+		else if (bossEventState == SceneGame::BossEventState::UIDRAW)
+		{
 			if (bossHpGauge < bossHpGaugeMax)
 			{
 				bossHpGauge += 2.0f;
 			}
-
-			if (bossHpGauge >= bossHpGaugeMax)
-			{
-				bossHpGauge = bossHpGaugeMax;
-
-				player_->SetCanMoveFlag(true);
-
-				if (boss)
-				{
-					boss->SetAppearFlag(false);
-				}
-
-				bossEventState = BossEventState::BATTLE;
-			}
-
-			break;
-
-		case SceneGame::BossEventState::BATTLE:
-			break;
-
-		default:
-			break;
+		}
 	}
 }
 
 //敵生成関数(雑魚敵)
 void SceneGame::AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y)
 {
+	std::shared_ptr<EnemyBase> newEnemy = nullptr;
+
 	switch (type)
 	{
 	case EnemyBase::ENEMY_TYPE::E_TYPE_1:
-		enemyList_.push_back(std::make_shared<Enemy1>(fileMng_, stage_.get(), x, y));
+		newEnemy = std::make_shared<Enemy1>(fileMng_, stage_.get(), x, y);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_2:
 		enemyList_.push_back(std::make_shared<Enemy2>(fileMng_, stage_.get(), x, y));
@@ -723,21 +902,37 @@ void SceneGame::AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y)
 	default:
 		break;
 	}
+
+	if (newEnemy)
+	{
+		newEnemy->SetNetworkId(_nextEnemyId);
+		_nextEnemyId++;
+		enemyList_.push_back(newEnemy);
+	}
 }
 
 //敵生成関数(ボス敵)
 void SceneGame::AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y)
 {
+	std::shared_ptr<EnemyBase> newBoss = nullptr;
+
 	switch (type)
 	{
 	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1:
-		enemyList_.push_back(std::make_shared<Boss1>(fileMng_, stage_.get(), x, y));
+		newBoss = std::make_shared<Boss1>(fileMng_, stage_.get(), x, y);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2:
-		enemyList_.push_back(std::make_shared<Boss2>(fileMng_, stage_.get(), x, y));
+		newBoss = std::make_shared<Boss2>(fileMng_, stage_.get(), x, y);
 		break;
 	default:
 		break;
+	}
+
+	if (newBoss)
+	{
+		newBoss->SetNetworkId(_nextEnemyId);
+		_nextEnemyId++;
+		enemyList_.push_back(newBoss);
 	}
 }
 
@@ -783,4 +978,20 @@ void SceneGame::TransitionIn(float t)
 {
 	float e = EaseInCubic(1 - t);
 	_fadeAlpha = e * 255.0f;
+}
+
+void SceneGame::StartBossEvent()
+{
+	if (isBossSpawned_) return;
+
+	bossEventState = BossEventState::WARNING;
+	bossTimer = 0;
+	//player_->SetCanMoveFlag(false);
+	isBossSpawned_ = true;
+
+	// 全クライアントへ開始命令を同期
+	BossEventPacket packet;
+	packet.type = PACKET_SYNC_EVENT;
+	packet.eventState = static_cast<int>(BossEventState::WARNING);
+	networkManager_.SendBossEvent(packet);
 }

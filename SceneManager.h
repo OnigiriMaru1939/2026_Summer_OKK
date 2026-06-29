@@ -41,14 +41,17 @@ public:
 	void SetClearResult(const ClearResult& result);
 	void SetTransitionDuration(float duration);
 
+	void SetIsHost(bool isHost) { _isHost = isHost; }
+	bool GetIsHost() const { return _isHost; }
+
 	void PushScene(SceneSuper::SceneID sceneID);
 	void PopScene();
 
 	bool IsTransitioning() const { return transition_.state != TransitionState::None; }
 
 private:
-	std::unique_ptr<SceneSuper> CreateScene(SceneSuper::SceneID sceneID);
-	void ChangeScene(SceneSuper::SceneID nextSceneID);
+	std::unique_ptr<SceneSuper> CreateScene(SceneSuper::SceneID sceneID, bool isHost = true);
+	void ChangeScene(SceneSuper::SceneID nextSceneID, bool isHost = true);
 
 	void UpdateTransition();
 
@@ -58,6 +61,7 @@ private:
 
 	bool isExit;
 	bool _isClear;
+	bool _isHost = true;
 
 	Transition transition_;
 

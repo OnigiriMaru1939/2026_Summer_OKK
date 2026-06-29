@@ -32,23 +32,34 @@ SceneResult::SceneResult(FileManager& fileMng, bool isClear, ClearResult& result
 													   if (!isTransition)
 													   {
 														   _decideSE->PlayOneShot();
+														   SceneID scene = SceneID::NONE;
 														   switch (static_cast<NextScene>(_selectedNext))
 														   {
 															   case NextScene::Next:
 																   SceneGame::selectedStageIndex_++;
-																   SetNextScene(SceneID::GAME);
+																   scene = SceneID::GAME;
+																   SetNextScene(scene);
 																   break;
 															   case NextScene::Retry:
-																   SetNextScene(SceneID::GAME);
+																   scene = SceneID::GAME;
+																   SetNextScene(scene);
 																   break;
 															   case NextScene::StageSelect:
-																   SetNextScene(SceneID::STAGE_SELECT);
+																   scene = SceneID::STAGE_SELECT;
+																   SetNextScene(scene);
 																   break;
 															   case NextScene::Title:
-																   SetNextScene(SceneID::TITLE);
+																   scene = SceneID::TITLE;
+																   SetNextScene(scene);
 																   break;
 														   }
-
+														   if (scene != SceneID::NONE)
+														   {
+															   ChangeScenePacket csp;
+															   csp.type = PACKET_CHANGE_SCENE;
+															   csp.nextScene = static_cast<int>(_selectedNext);
+															   _networkMng.SendChangeScene(csp);
+														   }
 														   isEnd = true;
 													   }
 												   });
@@ -63,6 +74,9 @@ SceneResult::SceneResult(FileManager& fileMng, bool isClear, ClearResult& result
 												   });
 
 	sceneMng.SetTransitionDuration(45.0f);
+	bool isHost = sceneMng.GetIsHost();
+	std::string ip = GetConfigValue("remote_ip");
+	_networkMng.Initialize(isHost, ip);
 }
 
 SceneResult::~SceneResult()
@@ -72,7 +86,38 @@ SceneResult::~SceneResult()
 
 void SceneResult::Update()
 {
-
+	_networkMng.ReceiveData();
+	int nextScene;
+	if (_networkMng.ReceiveChangeScene(nextScene))
+	{
+		_decideSE->PlayOneShot();
+		SceneID scene = SceneID::NONE;
+		switch (static_cast<NextScene>(nextScene))
+		{
+			case NextScene::Next:
+				SceneGame::selectedStageIndex_++;
+				scene = SceneID::GAME;
+				SetNextScene(scene);
+				break;
+			case NextScene::Retry:
+				scene = SceneID::GAME;
+				SetNextScene(scene);
+				break;
+			case NextScene::StageSelect:
+				scene = SceneID::STAGE_SELECT;
+				SetNextScene(scene);
+				break;
+			case NextScene::Title:
+				scene = SceneID::TITLE;
+				SetNextScene(scene);
+				break;
+			default:
+				return;
+				break;
+		}
+		isEnd = true;
+		return;
+	}
 }
 
 void SceneResult::Draw()

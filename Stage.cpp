@@ -227,7 +227,7 @@ void Stage::SetBgImage(const std::string& path)
 void Stage::SetMchipImage(const std::string& path)
 {
 	chipImg_ = fileMng_.LoadImageFM(path);
-	printfDx("マップチップ画像の読み込みに%s。\n Handle = %d", chipImg_ ? "成功しました" : "失敗しました", chipImg_->GetHandle());
+
 }
 
 int Stage::GetScrollX()
