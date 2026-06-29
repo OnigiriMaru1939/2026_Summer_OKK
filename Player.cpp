@@ -79,6 +79,7 @@ Player::Player(FileManager& fileMng, Stage* stage, SceneGame& game) : fileManage
 	shakeOffsetY = 0.0f;
 	angle = 0.0f;
 	sodaRatio = 0.0f;
+	sodaHeatRatio = 0.0f;
 	rotateSpeed = 0.05f;
 	jumpPower = 15.0f;
 	playerJumpMag = 1.5f;
@@ -88,13 +89,13 @@ Player::Player(FileManager& fileMng, Stage* stage, SceneGame& game) : fileManage
 	playerHp = playerHpMax;
 
 	//ゲージ等の初期化
-	sodaGauge = 1000.0f;
-	sodaGaugeMax = 1000.0f;
 	sodaShakeGauge = 0.0f;
+	sodaHeatShakeGauge = 0.0f;
 	playerShakePower = 0.0f;
 	sodaPower = 20.0f;
 	noDamageTime = 0;
 	noDamageMaxTime = 180;
+	sodaGaugeDecayTime = 30;
 	attackTimer = 0;
 	attackDamage = 20.0f;
 
@@ -160,10 +161,20 @@ void Player::Update()
 	//プレイヤー速度
 	playerSpeed = VelocityCalc();
 
+	//炭酸蓄積・炭酸ヒートゲージの割合
+	sodaRatio = sodaShakeGauge / SODA_SHAKE_GAUGE_MAX;
+	sodaHeatRatio = sodaHeatShakeGauge / SODA_HEAT_SHAKE_GAUGE_MAX;
+
 	//無敵時間のカウントダウン
 	if (noDamageTime > 0)
 	{
 		noDamageTime--;
+	}
+
+	//炭酸ゲージ減衰待機タイマー
+	if (sodaGaugeDecayTime > 0)
+	{
+		sodaGaugeDecayTime--;
 	}
 
 	//攻撃フラグの判定
@@ -179,6 +190,7 @@ void Player::Update()
 	{
 		//炭酸ゲージを0にする
 		sodaShakeGauge = 0.0f;
+		sodaHeatShakeGauge = 0.0f;
 
 		//振動停止
 		InputManager::GetInstance().StopVibration();
@@ -200,10 +212,17 @@ void Player::Update()
 
 	SodaMove();
 	
-	SodaGaugeCharge();
 	/*SodaShake();*/
 	//減衰（振らないと減る）
-	sodaShakeGauge -= 10.0f;
+	if (sodaGaugeDecayTime <= 0)
+	{
+		sodaHeatShakeGauge -= 10.0f;
+		if (sodaHeatShakeGauge <= 0)
+		{
+			sodaShakeGauge -= 10.0f;
+		}
+	}
+
 	if (sodaShakeGauge < 0.0f)
 	{
 		sodaShakeGauge = 0;
@@ -218,6 +237,11 @@ void Player::Update()
 		sodaChargeSE->SetVolume((int)(shakeRatio * 255));
 		sodaChargeSE->PlayLoop();
 	}
+	if (sodaHeatShakeGauge < 0.0f)
+	{
+		sodaHeatShakeGauge = 0;
+	}
+
 	if (auto emitter = sodaParticle.lock())
 	{
 		emitter->SetPosition(posX - sinf(angle) * width_, posY + cosf(angle) * height_);
@@ -288,6 +312,9 @@ void Player::Draw()
 
 	if (drawPlayer)
 	{
+		int greenBlue = static_cast<int>(255 * (1.0f - sodaHeatRatio));
+		SetDrawBright(255, greenBlue, greenBlue);
+
 		//プレイヤー画像を描画(回転可)
 		int handle = image_->GetHandle();
 		DrawRotaGraph(
@@ -299,6 +326,7 @@ void Player::Draw()
 			TRUE
 		);
 
+		SetDrawBright(255, 255, 255);
 	}
 
 	pMng->DrawAll(stage_->GetScrollX(), stage_->GetScrollY());
@@ -325,18 +353,27 @@ void Player::Draw()
 	DrawGauge(1350, 1000, 500, 40, playerHp, playerHpMax, GetColor(0, 255, 0), 0);        //プレイヤーのHPゲージ
 
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
 	//炭酸蓄積ゲージが0以上の場合のみ描画
 	if (sodaShakeGauge > 0 && canMoveFlag)
 	{
-		DrawGauge(static_cast<int>(canvasX) - 75, static_cast<int>(canvasY) - 50, 20, 100, sodaShakeGauge, SODA_SHAKE_GAUGE_MAX, GetColor(0, 0, 255), 1);        //炭酸蓄積ゲージ
+		//炭酸蓄積ゲージ
+		DrawGauge(static_cast<int>(canvasX) - 75, static_cast<int>(canvasY) - 50, 20, 100, sodaShakeGauge, SODA_SHAKE_GAUGE_MAX, GetColor(0, 0, 255), 1);
 	}
+	if (sodaHeatShakeGauge > 0 && canMoveFlag)
+	{
+		//炭酸ヒートゲージ
+		DrawGauge(static_cast<int>(canvasX) - 75, static_cast<int>(canvasY) - 50, 20, 100, sodaHeatShakeGauge, SODA_HEAT_SHAKE_GAUGE_MAX, GetColor(255, 0, 0), 1);
+	}
+
 	DrawCircle(static_cast<int>(canvasX), static_cast<int>(canvasY), 3, 0X0000ff);
 	// デバッグ
 	DrawFormatString(1000, 1000, GetColor(255, 0, 0), "SodaGauge: %d", static_cast<int>(sodaShakeGauge));
-	DrawFormatString(1000, 1020, GetColor(255, 0, 0), "noDamageTime: %d", static_cast<int>(noDamageTime));
-	DrawFormatString(1000, 1040, GetColor(255, 0, 0), "sodaAttackFlag: %d", sodaAttackFlag);
+	DrawFormatString(1000, 1020, GetColor(255, 0, 0), "HeatGauge: %d", static_cast<int>(sodaHeatShakeGauge));
+	DrawFormatString(1000, 1040, GetColor(255, 0, 0), "noDamageTime: %d", noDamageTime);
 	DrawFormatString(1000, 1060, GetColor(255, 0, 0), "playerSpeed: %d", static_cast<int>(playerSpeed));
 	DrawFormatString(1150, 1000, GetColor(255, 0, 0), "playerJumpMag: %.2f", playerJumpMag);
+	DrawFormatString(1150, 1020, GetColor(255, 0, 0), "sodaAttackFlag: %d", sodaAttackFlag);
 
 	DrawFormatString(0, 300, 0x00ff00, "PlayerPos X: %f,Y: %f", posX, posY);
 	DrawFormatString(0, 320, 0x00ff00, "PlayerMapChip X: %d,Y: %d", stage_->WorldToChipX(posX), stage_->WorldToChipY(posY));
@@ -345,31 +382,12 @@ void Player::Draw()
 	PlayerShake();
 }
 
-//炭酸残量ゲージを自動回復
-void Player::SodaGaugeCharge()
-{
-	sodaGauge += 0.1f;
-	//上限リミッター
-	if (sodaGauge > 100.0f) sodaGauge = 100.0f;
-}
-
 //重力処理
 void Player::AddGravity()
 {
 	velocityY += gravity;	//重力を速度に加算
-	//posX += velocityX;		//速度を位置に加算
-	//posY += velocityY;
 
-	velocityX *= AIR_RESUSTANCE;	//空気抵抗（X軸の速度を減衰）
-
-	// 地面判定（仮）
-	//if (posY > 500)
-	//{
-	//	posY = 500;
-	//	velocityX = 0;
-	//	velocityY = 0;
-	//	jumpFlag = false; 
-	//}
+	velocityX *= AIR_RESUSTANCE;	//空気抵抗
 }
 
 //ジャンプ処理・移動処理
@@ -417,6 +435,7 @@ void Player::MoveY()
 	}
 }
 
+//スペースキージャンプ処理
 void Player::SpaceJump()
 {
 	//移動禁止フラグが立っているときはジャンプできない
@@ -501,16 +520,30 @@ void Player::SodaShake()
 	//移動禁止フラグが立っているときはできない
 	if (!canMoveFlag) return;
 
+	//振ると減衰待機タイマーをリセットする
+	sodaGaugeDecayTime = 60;
+
 	//距離
 	float dist = InputManager::GetInstance().GetActionAxis(ActionID::Shake);
 	//printfDx("Shake Axis: %f\n", dist);
 	shakeMove = dist;
 
 	//ゲージ加算
-	sodaShakeGauge += shakeMove * 0.45f;
+	sodaShakeGauge += shakeMove * 0.1f;
+	if (sodaShakeGauge >= SODA_SHAKE_GAUGE_MAX)
+	{
+		sodaHeatShakeGauge += shakeMove * 0.2f;
+	}
 
 	//上限
 	if (sodaShakeGauge > SODA_SHAKE_GAUGE_MAX) sodaShakeGauge = SODA_SHAKE_GAUGE_MAX;
+
+	if (sodaHeatShakeGauge >= SODA_HEAT_SHAKE_GAUGE_MAX)
+	{
+		sodaShakeGauge = 0;
+		sodaHeatShakeGauge = 0;
+		PlayerExplosion();
+	}
 }
 
 //炭酸ジャンプ・攻撃処理
@@ -519,13 +552,10 @@ void Player::ClickSodaJump()
 	//移動禁止フラグが立っているときは攻撃できない
 	if (!canMoveFlag) return;
 
-	sodaRatio = sodaShakeGauge / sodaGaugeMax;
-
-	//炭酸蓄積ゲージが0より大きい場合、炭酸蓄積ゲージを減らす
 	if (sodaShakeGauge > 0)
 	{
-		//炭酸蓄積ゲージの割合を炭酸攻撃の威力に変換
-		sodaPower = sodaRatio * POWER_CONVERSION;
+		//炭酸蓄積・炭酸ヒートゲージの割合を炭酸攻撃の威力に変換
+		sodaPower = (sodaRatio + sodaHeatRatio) * POWER_CONVERSION;
 		float sodaMoveDist = sodaPower * playerJumpMag; //移動距離を攻撃力の1.5倍に設定
 
 		//プレイヤーが向いている方向に移動する
@@ -534,6 +564,7 @@ void Player::ClickSodaJump()
 		//炭酸攻撃処理
 		SodaAttack(sodaPower);
 		sodaShakeGauge = 0;
+		sodaHeatShakeGauge = 0;
 		//ParticleConfig::acceleration = 0;
 		const ParticleConfig* masterCfg = pMng->GetConfig(WATER_PARTICLE_PATH);
 		if (masterCfg)
@@ -553,8 +584,6 @@ void Player::ClickSodaJump()
 			sodaAttackSE->PlayOneShot();
 		}
 	}
-
-
 }
 
 //プレイヤーの振動処理
@@ -564,6 +593,13 @@ void Player::PlayerShake()
 
 	shakeOffsetX = (GetRand(10) - 5) * playerShakePower;
 	shakeOffsetY = (GetRand(10) - 5) * playerShakePower;
+}
+
+//プレイヤー破裂処理
+void Player::PlayerExplosion()
+{
+	Damage(10.0f);
+	velocityY = -15.0f;
 }
 
 //プレイヤーのノックバック処理
