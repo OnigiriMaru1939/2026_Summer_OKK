@@ -126,6 +126,7 @@ private:
 	float sodaPower;			//炭酸攻撃の威力
 	bool aliveFlag;				//生存フラグ
 	bool canMoveFlag;			//移動可能フラグ
+	bool stunFlag;				//気絶フラグ
 	bool jumpFlag;				//ジャンプフラグ
 	bool sodaAttackFlag;		//炭酸攻撃フラグ
 	float gravity;				//重力

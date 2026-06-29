@@ -150,6 +150,7 @@
     <ClCompile Include="Boss1.cpp" />
     <ClCompile Include="Boss2.cpp" />
     <ClCompile Include="Enemy1.cpp" />
+    <ClCompile Include="Enemy2.cpp" />
     <ClCompile Include="EnemyBase.cpp" />
     <ClCompile Include="Fps.cpp" />
     <ClCompile Include="GimmickBase.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="Boss1.h" />
     <ClInclude Include="Boss2.h" />
     <ClInclude Include="Enemy1.h" />
+    <ClInclude Include="Enemy2.h" />
     <ClInclude Include="EnemyBase.h" />
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="FileSuper.h" />
