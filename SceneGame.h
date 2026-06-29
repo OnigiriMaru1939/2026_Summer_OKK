@@ -115,6 +115,6 @@ private:
 	bool _isBossDefeatedSequence = false;
 	int _sequenceTimer = 0;
 
-	std::shared_ptr<ScreenFile> _offScreen = -1;
+	std::shared_ptr<ScreenFile> _offScreen;
 };
 

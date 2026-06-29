@@ -22,10 +22,9 @@ const std::vector<StageConfig>& GetStageConfigs()
 				//scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 800.0f, 1700.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 1200.0f,1500.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 800.0f, 1200.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 500.0f, 1800.0f);
 				//アイテムの生成
 				scene.AddItem(ItemBase::ITEM_TYPE::MENTOS, 1200.0f,1600.0f);
-
-			
 			},
 			
 
