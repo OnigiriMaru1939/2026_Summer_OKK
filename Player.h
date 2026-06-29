@@ -19,12 +19,14 @@ public:
 	static constexpr int PLAYER_WIDTH = 64;			//プレイヤーの横幅
 	static constexpr int PLAYER_HEIGHT = 64;		//プレイヤーの縦幅
 	static constexpr int SPEED = 15;				//プレイヤーの移動速度
-	static constexpr float ATTACK_SPEED_THRESHOLD = 10.0f;	//攻撃可能な最低限の速度
-	static constexpr float AIR_RESUSTANCE = 0.98f;			//空気抵抗
-	static constexpr float WALL_BOUNCE_X = 0.3f;			//横壁の反動係数
-	static constexpr float FLOOR_BOUNCE_Y = 0.3f;			//床の反動係数
-	static constexpr float FLOOR_FRICTION = 0.9f;			//床の摩擦係数
-	static constexpr float POWER_CONVERSION = 20.0f;		//威力変換定数
+	static constexpr float ATTACK_SPEED_THRESHOLD = 10.0f;		//攻撃可能な最低限の速度
+	static constexpr float AIR_RESUSTANCE = 0.98f;				//空気抵抗
+	static constexpr float WALL_BOUNCE_X = 0.3f;				//横壁の反動係数
+	static constexpr float FLOOR_BOUNCE_Y = 0.3f;				//床の反動係数
+	static constexpr float FLOOR_FRICTION = 0.9f;				//床の摩擦係数
+	static constexpr float POWER_CONVERSION = 20.0f;			//威力変換定数
+	static constexpr float SODA_SHAKE_GAUGE_MAX = 1000.0f;		//炭酸蓄積ゲージの最大値
+	static constexpr float SODA_HEAT_SHAKE_GAUGE_MAX = 1000.0f;	//炭酸蓄積ゲージの最大値
 	
 	Player(FileManager& fileMng, Stage* stage, SceneGame& game);
 	~Player();
@@ -37,7 +39,6 @@ public:
 	void Update();
 	void Draw();
 	void SodaShake();				//マウスを振ると炭酸蓄積ゲージが溜まる
-	void SodaGaugeCharge();			//炭酸残量ゲージの自然回復
 	void AddGravity();				//重力処理
 	void SodaMove();				//炭酸移動処理
 	void MoveX();					//Xの移動
@@ -49,6 +50,7 @@ public:
 	void SodaAttack(float power);	//炭酸攻撃処理
 	void Damage(float damage);		//ダメージ処理
 	void PlayerShake();				//プレイヤーの振動処理
+	void PlayerExplosion();			//破裂処理
 	void PlayerKnockBack(float enemyX, float enemyY, float power);			//プレイヤーのノックバック処理
 	RECT GetRect() const;			//プレイヤーの当たり判定の矩形を取得
 	bool CollisionHpBar();          //プレイヤーがHPバーに触れているか
@@ -60,12 +62,14 @@ public:
 
 	float playerHp;				//プレイヤーのHP
 	float playerHpMax;			//プレイヤーのHPの最大値
-	float sodaGauge;			//炭酸残量ゲージ
-	float sodaGaugeMax;			//炭酸残量ゲージの最大値
-	float sodaRatio;            //炭酸残量ゲージ
+	float sodaRatio;            //炭酸蓄積ゲージの割合
+	float sodaHeatRatio;		//炭酸ヒートゲージの割合
 	float sodaShakeGauge;		//炭酸蓄積ゲージ
+	float sodaHeatShakeGauge;	//炭酸ヒートゲージ
+  
 	int _noDamageTime;			//無敵時間
 	int noDamageMaxTime;		//無敵時間の最大値
+	int sodaGaugeDecayTime;		//炭酸ゲージ減衰待機タイマー
 	int attackTimer;			//攻撃時間
 
 	static constexpr float SODA_SHAKE_GAUGE_MAX = 1000.0f;	//炭酸蓄積ゲージの最大値
@@ -128,6 +132,7 @@ private:
 	float sodaPower;			//炭酸攻撃の威力
 	bool aliveFlag;				//生存フラグ
 	bool canMoveFlag;			//移動可能フラグ
+	bool stunFlag;				//気絶フラグ
 	bool jumpFlag;				//ジャンプフラグ
 	bool sodaAttackFlag;		//炭酸攻撃フラグ
 	float gravity;				//重力

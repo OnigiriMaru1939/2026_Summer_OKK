@@ -278,7 +278,6 @@ bool Stage::CheckHitWallRect(int x, int y, int width, int height)
 
 	return false;
 }
-
 // マップチップを設定
 void Stage::SetChip(int chipX, int chipY, int chipId)
 {

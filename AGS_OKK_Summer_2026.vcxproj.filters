@@ -71,6 +71,8 @@
     </ClCompile>
     <ClCompile Include="NetworkManager.cpp" />
     <ClCompile Include="RemotePlayer.cpp" />
+    <ClCompile Include="Enemy2.cpp" />
+    <ClCompile Include="Enemy3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Application">
@@ -272,5 +274,7 @@
     <ClInclude Include="Protocol.h" />
     <ClInclude Include="NetworkManager.h" />
     <ClInclude Include="RemotePlayer.h" />
+    <ClInclude Include="Enemy2.h" />
+    <ClInclude Include="Enemy3.h" />
   </ItemGroup>
 </Project>
