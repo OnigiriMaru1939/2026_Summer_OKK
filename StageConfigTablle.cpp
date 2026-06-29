@@ -17,13 +17,15 @@ const std::vector<StageConfig>& GetStageConfigs()
 				//プレイヤーの初期化
 				scene.GetPlayer()->SetPosition(150.0f, 2050.0f);
 				//ボスエリアの初期設定
-				scene.SetBossArea(700, 0, 1920, 950);
+				scene.SetBossArea(0, 2500, 1920, 5000 );
 				//敵の生成
 				//scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 800.0f, 1700.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 1200.0f,1500.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 800.0f, 1200.0f);
 				//アイテムの生成
 				scene.AddItem(ItemBase::ITEM_TYPE::MENTOS, 1200.0f,1600.0f);
+				//テレポートギミックの生成
+				scene.AddTeleport(1700.0f, 500.0f, 100.0f,3300.0f);
 
 			
 			},
