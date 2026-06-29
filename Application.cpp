@@ -15,8 +15,16 @@ Application::Application()
 {
 	SetUseCharCodeFormat(DX_CHARCODEFORMAT_UTF8);
 	SetWindowText("サイダーパンク");
+	SetGraphMode(SCREEN_WID - 100, SCREEN_HIG - 100, 32);
+	ChangeWindowMode(true);
+	SetWindowSizeChangeEnableFlag(TRUE, TRUE);
+	SetDoubleStartValidFlag(TRUE);
+	SetAlwaysRunFlag(TRUE);
+	SetOutApplicationLogValidFlag(FALSE);
+#ifdef _DEBUG
 	SetGraphMode(SCREEN_WID, SCREEN_HIG, 32);
 	ChangeWindowMode(false);
+#endif // DEBUG
 
 //#ifdef _WIN64
 //	Live2D_SetCubism4CoreDLLPath(TEXT("CubismSdkForNative-5-r.4.1/Core/dll/windows/x86_64/Live2DCubismCore.dll"));

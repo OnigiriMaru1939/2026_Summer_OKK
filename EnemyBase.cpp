@@ -5,6 +5,15 @@
 #include <DxLib.h>
 
 
+void EnemyBase::SyncNetworkState(float x, float y, int hp, bool isAlive, int noDamageTime)
+{
+	x_ = x;
+	y_ = y;
+	hp_ = hp;
+	isAlive_ = isAlive;
+	_noDamageTime = noDamageTime;
+}
+
 EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, float x, float y)
 	: fileManager_(fileMng)
 	, stage_(stage)
@@ -20,7 +29,7 @@ EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, float x, float y)
 	, angle(0.0f)
 	, gravity(0.5f)
 	, AttckDamage(20)
-	, noDamageTime(0)
+	, _noDamageTime(0)
 	, noDamageMaxTime(60)
 	, width_(0)
 	, height_(0)
@@ -120,9 +129,9 @@ void EnemyBase::AddGravity()
 
 void EnemyBase::NoDamageCountDown()
 {
-	if (noDamageTime > 0)
+	if (_noDamageTime > 0)
 	{
-		noDamageTime--; //無敵時間のカウントダウン
+		_noDamageTime--; //無敵時間のカウントダウン
 	}
 }
 
@@ -143,7 +152,7 @@ void EnemyBase::EnemyResetShake()
 void EnemyBase::ApplyDamage(int dmg)
 {
 	if (!isAlive_) 	return;				//生存していない場合はダメージを受けない
-	if (noDamageTime > 0) return;		//無敵時間中はダメージを受けない
+	if (_noDamageTime > 0) return;		//無敵時間中はダメージを受けない
 
 	hp_ -= dmg; // ダメージを適用
 	if (hp_ <= 0)
@@ -153,7 +162,7 @@ void EnemyBase::ApplyDamage(int dmg)
 	}
 
 	//無敵時間開始
-	noDamageTime = noDamageMaxTime;
+	_noDamageTime = noDamageMaxTime;
 }
 
 bool EnemyBase::IsAlive() const
@@ -204,9 +213,9 @@ void EnemyBase::Draw() const
 	);
 
 	//無敵時間中は点滅させる
-	if (noDamageTime > 0)
+	if (_noDamageTime > 0)
 	{
-		if ((noDamageTime / 4) % 2 == 0)
+		if ((_noDamageTime / 4) % 2 == 0)
 		{
 			return;
 		}

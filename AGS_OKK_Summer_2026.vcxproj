@@ -116,6 +116,7 @@
       <DisableSpecificWarnings>4828;4010</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -158,9 +159,11 @@
     <ClCompile Include="KeyConfig.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mentos.cpp" />
+    <ClCompile Include="NetworkManager.cpp" />
     <ClCompile Include="ParticleEmitter.cpp" />
     <ClCompile Include="ParticleManager.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="RemotePlayer.cpp" />
     <ClCompile Include="SceneGame.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="ScenePause.cpp" />
@@ -191,9 +194,12 @@
     <ClInclude Include="ItemBase.h" />
     <ClInclude Include="KeyConfig.h" />
     <ClInclude Include="Mentos.h" />
+    <ClInclude Include="NetworkManager.h" />
     <ClInclude Include="ParticleEmitter.h" />
     <ClInclude Include="ParticleManager.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Protocol.h" />
+    <ClInclude Include="RemotePlayer.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="SceneGame.h" />
     <ClInclude Include="SceneManager.h" />

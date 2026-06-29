@@ -16,9 +16,6 @@ SceneStageSelect::SceneStageSelect(FileManager& fileMng, SceneManager& sceneMng)
 	_stageFont = fileMng.CreateFontFM(Fonts::DotGothic16::PATH,
 									  Fonts::DotGothic16::NAME,
 									  80);
-	_stageFont = fileMng.CreateFontFM(Fonts::DotGothic16::PATH,
-									  Fonts::DotGothic16::NAME,
-									  80);
 	_stageNumFont = fileMng.CreateFontFM(Fonts::DotGothic16::PATH,
 									  Fonts::DotGothic16::NAME,
 									  120);
@@ -32,8 +29,13 @@ SceneStageSelect::SceneStageSelect(FileManager& fileMng, SceneManager& sceneMng)
 	_stageSelectBlockImg = fileMng.LoadImageFM("Resource/Image/StageSelect/StageSelect_Block.png");
 	_stageSelectBlockSelectedImg = fileMng.LoadImageFM("Resource/Image/StageSelect/StageSelect_Selected_Block.png");
 
-	_decideSE = fileMng_.LoadSoundFM("Resource/Sound/SE/Decide_SE.wav");
-	_cursorSE = fileMng_.LoadSoundFM("Resource/Sound/SE/Cursor_SE.wav");
+	_decideSE = fileMng.LoadSoundFM("Resource/Sound/SE/Decide_SE.wav");
+	_cursorSE = fileMng.LoadSoundFM("Resource/Sound/SE/Cursor_SE.wav");
+
+	// ネットワーク初期化
+	bool isHost = sceneMng.GetIsHost();
+	std::string ip = GetConfigValue("remote_ip");
+	_networkMng.Initialize(isHost, ip);
 
 	InputManager::GetInstance().SetTriggerCallback(ActionID::MoveH,
 												   [this]()
@@ -70,6 +72,7 @@ SceneStageSelect::SceneStageSelect(FileManager& fileMng, SceneManager& sceneMng)
 															   return;
 														   }
 														   // 選択されたステージをSceneGameに渡すために、SceneManagerに保存
+														   _networkMng.SendStageSelect(_selectedIndex);
 														   SceneGame::SetSelectedStageIndex(_selectedIndex);
 														   SetNextScene(SceneID::GAME);
 														   isEnd = true;
@@ -86,7 +89,18 @@ SceneStageSelect::~SceneStageSelect()
 
 void SceneStageSelect::Update()
 {
-
+	int receivedStageIndex = -1;
+	if (!isTransition && !isEnd && _networkMng.ReceiveStageSelect(receivedStageIndex))
+	{
+		// 有効なステージ番号（0より大きい）を受け取ったら強制遷移
+		if (receivedStageIndex > 0)
+		{
+			_decideSE->PlayOneShot(); // 相手が決定したときもSEを鳴らしてあげる
+			SceneGame::SetSelectedStageIndex(receivedStageIndex);
+			SetNextScene(SceneID::GAME);
+			isEnd = true;
+		}
+	}
 }
 
 void SceneStageSelect::Draw()

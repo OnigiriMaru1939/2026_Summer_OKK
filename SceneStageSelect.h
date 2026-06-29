@@ -5,7 +5,9 @@
 #include "SoundFile.h"
 #include "FontFile.h"
 #include "SceneManager.h"
+#include "NetworkManager.h"
 #include <memory>
+
 class SceneStageSelect :
     public SceneSuper
 {
@@ -54,5 +56,7 @@ private:
 	int _selectedIndex; // 0がタイトル、1～4がステージ選択
 
 	int _fadeAlpha;
+
+	NetworkManager _networkMng;
 };
 

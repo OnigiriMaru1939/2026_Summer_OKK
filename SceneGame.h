@@ -9,6 +9,8 @@
 #include "ScreenFile.h"
 #include "GimmickBase.h"
 #include "ItemBase.h"
+#include "NetworkManager.h"
+#include "RemotePlayer.h"
 
 class Player;
 class SceneManager;
@@ -27,7 +29,7 @@ public:
 		BATTLE,
 	};
 
-	SceneGame(FileManager& fileMng, SceneManager& sceneMng);
+	SceneGame(FileManager& fileMng, SceneManager& sceneMng, bool isHost = true);
 
 	~SceneGame() override;
 
@@ -39,6 +41,7 @@ public:
 	void UpdateItem();
 	void UpdateDuringTransition() override; // トランジション中の更新処理
 	void CheckPlayerEnemyCollision();
+	void ApplyDamageToEnemy(int enemyID, int damage);
 	void DrawGauge(int x,
 				   int y,
 				   int width,
@@ -66,17 +69,27 @@ public:
 	auto& GetEnemyList() { return enemyList_; }
 	FileManager& GetFileManager() { return fileMng_; }
 
+
 	static void SetSelectedStageIndex(int index) { selectedStageIndex_ = index; }
 	static int selectedStageIndex_;
 
 	void TransitionOut(float t) override;
 	void TransitionIn(float t) override;
+
+	bool IsHost() const { return isHost_; }
+
+	void StartBossEvent();
 private:
 	std::unique_ptr<Stage> stage_;
 	std::unique_ptr<Player> player_;
 	std::vector<std::shared_ptr<EnemyBase>> enemyList_;		//敵のリスト
 	std::vector<std::shared_ptr<GimmickBase>> gimmickList_; //ギミックのリスト
 	std::vector<std::shared_ptr<ItemBase>> itemList_;		//アイテムのリスト
+
+	NetworkManager networkManager_;
+	RemotePlayer remotePlayer_;
+
+	bool isHost_;
 
 	float clearTime;		//クリアタイム
 	int bossTimer;			//ボスイベントのタイマー
@@ -89,6 +102,8 @@ private:
 	bool IsClear() { return _isClear; }
 
 	float _fadeAlpha;
+
+	int _nextEnemyId = 0;
 
 	std::shared_ptr<FontFile> _bossNameFont;
 	std::shared_ptr<FontFile> _warningFont;
@@ -115,6 +130,6 @@ private:
 	bool _isBossDefeatedSequence = false;
 	int _sequenceTimer = 0;
 
-	std::shared_ptr<ScreenFile> _offScreen = -1;
+	std::shared_ptr<ScreenFile> _offScreen;
 };
 

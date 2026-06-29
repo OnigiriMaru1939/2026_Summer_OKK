@@ -63,7 +63,7 @@ void SceneManager::Update()
 void SceneManager::UpdateTransition()
 {
 	transition_.timer += 1.0f; // フレームごとにタイマーを進める
-
+	bool isHost = false;
 	switch (transition_.state)
 	{
 		case TransitionState::FadeOutCurrent:
@@ -74,7 +74,7 @@ void SceneManager::UpdateTransition()
 			}
 			break;
 		case TransitionState::SwitchScene:
-			ChangeScene(transition_.nextSceneID);
+			ChangeScene(transition_.nextSceneID, _isHost);
 
 			currentScene = scenes.back().get();
 			currentScene->SetIsTransition(true);
@@ -100,8 +100,7 @@ void SceneManager::Draw()
 {
 	if (scenes.empty()) return;
 
-	clsDx();
-	printfDx("SceneNum = %d", static_cast<int>(scenes.size()));
+
 
 	for (const auto& scene : scenes)
 	{
@@ -109,7 +108,7 @@ void SceneManager::Draw()
 	}
 }
 
-std::unique_ptr<SceneSuper> SceneManager::CreateScene(SceneSuper::SceneID sceneID)
+std::unique_ptr<SceneSuper> SceneManager::CreateScene(SceneSuper::SceneID sceneID, bool isHost)
 {
 	switch (sceneID)
 	{
@@ -118,7 +117,7 @@ std::unique_ptr<SceneSuper> SceneManager::CreateScene(SceneSuper::SceneID sceneI
 		case SceneSuper::SceneID::STAGE_SELECT:
 			return std::make_unique<SceneStageSelect>(fileMng_, *this);
 		case SceneSuper::SceneID::GAME:
-			return std::make_unique<SceneGame>(fileMng_, *this);
+			return std::make_unique<SceneGame>(fileMng_, *this, isHost);
 		case SceneSuper::SceneID::RESULT:
 			return std::make_unique<SceneResult>(fileMng_, _isClear, _clearResult, *this);
 		case SceneSuper::SceneID::PAUSE:
@@ -128,7 +127,7 @@ std::unique_ptr<SceneSuper> SceneManager::CreateScene(SceneSuper::SceneID sceneI
 	}
 }
 
-void SceneManager::ChangeScene(SceneSuper::SceneID nextSceneID)
+void SceneManager::ChangeScene(SceneSuper::SceneID nextSceneID, bool isHost)
 {
 	if (nextSceneID == SceneSuper::SceneID::EXIT)
 	{
@@ -143,7 +142,7 @@ void SceneManager::ChangeScene(SceneSuper::SceneID nextSceneID)
 	InputManager::GetInstance().ClearTriggerCallbacks();
 	InputManager::GetInstance().ClearReleaseCallbacks();
 
-	auto newScene = CreateScene(nextSceneID);
+	auto newScene = CreateScene(nextSceneID, isHost);
 
 	if (newScene != nullptr)
 	{
