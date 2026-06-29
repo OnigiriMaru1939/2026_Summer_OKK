@@ -642,7 +642,7 @@ void SceneGame::BossEvent()
 						AddBoss(
 							EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1,
 							1800.0f,
-							200.0f
+							3300.0f
 						);
 						break;
 
