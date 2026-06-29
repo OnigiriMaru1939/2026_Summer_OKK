@@ -16,6 +16,19 @@ Enemy2::~Enemy2()
 void Enemy2::Update()
 {
 	Move();					//移動
+	Draw();					//描画
 	AddGravity();			//重力を加える
 	NoDamageCountDown();	//無敵時間のカウントダウン
+}
+
+void Enemy2::Draw() const
+{
+	EnemyBase::Draw();
+}
+
+void Enemy2::Move()
+{
+	EnemyBase::Move();
+
+	
 }
