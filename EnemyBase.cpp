@@ -2,8 +2,11 @@
 #include "FileManager.h"
 #include "ImageFile.h"
 #include "Player.h"
+#include "ParticleManager.h"
+#include "ParticleEmitter.h"
 #include <DxLib.h>
 
+constexpr auto ENEMY_KILL_PARTICLE_PATH = "Resource/ParticleJsonData/killParameter.json";
 
 void EnemyBase::SyncNetworkState(float x, float y, int hp, bool isAlive, int noDamageTime)
 {
@@ -14,9 +17,10 @@ void EnemyBase::SyncNetworkState(float x, float y, int hp, bool isAlive, int noD
 	_noDamageTime = noDamageTime;
 }
 
-EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, float x, float y)
+EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, float x, float y, ParticleManager& pMng)
 	: fileManager_(fileMng)
 	, stage_(stage)
+	, particleManager(pMng)
 	, x_(x)
 	, y_(y)
 	, vx_(0.0f)
@@ -38,6 +42,7 @@ EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, float x, float y)
 	, isAlive_(true)
 	, jumpFlag(false)
 {
+	particleManager.RegisterConfig(ENEMY_KILL_PARTICLE_PATH);
 }
 
 EnemyBase::~EnemyBase()
@@ -264,4 +269,16 @@ void EnemyBase::DrawGauge(
 		color,
 		TRUE
 	);
+}
+
+void EnemyBase::KillEffect()
+{
+	const ParticleConfig* masterCfg = particleManager.GetConfig(ENEMY_KILL_PARTICLE_PATH);
+	if (masterCfg)
+	{
+		ParticleConfig customCfg = *masterCfg;
+		float life = 20.0f;
+
+		eKillParticle = particleManager.PlayParticle(customCfg, x_, y_, life);
+	}
 }

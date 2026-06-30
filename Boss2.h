@@ -17,7 +17,7 @@ public:
 
 		MAX
 	};
-	Boss2(FileManager& fileMng, Stage* stage, float x, float y);
+	Boss2(FileManager& fileMng, Stage* stage, float x, float y, ParticleManager& pMng);
 	~Boss2() override;
 	void Update() override;
 	void Draw() const override;

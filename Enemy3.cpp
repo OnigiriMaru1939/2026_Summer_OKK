@@ -1,7 +1,7 @@
 ﻿#include "Enemy3.h"
 
 
-Enemy3::Enemy3(FileManager& fileMng, Stage* stage, float x, float y) : EnemyBase(fileMng, stage, x, y)
+Enemy3::Enemy3(FileManager& fileMng, Stage* stage, float x, float y, ParticleManager& pMng) : EnemyBase(fileMng, stage, x, y, pMng)
 {
 	SetImage("Resource/Image/Enemys/Fantagy.png");
 	enemyType_ = ENEMY_TYPE::E_TYPE_3;

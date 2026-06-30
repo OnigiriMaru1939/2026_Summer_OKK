@@ -45,7 +45,6 @@ void SceneManager::Update()
 	}
 	else
 	{
-		currentScene = scenes.back().get();
 		currentScene->Update();
 
 		if (currentScene->IsEnd())

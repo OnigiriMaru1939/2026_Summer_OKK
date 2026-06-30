@@ -7,7 +7,7 @@ struct ParticleInstance;
 class ParticleEmitter
 {
 public:
-	ParticleEmitter(const ParticleConfig& cfg, float x, float y);
+	ParticleEmitter(const ParticleConfig& cfg, float x, float y, float life = 30.0f);
 	~ParticleEmitter();
 
 	void Update();
