@@ -1,12 +1,12 @@
 ﻿#include "ParticleEmitter.h"
 
-ParticleEmitter::ParticleEmitter(const ParticleConfig& cfg, float x, float y) 
+ParticleEmitter::ParticleEmitter(const ParticleConfig& cfg, float x, float y, float life) 
 	: config(cfg),
 	base_x(x),
 	base_y(y)
 {
 	emitCounter = 0.0f;
-	emitterLife = 30.0f;
+	emitterLife = life;
 	particles.resize(1000);
 }
 

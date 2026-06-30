@@ -14,14 +14,14 @@
 
 
 constexpr auto WATER_PARTICLE_PATH = "Resource/ParticleJsonData/waterParameter.json";
-Player::Player(FileManager& fileMng, Stage* stage, SceneGame& game) : fileManager(fileMng), stage_(stage), sceneGame(game)
+Player::Player(FileManager& fileMng, Stage& stage, SceneGame& game, ParticleManager& pMng) : fileManager(fileMng), stage_(stage), sceneGame(game), particleManager(pMng)
 {
 	AddFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
 	hpFontHandle = CreateFontToHandle("DotGothic16", 30, -1, DX_FONTTYPE_EDGE);
 	SetImage("Resource/Image/Player/Cider_Player.png");
 
-	pMng = std::make_unique<ParticleManager>(fileMng);
-	pMng->RegisterConfig(WATER_PARTICLE_PATH);
+
+	particleManager.RegisterConfig(WATER_PARTICLE_PATH);
 
 	sodaAttackSE = fileMng.LoadSoundFM("Resource/Sound/SE/Soda_SE.wav");
 	sodaChargeSE = fileMng.LoadSoundFM("Resource/Sound/SE/Soda_Charge_SE.wav");
@@ -185,7 +185,7 @@ void Player::Update()
 	}
 
 	//気絶からの復帰
-	if (stunFlag && noDamageTime <= 0)
+	if (stunFlag && _noDamageTime <= 0)
 	{
 		stunFlag = false;
 		canMoveFlag = true;
@@ -210,8 +210,6 @@ void Player::Update()
 		sodaAttackFlag = false;
 
 		MoveY();
-
-		pMng->UpdateAll();
 
 		UpdateStageScroll();
 
@@ -254,11 +252,6 @@ void Player::Update()
 	{
 		emitter->SetPosition(posX - sinf(angle) * width_, posY + cosf(angle) * height_);
 	}
-	else
-	{
-		//sodaParticle.reset();
-	}
-	pMng->UpdateAll();
 
 	UpdateStageScroll();
 }
@@ -266,37 +259,37 @@ void Player::Update()
 void Player::UpdateStageScroll()
 {
 	//プレイヤー画面スクロール処理
-	canvasX = posX - stage_->GetScrollX();
-	canvasY = posY - stage_->GetScrollY();
+	canvasX = posX - stage_.GetScrollX();
+	canvasY = posY - stage_.GetScrollY();
 	if (canvasX < Stage::CHIP_SIZE * 10)
 	{
-		stage_->SetScrollX(static_cast<int>(posX) - Stage::CHIP_SIZE * 10);
-		if (stage_->GetScrollX() < 0)
+		stage_.SetScrollX(static_cast<int>(posX) - Stage::CHIP_SIZE * 10);
+		if (stage_.GetScrollX() < 0)
 		{
-			stage_->SetScrollX(0);
+			stage_.SetScrollX(0);
 		}
 	}
 	if (canvasX > Stage::CHIP_SIZE * 38)
 	{
 		int newScrollX = static_cast<int>(posX) - Stage::CHIP_SIZE * 38;
-		newScrollX = std::min(newScrollX, stage_->GetMaxScrollX());
-		stage_->SetScrollX(newScrollX);
+		newScrollX = std::min(newScrollX, stage_.GetMaxScrollX());
+		stage_.SetScrollX(newScrollX);
 	}
 
 	if (canvasY < Stage::CHIP_SIZE * 5)
 	{
-		stage_->SetScrollY(static_cast<int>(posY) - Stage::CHIP_SIZE * 5);
-		if (stage_->GetScrollY() < 0)
+		stage_.SetScrollY(static_cast<int>(posY) - Stage::CHIP_SIZE * 5);
+		if (stage_.GetScrollY() < 0)
 		{
-			stage_->SetScrollY(0);
+			stage_.SetScrollY(0);
 		}
 	}
 
 	if (canvasY > Stage::CHIP_SIZE * 22)
 	{
 		int newScrollY = static_cast<int>(posY) - Stage::CHIP_SIZE * 22;
-		newScrollY = std::min(newScrollY, stage_->GetMaxScrollY());
-		stage_->SetScrollY(newScrollY);
+		newScrollY = std::min(newScrollY, stage_.GetMaxScrollY());
+		stage_.SetScrollY(newScrollY);
 	}
 }
 
@@ -337,16 +330,14 @@ void Player::Draw()
 		SetDrawBright(255, 255, 255);
 	}
 
-	pMng->DrawAll(stage_->GetScrollX(), stage_->GetScrollY());
-
 	//当たり判定の矩形を描画
 	RECT rc = GetRect();
 
 	DrawBox(
-		rc.left - stage_->GetScrollX(),
-		rc.top - stage_->GetScrollY(),
-		rc.right - stage_->GetScrollX(),
-		rc.bottom - stage_->GetScrollY(),
+		rc.left - stage_.GetScrollX(),
+		rc.top - stage_.GetScrollY(),
+		rc.right - stage_.GetScrollX(),
+		rc.bottom - stage_.GetScrollY(),
 		GetColor(0, 255, 0),
 		FALSE
 	);
@@ -385,7 +376,7 @@ void Player::Draw()
 	DrawFormatString(1150, 1020, GetColor(255, 0, 0), "sodaAttackFlag: %d", sodaAttackFlag);
 
 	DrawFormatString(0, 300, 0x00ff00, "PlayerPos X: %f,Y: %f", posX, posY);
-	DrawFormatString(0, 320, 0x00ff00, "PlayerMapChip X: %d,Y: %d", stage_->WorldToChipX(posX), stage_->WorldToChipY(posY));
+	DrawFormatString(0, 320, 0x00ff00, "PlayerMapChip X: %d,Y: %d", stage_.WorldToChipX(posX), stage_.WorldToChipY(posY));
 
 	//プレイヤーの振動処理
 	PlayerShake();
@@ -490,7 +481,7 @@ void Player::RotateAxis()
 //衝突判定
 bool Player::WillCollide(int newX, int newY)
 {
-	return stage_->CheckHitWallRect(
+	return stage_.CheckHitWallRect(
 		newX,
 		newY,
 		(int)(width_ * scale),
@@ -574,8 +565,8 @@ void Player::ClickSodaJump()
 		SodaAttack(sodaPower);
 		sodaShakeGauge = 0;
 		sodaHeatShakeGauge = 0;
-		//ParticleConfig::acceleration = 0;
-		const ParticleConfig* masterCfg = pMng->GetConfig(WATER_PARTICLE_PATH);
+
+		const ParticleConfig* masterCfg = particleManager.GetConfig(WATER_PARTICLE_PATH);
 		if (masterCfg)
 		{
 			// ParticleConfig構造体のコピー
@@ -587,7 +578,7 @@ void Player::ClickSodaJump()
 			customCfg.initDir += plusAngle;
 			customCfg.startScale *= sodaRatio;
 			customCfg.initSpeed *= sodaRatio;
-			sodaParticle = pMng->PlayParticle(customCfg, posX - sinf(angle) * width_, posY + cosf(angle) * height_);
+			sodaParticle = particleManager.PlayParticle(customCfg, posX - sinf(angle) * width_, posY + cosf(angle) * height_);
 
 			sodaAttackSE->SetVolume((int)(sodaRatio * 255)); // 音量を炭酸ゲージの割合に応じて変化させる
 			sodaAttackSE->PlayOneShot();
@@ -611,7 +602,7 @@ void Player::PlayerExplosion()
 	velocityY = -15.0f;
 
 	//気絶時間２秒
-	noDamageTime = 120;
+	_noDamageTime = 120;
 	stunFlag = true;
 	canMoveFlag = false;
 }
@@ -654,10 +645,10 @@ bool Player::CollisionHpBar()
 	RECT rc = GetRect();
 
 	//ワールド座標→画面座標
-	rc.left -= stage_->GetScrollX();
-	rc.right -= stage_->GetScrollX();
-	rc.top -= stage_->GetScrollY();
-	rc.bottom -= stage_->GetScrollY();
+	rc.left -= stage_.GetScrollX();
+	rc.right -= stage_.GetScrollX();
+	rc.top -= stage_.GetScrollY();
+	rc.bottom -= stage_.GetScrollY();
 
 	RECT hpBar;
 	hpBar.left = 1350;

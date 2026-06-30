@@ -1,7 +1,7 @@
 ﻿#include "Boss2.h"
 
 
-Boss2::Boss2(FileManager& fileMng, Stage* stage, float x, float y) : EnemyBase(fileMng, stage, x, y)
+Boss2::Boss2(FileManager& fileMng, Stage* stage, float x, float y, ParticleManager& pMng) : EnemyBase(fileMng, stage, x, y, pMng)
 {
 	SetImage("Resource/Image/Enemys/Monster.png");
 	enemyType_ = ENEMY_TYPE::E_TYPE_BOSS_2;

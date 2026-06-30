@@ -1,6 +1,7 @@
 ﻿#define NOMINMAX
 #include "SceneGame.h"
 #include "InputManager.h"
+#include "ParticleManager.h"
 #include "Player.h"
 #include "EnemyBase.h"
 #include "Enemy1.h"
@@ -32,8 +33,11 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng, bool isHost) 
 	_warningFont = fileMng.CreateFontFM(Fonts::DotGothic16::PATH,
 										 Fonts::DotGothic16::NAME,
 										 160);
+
+	_pMng = std::make_unique<ParticleManager>(fileMng);
+
 	stage_ = std::make_unique<Stage>(fileMng);
-	player_ = std::make_unique<Player>(fileMng, stage_.get(), *this);
+	player_ = std::make_unique<Player>(fileMng, *stage_, *this, *_pMng);
 
 	//ステージ固有のセットアップを実行
 	const auto& stageConfigs = GetStageConfigs();
@@ -190,6 +194,7 @@ void SceneGame::Update()
 	//プレイヤーとアイテムの衝突判定
 	CheckPlayerItemCollision();
 
+	_pMng->UpdateAll();
 	// Stageの更新
 	UpdateStage();
 }
@@ -214,7 +219,8 @@ void SceneGame::Draw()
 			0xff0000, false);
 
 
-	DrawString(0, 20, "GAME SCENE", 0xffffff);
+	_pMng->DrawAll(stage_->GetScrollX(), stage_->GetScrollY());
+
 	for (auto& gimmick : gimmickList_) { gimmick->Draw(); }
 	//敵を描画
 	for (auto& enemy : enemyList_)
@@ -481,7 +487,8 @@ void SceneGame::UpdateEnemy()
 				edp.enemyID = enemy->GetNetworkId();
 				networkManager_.SendEnemyDeath(edp);
 			}
-			// 敵が死んでいる場合はリストから削除
+			// 敵が死んでいる場合は演出をはさんでリストから削除
+			enemy->KillEffect();
 			// ボスを倒したらトランジション
 			if (std::dynamic_pointer_cast<IBoss>(enemy) && !_isBossDefeatedSequence)
 			{
@@ -891,13 +898,13 @@ void SceneGame::AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y)
 	switch (type)
 	{
 	case EnemyBase::ENEMY_TYPE::E_TYPE_1:
-		newEnemy = std::make_shared<Enemy1>(fileMng_, stage_.get(), x, y);
+		newEnemy = std::make_shared<Enemy1>(fileMng_, stage_.get(), x, y, *_pMng);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_2:
-		enemyList_.push_back(std::make_shared<Enemy2>(fileMng_, stage_.get(), x, y));
+		enemyList_.push_back(std::make_shared<Enemy2>(fileMng_, stage_.get(), x, y, *_pMng));
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_3:
-		enemyList_.push_back(std::make_shared<Enemy3>(fileMng_, stage_.get(), x, y));
+		enemyList_.push_back(std::make_shared<Enemy3>(fileMng_, stage_.get(), x, y, *_pMng));
 		break;
 	default:
 		break;
@@ -919,10 +926,10 @@ void SceneGame::AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y)
 	switch (type)
 	{
 	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1:
-		newBoss = std::make_shared<Boss1>(fileMng_, stage_.get(), x, y);
+		newBoss = std::make_shared<Boss1>(fileMng_, stage_.get(), x, y, *_pMng);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2:
-		newBoss = std::make_shared<Boss2>(fileMng_, stage_.get(), x, y);
+		newBoss = std::make_shared<Boss2>(fileMng_, stage_.get(), x, y, *_pMng);
 		break;
 	default:
 		break;

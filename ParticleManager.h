@@ -76,8 +76,8 @@ public:
 
 	std::string GetValue(const std::string& source, const std::string& key);
 
-	std::weak_ptr<ParticleEmitter> PlayParticle(const std::string& configName, float x, float y);
-	std::weak_ptr<ParticleEmitter> PlayParticle(const ParticleConfig& customConfig, float x, float y);
+	std::weak_ptr<ParticleEmitter> PlayParticle(const std::string& configName, float x, float y, float life = 30.0f);
+	std::weak_ptr<ParticleEmitter> PlayParticle(const ParticleConfig& customConfig, float x, float y, float life = 30.0f);
 	const ParticleConfig* GetConfig(const std::string& configName);
 private:
 	FileManager& _fileMng;

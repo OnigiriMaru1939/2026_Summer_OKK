@@ -28,7 +28,7 @@ public:
 	static constexpr float SODA_SHAKE_GAUGE_MAX = 1000.0f;		//炭酸蓄積ゲージの最大値
 	static constexpr float SODA_HEAT_SHAKE_GAUGE_MAX = 1000.0f;	//炭酸蓄積ゲージの最大値
 	
-	Player(FileManager& fileMng, Stage* stage, SceneGame& game);
+	Player(FileManager& fileMng, Stage& stage, SceneGame& game, ParticleManager& pMng);
 	~Player();
 	bool SetImage(const std::string& path);			//画像のセット
 	void SetPosition(float x, float y);				//プレイヤーの位置を設定
@@ -72,7 +72,6 @@ public:
 	int sodaGaugeDecayTime;		//炭酸ゲージ減衰待機タイマー
 	int attackTimer;			//攻撃時間
 
-	static constexpr float SODA_SHAKE_GAUGE_MAX = 1000.0f;	//炭酸蓄積ゲージの最大値
 	float GetWorldX() const { return posX; }
 	float GetWorldY() const { return posY; }
 	float GetX() const { return canvasX; }
@@ -111,7 +110,7 @@ private:
 				   int color,
 				   int mode);
 
-	std::unique_ptr<ParticleManager> pMng;
+	ParticleManager& particleManager;
 	FileManager& fileManager;					//ファイルマネージャー
 	SceneGame& sceneGame;
 
@@ -120,7 +119,7 @@ private:
 	std::shared_ptr<SoundFile> sodaAttackSE;		//炭酸攻撃のサウンド
 	std::shared_ptr<SoundFile> sodaChargeSE;		//炭酸蓄積のサウンド
 
-	Stage* stage_;								//ステージへのポインタ
+	Stage& stage_;								//ステージへのポインタ
 	std::weak_ptr<ParticleEmitter> sodaParticle;		// 炭酸攻撃のパーティクルエミッター weak_ptrにすることで、エミッターが削除された後も安全にアクセスできるようにする
 
 	int width_;					//プレイヤーの画像の幅

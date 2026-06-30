@@ -14,6 +14,7 @@
 
 class Player;
 class SceneManager;
+class ParticleManager;
 
 class SceneGame :
     public SceneSuper
@@ -82,6 +83,9 @@ public:
 private:
 	std::unique_ptr<Stage> stage_;
 	std::unique_ptr<Player> player_;
+
+	std::unique_ptr<ParticleManager> _pMng;
+
 	std::vector<std::shared_ptr<EnemyBase>> enemyList_;		//敵のリスト
 	std::vector<std::shared_ptr<GimmickBase>> gimmickList_; //ギミックのリスト
 	std::vector<std::shared_ptr<ItemBase>> itemList_;		//アイテムのリスト

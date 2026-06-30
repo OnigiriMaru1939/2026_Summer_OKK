@@ -15,12 +15,12 @@ Application::Application()
 {
 	SetUseCharCodeFormat(DX_CHARCODEFORMAT_UTF8);
 	SetWindowText("サイダーパンク");
-	SetGraphMode(SCREEN_WID - 100, SCREEN_HIG - 100, 32);
-	ChangeWindowMode(true);
 	SetWindowSizeChangeEnableFlag(TRUE, TRUE);
 	SetDoubleStartValidFlag(TRUE);
 	SetAlwaysRunFlag(TRUE);
-	SetOutApplicationLogValidFlag(FALSE);
+
+	SetGraphMode(SCREEN_WID - 100, SCREEN_HIG - 100, 32);
+	ChangeWindowMode(true);
 #ifdef _DEBUG
 	SetGraphMode(SCREEN_WID, SCREEN_HIG, 32);
 	ChangeWindowMode(false);

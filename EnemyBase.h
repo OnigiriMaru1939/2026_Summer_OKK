@@ -2,6 +2,8 @@
 #include <memory>
 #include <string>
 #include "Stage.h"
+#include "ParticleManager.h"
+#include "ParticleEmitter.h"
 
 class FileManager;
 class ImageFile;
@@ -28,7 +30,7 @@ public:
 		E_TYPE_MAX,
 	};
 
-	EnemyBase(FileManager& fileMng, Stage* stage, float x, float y);
+	EnemyBase(FileManager& fileMng, Stage* stage, float x, float y, ParticleManager& pMng);
 	virtual ~EnemyBase();
 
 	virtual void Update() = 0; // 更新処理
@@ -73,10 +75,13 @@ public:
 	int GetHpMax() const { return hpMax_; }
 	//フラグを取得
 	bool GetJumpFlag() const { return jumpFlag; }
-	bool GetAliveFlag() const { return isAlive_; }
 	int GetNoDamageTime() const { return _noDamageTime; }
 	void SetAppearFlag(bool flag) { isAppearing = flag; } //出現フラグを設定する関数
+
+	void KillEffect();
 protected:
+	ParticleManager& particleManager;
+	std::weak_ptr<ParticleEmitter> eKillParticle;
 	FileManager& fileManager_;
 	std::shared_ptr<ImageFile> image_;	//画像データ
 	Stage* stage_;						//ステージへのポインタ

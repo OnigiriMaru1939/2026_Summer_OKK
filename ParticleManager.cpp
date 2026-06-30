@@ -110,8 +110,6 @@ void ParticleManager::UpdateAll()
 	{
 		(*it)->Update();
 
-		// もし「一定時間で消えるエミッター」にするなら、ここで判定して削除
-		// 現状は無限ループ設定に近いため、必要に応じて emitter 側に寿命を持たせる
 		if ((*it)->IsDead())
 		{
 			it = emitters.erase(it);
@@ -151,20 +149,20 @@ std::string ParticleManager::GetValue(const std::string& source, const std::stri
 	return val;
 }
 
-std::weak_ptr<ParticleEmitter> ParticleManager::PlayParticle(const std::string& configName, float x, float y)
+std::weak_ptr<ParticleEmitter> ParticleManager::PlayParticle(const std::string& configName, float x, float y, float life)
 {
 	if (configLibrary.find(configName) == configLibrary.end()) return std::weak_ptr<ParticleEmitter>();
 
 	const auto& cfg = configLibrary[configName];
 
-	std::shared_ptr<ParticleEmitter> newEmitter = std::make_shared<ParticleEmitter>(cfg, x, y);
+	std::shared_ptr<ParticleEmitter> newEmitter = std::make_shared<ParticleEmitter>(cfg, x, y, life);
 	emitters.push_back(newEmitter);
 	return newEmitter;
 }
 
-std::weak_ptr<ParticleEmitter> ParticleManager::PlayParticle(const ParticleConfig& customConfig, float x, float y)
+std::weak_ptr<ParticleEmitter> ParticleManager::PlayParticle(const ParticleConfig& customConfig, float x, float y, float life)
 {
-	std::shared_ptr<ParticleEmitter> newEmitter = std::make_shared<ParticleEmitter>(customConfig, x, y);
+	std::shared_ptr<ParticleEmitter> newEmitter = std::make_shared<ParticleEmitter>(customConfig, x, y, life);
 	emitters.push_back(newEmitter);
 	return newEmitter;
 }
