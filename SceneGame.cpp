@@ -25,7 +25,7 @@
 // 静的変数の定義
 int SceneGame::selectedStageIndex_ = 1;
 
-SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng, bool isHost) : SceneSuper(fileMng, sceneMng), isHost_(isHost)
+SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng, bool isHost, const std::string& ip) : SceneSuper(fileMng, sceneMng), isHost_(isHost)
 {
 	_bossNameFont = fileMng.CreateFontFM(Fonts::DotGothic16::PATH,
 										 Fonts::DotGothic16::NAME,
@@ -75,7 +75,7 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng, bool isHost) 
 												   });
 
 	sceneMng_.SetTransitionDuration(45.0f);
-	std::string ip = GetConfigValue("remote_ip");
+
 	networkManager_.Initialize(isHost, ip);
 }
 
@@ -102,6 +102,7 @@ void SceneGame::Update()
 			SetNextScene(SceneID::RESULT);
 			isEnd = true;
 		}
+		_pMng->UpdateAll();
 		return;
 	}
 	clearTime += 1.0f / 60.0f; // クリアタイムの更新
@@ -538,7 +539,7 @@ void SceneGame::UpdateDuringTransition()
 	// プレイヤーの更新
 	player_->UpdateStageScroll();
 	//UpdatePlayer();
-
+	_pMng->UpdateAll();
 	// Stageの更新
 	UpdateStage();
 
@@ -901,10 +902,10 @@ void SceneGame::AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y)
 		newEnemy = std::make_shared<Enemy1>(fileMng_, stage_.get(), x, y, *_pMng);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_2:
-		enemyList_.push_back(std::make_shared<Enemy2>(fileMng_, stage_.get(), x, y, *_pMng));
+		newEnemy = std::make_shared<Enemy2>(fileMng_, stage_.get(), x, y, *_pMng);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_3:
-		enemyList_.push_back(std::make_shared<Enemy3>(fileMng_, stage_.get(), x, y, *_pMng));
+		newEnemy = std::make_shared<Enemy3>(fileMng_, stage_.get(), x, y, *_pMng);
 		break;
 	default:
 		break;

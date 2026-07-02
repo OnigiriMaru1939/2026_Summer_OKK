@@ -68,6 +68,7 @@ void Application::Run()
 
 		Draw();
 #ifdef _DEBUG
+		InputManager::GetInstance().DrawDebug(0, 40);
 		fps.Draw();
 #endif // DEBUG_
 
@@ -85,8 +86,6 @@ void Application::Update()
 void Application::Draw()
 {
 	sceneMng->Draw();
-
-	InputManager::GetInstance().DrawDebug(0, 40);
 }
 
 void Application::DebugMoveX()
