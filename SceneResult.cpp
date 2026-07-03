@@ -6,7 +6,7 @@
 #include <string>
 #include <algorithm>
 
-SceneResult::SceneResult(FileManager& fileMng, bool isClear, ClearResult& result, SceneManager& sceneMng) : SceneSuper(fileMng, sceneMng), _isClear(isClear), _clearResult(result)
+SceneResult::SceneResult(FileManager& fileMng, bool isClear, ClearResult& result, SceneManager& sceneMng, const std::string& ip) : SceneSuper(fileMng, sceneMng), _isClear(isClear), _clearResult(result)
 {
 	SceneGame::selectedStageIndex_ == 4 ? _selectedNext = 1 : _selectedNext = 0;
 	_resultFont = fileMng_.CreateFontFM(Fonts::DotGothic16::PATH,
@@ -75,7 +75,6 @@ SceneResult::SceneResult(FileManager& fileMng, bool isClear, ClearResult& result
 
 	sceneMng.SetTransitionDuration(45.0f);
 	bool isHost = sceneMng.GetIsHost();
-	std::string ip = GetConfigValue("remote_ip");
 	_networkMng.Initialize(isHost, ip);
 }
 

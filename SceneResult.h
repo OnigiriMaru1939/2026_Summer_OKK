@@ -6,6 +6,7 @@
 #include "FontFile.h"
 #include "SceneManager.h"
 #include "NetworkManager.h"
+#include <string>
 
 enum class NextScene
 {
@@ -33,7 +34,7 @@ private:
 	static constexpr int NEXT_BUTTON_HIG = 150;
 	static constexpr int NEXT_BUTTON_MARGIN = 50;
 public:
-	SceneResult(FileManager& fileMng, bool isClear, ClearResult& result, SceneManager& sceneMng);
+	SceneResult(FileManager& fileMng, bool isClear, ClearResult& result, SceneManager& sceneMng, const std::string& ip = "127.0.0.1");
 
 	~SceneResult() override;
 

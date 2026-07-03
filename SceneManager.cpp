@@ -45,6 +45,7 @@ void SceneManager::Update()
 	}
 	else
 	{
+		currentScene = scenes.back().get();
 		currentScene->Update();
 
 		if (currentScene->IsEnd())
@@ -114,11 +115,11 @@ std::unique_ptr<SceneSuper> SceneManager::CreateScene(SceneSuper::SceneID sceneI
 		case SceneSuper::SceneID::TITLE:
 			return std::make_unique<SceneTitle>(fileMng_, *this);
 		case SceneSuper::SceneID::STAGE_SELECT:
-			return std::make_unique<SceneStageSelect>(fileMng_, *this);
+			return std::make_unique<SceneStageSelect>(fileMng_, *this, _remoteIp);
 		case SceneSuper::SceneID::GAME:
-			return std::make_unique<SceneGame>(fileMng_, *this, isHost);
+			return std::make_unique<SceneGame>(fileMng_, *this, isHost, _remoteIp);
 		case SceneSuper::SceneID::RESULT:
-			return std::make_unique<SceneResult>(fileMng_, _isClear, _clearResult, *this);
+			return std::make_unique<SceneResult>(fileMng_, _isClear, _clearResult, *this, _remoteIp);
 		case SceneSuper::SceneID::PAUSE:
 			return std::make_unique<ScenePause>(fileMng_, *this);
 		default:

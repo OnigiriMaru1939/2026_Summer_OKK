@@ -30,7 +30,7 @@ public:
 		BATTLE,
 	};
 
-	SceneGame(FileManager& fileMng, SceneManager& sceneMng, bool isHost = true);
+	SceneGame(FileManager& fileMng, SceneManager& sceneMng, bool isHost = true, const std::string& ip = "127.0.0.1");
 
 	~SceneGame() override;
 
@@ -39,6 +39,7 @@ public:
 	void UpdatePlayer();
 	void UpdateEnemy();
 	void UpdateStage();
+	void UpdateGimmick();
 	void UpdateItem();
 	void UpdateDuringTransition() override; // トランジション中の更新処理
 	void CheckPlayerEnemyCollision();

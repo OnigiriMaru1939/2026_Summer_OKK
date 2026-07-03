@@ -7,6 +7,7 @@
 #include "SceneManager.h"
 #include "NetworkManager.h"
 #include <memory>
+#include <string>
 
 class SceneStageSelect :
     public SceneSuper
@@ -29,7 +30,7 @@ private:
 	static constexpr int TITLE_W = 400;	// 仮タイトルボタン幅
 	static constexpr int TITLE_H = 150;	// 仮タイトルボタン高さ
 public:
-	SceneStageSelect(FileManager& fileMng, SceneManager& sceneMng);
+	SceneStageSelect(FileManager& fileMng, SceneManager& sceneMng, const std::string& ip = "127.0.0.1");
 
 	~SceneStageSelect() override;
 
