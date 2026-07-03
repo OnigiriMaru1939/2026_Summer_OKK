@@ -172,6 +172,8 @@ void SceneGame::Update()
 		gimmickList_.end()
 	);
 
+	//ギミックの更新
+	UpdateGimmick();
 	//アイテムの更新
 	UpdateItem();
 
@@ -514,6 +516,14 @@ void SceneGame::UpdateEnemy()
 void SceneGame::UpdateStage()
 {
 	if (stage_) stage_->Update();
+}
+
+void SceneGame::UpdateGimmick()
+{
+	for (auto& gimmick : gimmickList_)
+	{
+		gimmick->Update();
+	}
 }
 
 //アイテムの更新
