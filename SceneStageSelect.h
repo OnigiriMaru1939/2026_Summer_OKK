@@ -58,6 +58,6 @@ private:
 
 	int _fadeAlpha;
 
-	NetworkManager _networkMng;
+	NetworkManager& _networkMng;
 };
 

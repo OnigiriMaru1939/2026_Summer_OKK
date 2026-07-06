@@ -3,16 +3,19 @@
 #include "SoundFile.h"
 #include "ImageFile.h"
 #include "FontFile.h"
+#include "NetworkManager.h"
 #include <memory>
+#include <string>
+
 class SceneManager;
 
 enum class NextScenePause
 {
 	Back = 0,
-	Retry,
-	StageSelect,
-	Title,
-	Exit,
+	Retry = 1,
+	StageSelect = 2,
+	Title = 3,
+	Exit = 5,
 	Max
 };
 
@@ -26,13 +29,16 @@ private:
 	static constexpr int BUTTON_HIG = 100;
 	static constexpr int BUTTON_MARGIN = 70;
 public:
-	ScenePause(FileManager& fileMng, SceneManager& sceneMng);
+	ScenePause(FileManager& fileMng, SceneManager& sceneMng, const std::string& ip = "127.0.0.1");
 	~ScenePause() override;
 	void Update() override;
 	void Draw() override;
+
+	void SyncResume();
+	void SyncChangeScene(int nextSceneIndex);
 private:
+	void DecidePauseScene(bool isFromNetwork = false);
 	void MoveSelect(float moveValue);
-	void DecidePauseScene();
 	std::shared_ptr<ImageFile> _blockImg;
 	std::shared_ptr<ImageFile> _blockSelectImg;
 	std::shared_ptr<SoundFile> _decideSE;
@@ -43,5 +49,7 @@ private:
 	std::shared_ptr<FontFile> _explainFont;
 
 	int _selectedIndex;
+
+	NetworkManager& _networkMng;
 };
 

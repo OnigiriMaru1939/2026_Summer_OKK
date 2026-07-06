@@ -12,9 +12,9 @@
 #include "BulletBase.h"
 #include "NetworkManager.h"
 #include "RemotePlayer.h"
+#include "SceneManager.h"
 
 class Player;
-class SceneManager;
 class ParticleManager;
 
 class SceneGame :
@@ -73,6 +73,7 @@ public:
 	FileManager& GetFileManager() { return fileMng_; }
 
 
+	void RequestPause() { sceneMng_.PushScene(SceneID::PAUSE); }
 	static void SetSelectedStageIndex(int index) { selectedStageIndex_ = index; }
 	static int selectedStageIndex_;
 
@@ -93,7 +94,7 @@ private:
 	std::vector<std::shared_ptr<ItemBase>> itemList_;			//アイテムのリスト
 	std::vector<std::shared_ptr<BulletBase>> bulletList_;		//弾のリスト
 
-	NetworkManager networkManager_;
+	NetworkManager& networkManager_;
 	std::shared_ptr<RemotePlayer> remotePlayer_;
 
 	bool isHost_;
