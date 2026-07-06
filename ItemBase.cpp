@@ -67,6 +67,7 @@ void ItemBase::Draw()
 	//生存していないか画像がない場合は描画しない
 	if (!alive_ || !image_) return;
 
+#ifdef _DEBUG
 	//当たり判定の矩形を描画
 	RECT rc = GetRect();
 
@@ -78,6 +79,7 @@ void ItemBase::Draw()
 		GetColor(0, 255, 0),
 		FALSE
 	);
+#endif
 
 	int handle = 0;
 	handle = image_->GetHandle();

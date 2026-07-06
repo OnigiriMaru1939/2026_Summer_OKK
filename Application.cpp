@@ -19,12 +19,12 @@ Application::Application()
 	SetDoubleStartValidFlag(TRUE);
 	SetAlwaysRunFlag(TRUE);
 
-
-	SetGraphMode(SCREEN_WID - 100, SCREEN_HIG - 100, 32);
-	ChangeWindowMode(true);
-#ifdef _DEBUG
 	SetGraphMode(SCREEN_WID, SCREEN_HIG, 32);
 	ChangeWindowMode(false);
+
+#ifdef _DEBUG
+	SetGraphMode(SCREEN_WID - 100, SCREEN_HIG - 100, 32);
+	ChangeWindowMode(true);
 #endif // DEBUG
 
 //#ifdef _WIN64

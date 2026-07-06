@@ -21,6 +21,12 @@ class SceneGame :
     public SceneSuper
 {
 public:
+	struct tutorialPanel
+	{
+		std::shared_ptr<ImageFile> path;
+		float x;
+		float y;
+	};
 	//ボスイベントの状態
 	enum class BossEventState
 	{
@@ -61,11 +67,12 @@ public:
 	RECT GetBossArea() const;                                           //ボスエリアの矩形を取得
 	std::shared_ptr<EnemyBase> GetBoss();                                   //ボス1の取得
 
-	//敵生成関数
+	// 生成関数
 	void AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y);
 	void AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y);
 	void AddTeleport(float x, float y, float targetX, float targetY);
 	void AddItem(ItemBase::ITEM_TYPE type, float x, float y);
+	void SetTutorial(std::string path, float x, float y);
 
 	Stage* GetStage() { return stage_.get(); }
 	Player* GetPlayer() { return player_.get(); }
@@ -88,6 +95,11 @@ private:
 	std::unique_ptr<Player> player_;
 
 	std::unique_ptr<ParticleManager> _pMng;
+
+	std::vector<tutorialPanel> _tutorialPanelList; // チュートリアルの画像リスト
+
+	std::shared_ptr<ImageFile> _PauseImg;
+	bool CollisionPauseImg();
 
 	std::vector<std::shared_ptr<EnemyBase>> enemyList_;			//敵のリスト
 	std::vector<std::shared_ptr<GimmickBase>> gimmickList_;		//ギミックのリスト
