@@ -5,7 +5,7 @@
 class Enemy1 : public EnemyBase
 {
 public:
-	Enemy1(FileManager& fileMng, Stage* stage, float x, float y, ParticleManager& pMng);
+	Enemy1(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng);
 	~Enemy1() override;
 	void Update() override;
 };

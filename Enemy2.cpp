@@ -1,6 +1,6 @@
 ﻿#include "Enemy2.h"
 
-Enemy2::Enemy2(FileManager& fileMng, Stage* stage, float x, float y, ParticleManager& pMng) : EnemyBase(fileMng, stage, x, y, pMng)
+Enemy2::Enemy2(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng) : EnemyBase(fileMng, stage, sceneGame, x, y, pMng)
 {
 	SetImage("Resource/Image/Enemys/Wingbull.png");
 	enemyType_ = ENEMY_TYPE::E_TYPE_2;

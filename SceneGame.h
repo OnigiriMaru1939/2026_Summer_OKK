@@ -4,12 +4,13 @@
 #include "Application.h"
 #include "Stage.h"
 #include "EnemyBase.h"
+#include "BulletBase.h"
+#include "Bullet.h"
 #include "Boss1.h"
 #include "FontFile.h"
 #include "ScreenFile.h"
 #include "GimmickBase.h"
 #include "ItemBase.h"
-#include "BulletBase.h"
 #include "NetworkManager.h"
 #include "RemotePlayer.h"
 
@@ -39,6 +40,7 @@ public:
 	void Draw() override;
 	void UpdatePlayer();
 	void UpdateEnemy();
+	void UpdateEnemyShot();
 	void UpdateStage();
 	void UpdateGimmick();
 	void UpdateItem();
@@ -54,16 +56,18 @@ public:
 				   int color);
 	void CheckPlayerGimmickCollision();									//プレイヤーとギミックの衝突判定
 	void CheckPlayerItemCollision();									//プレイヤーとアイテムの衝突判定
+	void CheckPlayerEnemyShotCollision();								//プレイヤーと敵の弾の衝突判定
 	void CheckBossSpawn();												//ボスの生成判定
 	void BossEvent();                                                   //ボスイベントの処理
 	void BossEventDraw();                                               //ボスイベントの描画
 	void SetBossArea(int left, int top, int right, int bottom);         //ボスエリアの矩形を設定
 	RECT GetBossArea() const;                                           //ボスエリアの矩形を取得
-	std::shared_ptr<EnemyBase> GetBoss();                                   //ボス1の取得
+	std::shared_ptr<EnemyBase> GetBoss();                               //ボス1の取得
 
 	//敵生成関数
 	void AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y);
 	void AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y);
+	void AddEnemyShot(BulletBase::BULLET_TYPE type, float x, float y, float vx, float vy, float scale);
 	void AddTeleport(float x, float y, float targetX, float targetY);
 	void AddItem(ItemBase::ITEM_TYPE type, float x, float y);
 
@@ -91,7 +95,7 @@ private:
 	std::vector<std::shared_ptr<EnemyBase>> enemyList_;			//敵のリスト
 	std::vector<std::shared_ptr<GimmickBase>> gimmickList_;		//ギミックのリスト
 	std::vector<std::shared_ptr<ItemBase>> itemList_;			//アイテムのリスト
-	std::vector<std::shared_ptr<BulletBase>> bulletList_;		//弾のリスト
+	std::vector<std::shared_ptr<BulletBase>> bulletList_;		//敵の弾のリスト
 
 	NetworkManager networkManager_;
 	std::shared_ptr<RemotePlayer> remotePlayer_;
