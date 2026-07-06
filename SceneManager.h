@@ -4,6 +4,7 @@
 #include <list>
 #include <string>
 #include "SceneSuper.h"
+#include "NetworkManager.h"
 
 class FileManager;
 
@@ -51,7 +52,11 @@ public:
 	bool IsTransitioning() const { return transition_.state != TransitionState::None; }
 
 	void SetRemoteIp(const std::string& ip) { _remoteIp = ip; }
+
+	NetworkManager& GetNetworkManager() { return networkManager_; }
 private:
+	NetworkManager networkManager_;
+
 	std::unique_ptr<SceneSuper> CreateScene(SceneSuper::SceneID sceneID, bool isHost = true);
 	void ChangeScene(SceneSuper::SceneID nextSceneID, bool isHost = true);
 

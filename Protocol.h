@@ -46,6 +46,13 @@ enum PacketType
 	PACKET_APPLY_DAMAGE = 7,
 	PACKET_HIT_CONFIRMED = 8,
 	PACKET_CHANGE_SCENE = 9,
+	PACKET_PAUSE = 10,
+	PACKET_RESUME = 11,
+};
+
+struct SystemPacket
+{
+	int type;
 };
 
 struct ChangeScenePacket

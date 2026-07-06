@@ -9,6 +9,7 @@ class Player;
 class RemotePlayer;
 class EnemyBase;
 class SceneGame;
+class ScenePause;
 
 class NetworkManager
 {
@@ -38,10 +39,12 @@ public:
 	void SendDamage(const DamagePacket& packet);
 	void SendHitConfirmed(const HitConfirmedPacket& packet);
 	void SendChangeScene(const ChangeScenePacket& packet);
+	void SendSystem(const SystemPacket& packet);
 
 	// 受信系（ここでパケットを振り分ける）
 	// ループ内で呼び出し、届いたパケットに応じて各オブジェクトを更新する
 	void ReceiveData(RemotePlayer* remotePlayer = nullptr, std::vector<std::shared_ptr<EnemyBase>>* enemyList = nullptr, SceneGame* sceneGame = nullptr);
+	void ReceivePauseData(ScenePause* pauseScene);
 	// ステージ
 	bool ReceiveStageSelect(int& outStageIndex);
 	bool ReceiveChangeScene(int& outNextSceneID);

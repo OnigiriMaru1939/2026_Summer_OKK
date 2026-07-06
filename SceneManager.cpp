@@ -121,7 +121,7 @@ std::unique_ptr<SceneSuper> SceneManager::CreateScene(SceneSuper::SceneID sceneI
 		case SceneSuper::SceneID::RESULT:
 			return std::make_unique<SceneResult>(fileMng_, _isClear, _clearResult, *this, _remoteIp);
 		case SceneSuper::SceneID::PAUSE:
-			return std::make_unique<ScenePause>(fileMng_, *this);
+			return std::make_unique<ScenePause>(fileMng_, *this, _remoteIp);
 		default:
 			return nullptr;
 	}

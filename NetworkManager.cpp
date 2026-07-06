@@ -3,6 +3,7 @@
 #include "RemotePlayer.h"
 #include "EnemyBase.h"
 #include "SceneGame.h"
+#include "ScenePause.h"
 
 NetworkManager::~NetworkManager()
 {
@@ -16,6 +17,8 @@ NetworkManager::~NetworkManager()
 
 bool NetworkManager::Initialize(bool isHost, const std::string& targetIPString)
 {
+	if (udpSocket != -1) return true;
+
 	// ホストは8080で待ち受け、クライアントは8081で待ち受ける例
 	int myPort = isHost ? 8080 : 8081;
 	targetPort = isHost ? 8081 : 8080;
@@ -97,6 +100,12 @@ void NetworkManager::SendChangeScene(const ChangeScenePacket& packet)
 {
 	if (udpSocket == -1) return;
 	NetWorkSendUDP(udpSocket, targetIP, targetPort, (void*)&packet, sizeof(ChangeScenePacket));
+}
+
+void NetworkManager::SendSystem(const SystemPacket& packet)
+{
+	if (udpSocket == -1) return;
+	NetWorkSendUDP(udpSocket, targetIP, targetPort, (void*)&packet, sizeof(SystemPacket));
 }
 
 void NetworkManager::ReceiveData(RemotePlayer* remotePlayer, std::vector<std::shared_ptr<EnemyBase>>* enemyList, SceneGame* sceneGame)
@@ -205,7 +214,40 @@ void NetworkManager::ReceiveData(RemotePlayer* remotePlayer, std::vector<std::sh
 						receivedNextScene = csp->nextScene;
 					}
 					break;
+				case PACKET_PAUSE:
+					sceneGame->RequestPause();
 			}
+		}
+	}
+}
+
+void NetworkManager::ReceivePauseData(ScenePause* pauseScene)
+{
+	if (udpSocket == -1) return;
+
+	// ポーズ中も常にパケットを受信し続ける
+	while (CheckNetWorkRecvUDP(udpSocket) == TRUE)
+	{
+		char buffer[1024];
+		IPDATA senderIP;
+		int senderPort;
+		int recvLen = NetWorkRecvUDP(udpSocket, &senderIP, &senderPort, buffer, sizeof(buffer), FALSE);
+
+		if (recvLen > 0)
+		{
+			int type = *reinterpret_cast<int*>(buffer);
+
+			if (type == PACKET_RESUME)
+			{
+				pauseScene->SyncResume(); // 相手が再開した
+			}
+			else if (type == PACKET_CHANGE_SCENE)
+			{
+				ChangeScenePacket* csp = reinterpret_cast<ChangeScenePacket*>(buffer);
+				pauseScene->SyncChangeScene(csp->nextScene); // 相手がシーン遷移を選択した
+			}
+			// ★重要：PACKET_SYNC_PLAYER などのゲーム内パケットは、
+			// 何も処理せずに無視する（捨てる）ことでバッファ詰まりを防ぎます。
 		}
 	}
 }

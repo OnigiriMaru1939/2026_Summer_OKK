@@ -71,6 +71,7 @@ SceneTitle::SceneTitle(FileManager& fileMng, SceneManager& sceneMng) : SceneSupe
 																	   SceneID::STAGE_SELECT);
 																   sceneMng_.SetIsHost(_selectedIndex == 0);
 																   sceneMng_.SetRemoteIp(_inputIp);
+																   sceneMng_.GetNetworkManager().Initialize(_selectedIndex == 0, _inputIp);
 																   isEnd = true;
 															   }
 														   }

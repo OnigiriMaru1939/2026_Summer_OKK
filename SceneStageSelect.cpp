@@ -7,7 +7,8 @@
 #include "Application.h"
 #include "Fonts.h"
 
-SceneStageSelect::SceneStageSelect(FileManager& fileMng, SceneManager& sceneMng, const std::string& ip) : SceneSuper(fileMng, sceneMng)
+SceneStageSelect::SceneStageSelect(FileManager& fileMng, SceneManager& sceneMng, const std::string& ip) : SceneSuper(fileMng, sceneMng),
+_networkMng(sceneMng.GetNetworkManager())
 {
 	_fadeAlpha = 255.0f;
 	// 仮別フォント
@@ -33,8 +34,8 @@ SceneStageSelect::SceneStageSelect(FileManager& fileMng, SceneManager& sceneMng,
 	_cursorSE = fileMng.LoadSoundFM("Resource/Sound/SE/Cursor_SE.wav");
 
 	// ネットワーク初期化
-	bool isHost = sceneMng.GetIsHost();
-	_networkMng.Initialize(isHost, ip);
+	//bool isHost = sceneMng.GetIsHost();
+	//_networkMng.Initialize(isHost, ip);
 
 	InputManager::GetInstance().SetTriggerCallback(ActionID::MoveH,
 												   [this]()
@@ -94,6 +95,7 @@ void SceneStageSelect::Update()
 		// 有効なステージ番号（0より大きい）を受け取ったら強制遷移
 		if (receivedStageIndex > 0)
 		{
+			_selectedIndex = receivedStageIndex;
 			_decideSE->PlayOneShot(); // 相手が決定したときもSEを鳴らしてあげる
 			SceneGame::SetSelectedStageIndex(receivedStageIndex);
 			SetNextScene(SceneID::GAME);

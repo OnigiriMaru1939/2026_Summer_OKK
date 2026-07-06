@@ -11,10 +11,11 @@
 enum class NextScene
 {
 	Next = 0,
-	Retry,
-	StageSelect,
-	Title,
-	Result,
+	Retry = 1,
+	StageSelect = 2,
+	Title = 3,
+	Result = 4,
+	Exit = 5,
 	Max
 };
 
@@ -61,7 +62,7 @@ private:
 	float _fadeInAlpha;
 	float _fadeOutAlpha;
 
-	NetworkManager _networkMng;
+	NetworkManager& _networkMng;
 
 	void MoveSelect(float moveValue);
 };

@@ -7,8 +7,10 @@
 #include "InputManager.h"
 #include "SceneManager.h"
 #include "Fonts.h"
+#include "SceneResult.h"
 
-ScenePause::ScenePause(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(fileMng, sceneMng)
+ScenePause::ScenePause(FileManager& fileMng, SceneManager& sceneMng, const std::string& ip) : SceneSuper(fileMng, sceneMng),
+_networkMng(sceneMng.GetNetworkManager())
 {
 	_textFont = fileMng_.CreateFontFM(Fonts::DotGothic16::PATH,
 									  Fonts::DotGothic16::NAME,
@@ -19,6 +21,7 @@ ScenePause::ScenePause(FileManager& fileMng, SceneManager& sceneMng) : SceneSupe
 	_explainFont = fileMng_.CreateFontFM(Fonts::DotGothic16::PATH,
 									   Fonts::DotGothic16::NAME,
 									   40);
+
 	_selectedIndex = 0;
 	_blockImg = fileMng_.LoadImageFM("Resource/Image/Pause/Pause_Block.png");
 	_blockSelectImg = fileMng_.LoadImageFM("Resource/Image/Pause/Pause_Block_Select.png");
@@ -70,6 +73,7 @@ ScenePause::~ScenePause()
 
 void ScenePause::Update()
 {
+	sceneMng_.GetNetworkManager().ReceivePauseData(this);
 }
 
 void ScenePause::Draw()
@@ -108,6 +112,17 @@ void ScenePause::Draw()
 	}
 }
 
+void ScenePause::SyncResume()
+{
+	sceneMng_.PopScene();
+}
+
+void ScenePause::SyncChangeScene(int nextSceneIndex)
+{
+	_selectedIndex = nextSceneIndex;
+	DecidePauseScene(this);
+}
+
 void ScenePause::MoveSelect(float moveValue)
 {
 	if (moveValue > 0)
@@ -129,27 +144,55 @@ void ScenePause::MoveSelect(float moveValue)
 	_selectedIndex = std::max(0, std::min(static_cast<int>(NextScenePause::Max) - 1, _selectedIndex));
 }
 
-void ScenePause::DecidePauseScene()
+void ScenePause::DecidePauseScene(bool isFromNetwork)
 {
+	SceneID scene = SceneID::NONE;
+
+	if (static_cast<NextScenePause>(_selectedIndex) == NextScenePause::Back)
+	{
+		// 戻る（再開）処理
+		if (!isFromNetwork)
+		{
+			SystemPacket p;
+			p.type = PACKET_RESUME;
+			sceneMng_.GetNetworkManager().SendSystem(p);
+		}
+		sceneMng_.PopScene();
+		return;
+	}
+
 	switch (static_cast<NextScenePause>(_selectedIndex))
 	{
-		case NextScenePause::Back:
-			sceneMng_.PopScene();
-			break;
 		case NextScenePause::Retry:
-			SetNextScene(SceneID::GAME);
+			scene = SceneID::GAME;
+			SetNextScene(scene);
 			break;
 		case NextScenePause::StageSelect:
-			SetNextScene(SceneID::STAGE_SELECT);
+			scene = SceneID::STAGE_SELECT;
+			SetNextScene(scene);
 			break;
 		case NextScenePause::Title:
-			SetNextScene(SceneID::TITLE);
+			scene = SceneID::TITLE;
+			SetNextScene(scene);
 			break;
 		case NextScenePause::Exit:
-			SetNextScene(SceneID::EXIT);
+			scene = SceneID::EXIT;
+			SetNextScene(scene);
 			break;
 		default:
 			break;
 	}
-	isEnd = true;
+	if (scene != SceneID::NONE)
+	{
+		// 自分が操作した時だけ、相手に教える（無限ループ防止）
+		if (!isFromNetwork)
+		{
+			ChangeScenePacket csp;
+			csp.type = PACKET_CHANGE_SCENE;
+			csp.nextScene = static_cast<int>(_selectedIndex);
+			sceneMng_.GetNetworkManager().SendChangeScene(csp);
+		}
+		SetNextScene(scene);
+		isEnd = true;
+	}
 }

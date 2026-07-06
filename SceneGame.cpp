@@ -25,7 +25,8 @@
 // 静的変数の定義
 int SceneGame::selectedStageIndex_ = 1;
 
-SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng, bool isHost, const std::string& ip) : SceneSuper(fileMng, sceneMng), isHost_(isHost)
+SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng, bool isHost, const std::string& ip) : SceneSuper(fileMng, sceneMng), isHost_(isHost), 
+networkManager_(sceneMng.GetNetworkManager())
 {
 	_bossNameFont = fileMng.CreateFontFM(Fonts::DotGothic16::PATH,
 										 Fonts::DotGothic16::NAME,
@@ -33,8 +34,6 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng, bool isHost, 
 	_warningFont = fileMng.CreateFontFM(Fonts::DotGothic16::PATH,
 										 Fonts::DotGothic16::NAME,
 										 160);
-
-	networkManager_.Initialize(isHost, ip);
 
 	_pMng = std::make_unique<ParticleManager>(fileMng);
 
@@ -73,6 +72,9 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng, bool isHost, 
 												   {
 													   if (!isTransition)
 													   {
+														   SystemPacket p;
+														   p.type = PACKET_PAUSE;
+														   networkManager_.SendSystem(p);
 														   sceneMng_.PushScene(SceneID::PAUSE);
 													   }
 												   });
@@ -887,6 +889,7 @@ void SceneGame::BossEvent()
 					{
 						boss->SetAppearFlag(false);
 					}
+					player_->SetCanMoveFlag(true);
 					break;
 			}
 			bossEventState = newBossState;
