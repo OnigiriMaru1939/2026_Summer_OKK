@@ -372,18 +372,6 @@ void Player::Draw()
 
 	DrawCircle(static_cast<int>(canvasX), static_cast<int>(canvasY), 3, 0X0000ff);
 	// デバッグ
-	//当たり判定の矩形を描画
-	RECT rc = GetRect();
-
-	DrawBox(
-		rc.left - stage_.GetScrollX(),
-		rc.top - stage_.GetScrollY(),
-		rc.right - stage_.GetScrollX(),
-		rc.bottom - stage_.GetScrollY(),
-		GetColor(0, 255, 0),
-		FALSE
-	);
-
 	DrawFormatString(1000, 1000, GetColor(255, 0, 0), "SodaGauge: %d", static_cast<int>(sodaShakeGauge));
 	DrawFormatString(1000, 1020, GetColor(255, 0, 0), "_noDamageTime: %d", static_cast<int>(_noDamageTime));
 	DrawFormatString(1000, 1040, GetColor(255, 0, 0), "sodaAttackFlag: %d", sodaAttackFlag);
