@@ -332,6 +332,7 @@ void Player::Draw()
 		SetDrawBright(255, 255, 255);
 	}
 
+#ifdef _DEBUG
 	//当たり判定の矩形を描画
 	RECT rc = GetRect();
 
@@ -343,7 +344,7 @@ void Player::Draw()
 		GetColor(0, 255, 0),
 		FALSE
 	);
-  
+#endif
 	//ゲージの描画
 	if (CollisionHpBar())
 	{
