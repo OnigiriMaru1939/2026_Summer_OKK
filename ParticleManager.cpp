@@ -19,6 +19,9 @@ ParticleManager::~ParticleManager()
 // Particle Developからのデータを輸入するために強引にロード
 void ParticleManager::RegisterConfig(const std::string& jsonPath)
 {
+	// 既に登録済みなら何もしない
+	if (configLibrary.find(jsonPath) != configLibrary.end()) return;
+
 	std::ifstream ifs(jsonPath);
 	if (!ifs.is_open()) return;
 

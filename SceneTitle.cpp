@@ -28,6 +28,8 @@ SceneTitle::SceneTitle(FileManager& fileMng, SceneManager& sceneMng) : SceneSupe
 	_bgImg = fileMng_.LoadImageFM("Resource/Image/Title/Title_bg.png");
 	_TitleLogoImg = fileMng_.LoadImageFM("Resource/Image/Title/Title_Logo.png");
 	_TitleStartImg = fileMng_.LoadImageFM("Resource/Image/Title/Title_Start.png");
+	_Title1PImg = fileMng_.LoadImageFM("Resource/Image/Title/Title_1P_Button.png");
+	_Title2PImg = fileMng_.LoadImageFM("Resource/Image/Title/Title_2P_Button.png");
 	_mainBgm = fileMng_.LoadSoundFM("Resource/Sound/BGM/Night_Light.wav");
 	_decideSE = fileMng_.LoadSoundFM("Resource/Sound/SE/Decide_SE.wav");
 
@@ -137,15 +139,11 @@ void SceneTitle::Draw()
 	DrawRotaGraph(Application::SCREEN_WID / 2, Application::SCREEN_HIG / 2, 1.0f, 0.0f, _bgImg->GetHandle(), true);
 	DrawRotaGraph(Application::SCREEN_WID / 2, LOGO_Y, 1.0f, 0.0f, _TitleLogoImg->GetHandle(), true);
 
-	DrawRotaGraph(Application::SCREEN_WID / 2, START_Y, 1.0f, 0.0f, _TitleStartImg->GetHandle(), true);
-
 	// ─── 選択肢の描画 (選択中なら黄色、それ以外は白) ───
-	unsigned int color1P = (_selectedIndex == 0) ? GetColor(255, 255, 0) : GetColor(255, 255, 255);
-	unsigned int color2P = (_selectedIndex == 1) ? GetColor(255, 255, 0) : GetColor(255, 255, 255);
 	unsigned int colorIP = (_selectedIndex == 2) ? GetColor(255, 255, 0) : GetColor(255, 255, 255);
 
-	DrawString(Application::SCREEN_WID / 2 - 120, LOGO_Y + 400, "1P START (HOST)", color1P);
-	DrawString(Application::SCREEN_WID / 2 - 120, LOGO_Y + 420, "2P START (CLIENT)", color2P);
+	DrawRotaGraph(Application::SCREEN_WID / 2, MENU_Y, 1.0f, 0.0f, _Title1PImg->GetHandle(), true);
+	DrawRotaGraph(Application::SCREEN_WID / 2, MENU_Y + MENU_SPACING, 1.0f, 0.0f, _Title2PImg->GetHandle(), true);
 
 	std::string ipLabel = "Target IP: " + _inputIp;
 
@@ -154,18 +152,28 @@ void SceneTitle::Draw()
 		ipLabel += "_";
 	}
 
-	DrawString(Application::SCREEN_WID / 2 - 120, LOGO_Y + 440, ipLabel.c_str(), colorIP);
-	DrawString(Application::SCREEN_WID / 2 - 120, LOGO_Y + 470, "  Your IP:", 0xffC800);
+	DrawString(Application::SCREEN_WID / 2 - 120, MENU_Y + (MENU_SPACING * 2) - GetFontSize() / 2, ipLabel.c_str(), colorIP);
+
+	DrawString(Application::SCREEN_WID / 2 - 120, IP_Y + 30, "  Your IP:", 0xffC800);
 	for (int i = 0; i < ipCount; i++)
 	{
-		DrawString(Application::SCREEN_WID / 2 - 20, LOGO_Y + 470 + (i * 20), myIPBuffer[i], GetColor(255, 200, 0));
+		DrawString(Application::SCREEN_WID / 2, IP_Y + 30 + (i * 20), myIPBuffer[i], GetColor(255, 200, 0));
 	}
+
+	// 選択中の項目の左に矢印を描画
+	SetFontSize(40);
+	int arrowX = Application::SCREEN_WID / 2 - 200;
+	int arrowY = MENU_Y + (_selectedIndex * MENU_SPACING) - GetFontSize() / 2;
+	DrawString(arrowX, arrowY, "▶", GetColor(255, 255, 0));
+	SetFontSize(20);
+
+	DrawRotaGraph(Application::SCREEN_WID / 2, START_Y, 0.8f, 0.0f, _TitleStartImg->GetHandle(), true);
 
 	std::string TitleEndText = "Press Escape/Back to Exit";
 	int textWidth = GetDrawStringWidth(TitleEndText.c_str(), TitleEndText.length());
 	DrawString((Application::SCREEN_WID / 2) - (textWidth / 2), START_Y + 60, TitleEndText.c_str(), GetColor(255, 255, 255));
 
-	DrawFormatString(700, 0, 0x00ff00, "selectedIndex:%d", _selectedIndex);
+	//DrawFormatString(700, 0, 0x00ff00, "selectedIndex:%d", _selectedIndex);
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(_fadeAlpha));
 	DrawBox(0, 0, Application::SCREEN_WID, Application::SCREEN_HIG, 0x000000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);

@@ -91,7 +91,7 @@ private:
 	std::vector<std::shared_ptr<ItemBase>> itemList_;		//アイテムのリスト
 
 	NetworkManager networkManager_;
-	RemotePlayer remotePlayer_;
+	std::shared_ptr<RemotePlayer> remotePlayer_;
 
 	bool isHost_;
 

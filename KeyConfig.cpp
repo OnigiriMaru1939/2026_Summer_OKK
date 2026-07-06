@@ -175,10 +175,7 @@ bool KeyConfig::LoadFromFile(const std::wstring& filename)
 			}
 			// else: 未知のアクション名は無視
 		}
-		//for (const auto& pair : keyConfigMap_)
-		//{
-		//	printfDx("Action %d has %d mappings\n", (int)pair.first, (int)pair.second.size());
-		//}
+
 	}
 	return true;
 }

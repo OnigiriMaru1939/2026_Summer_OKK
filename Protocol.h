@@ -81,6 +81,7 @@ struct PlayerPacket
 	int type;           // PACKET_SYNC_PLAYER
 	float posX, posY;   // 位置
 	float vx, vy;       // 速度（補完用）
+	float angle;         // 向き（補完用）
 	bool isAttack;      // 攻撃中か
 	// ※必要に応じてHPなども追加可能
 };
@@ -113,4 +114,6 @@ struct SodaJumpPacket
 {
 	int type;           // PACKET_SHOOT
 	float startX, startY;
+	float angle;
+	float sodaRatio;
 };
