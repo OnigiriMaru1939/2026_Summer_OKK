@@ -5,6 +5,7 @@
 #include "FileManager.h"
 #include "ImageFile.h"
 #include "SoundFile.h"
+#include "NetworkManager.h"
 #include "ParticleManager.h"
 #include "ParticleEmitter.h"
 #include "SceneGame.h"
@@ -14,11 +15,8 @@
 
 
 constexpr auto WATER_PARTICLE_PATH = "Resource/ParticleJsonData/waterParameter.json";
-Player::Player(FileManager& fileMng, Stage& stage, SceneGame& game, ParticleManager& pMng) 
-	: fileManager(fileMng),
-	stage_(stage), 
-	sceneGame(game),
-	particleManager(pMng)
+
+Player::Player(FileManager& fileMng, Stage& stage, SceneGame& game, ParticleManager& pMng, NetworkManager& nMng) : fileManager(fileMng), stage_(stage), sceneGame(game), particleManager(pMng), networkManager_(nMng)
 {
 	AddFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
 	hpFontHandle = CreateFontToHandle("DotGothic16", 30, -1, DX_FONTTYPE_EDGE);
@@ -334,6 +332,18 @@ void Player::Draw()
 		SetDrawBright(255, 255, 255);
 	}
 
+	//当たり判定の矩形を描画
+	RECT rc = GetRect();
+
+	DrawBox(
+		rc.left - stage_.GetScrollX(),
+		rc.top - stage_.GetScrollY(),
+		rc.right - stage_.GetScrollX(),
+		rc.bottom - stage_.GetScrollY(),
+		GetColor(0, 255, 0),
+		FALSE
+	);
+  
 	//ゲージの描画
 	if (CollisionHpBar())
 	{
@@ -356,7 +366,7 @@ void Player::Draw()
 		//炭酸ヒートゲージ
 		DrawGauge(static_cast<int>(canvasX) - 75, static_cast<int>(canvasY) - 50, 20, 100, sodaHeatShakeGauge, SODA_HEAT_SHAKE_GAUGE_MAX, GetColor(255, 0, 0), 1);
 	}
-
+  
 	//プレイヤーの振動処理
 	PlayerShake();
 
@@ -588,6 +598,14 @@ void Player::ClickSodaJump()
 			sodaAttackSE->SetVolume((int)(sodaRatio * 255)); // 音量を炭酸ゲージの割合に応じて変化させる
 			sodaAttackSE->PlayOneShot();
 		}
+
+		SodaJumpPacket sjp;
+		sjp.type = PACKET_SODA;
+		sjp.startX = posX;
+		sjp.startY = posY;
+		sjp.angle = angle;
+		sjp.sodaRatio = sodaRatio;
+		networkManager_.SendSodaJump(sjp);
 	}
 }
 

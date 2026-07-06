@@ -7,7 +7,7 @@
 #include "Application.h"
 #include "Fonts.h"
 
-SceneStageSelect::SceneStageSelect(FileManager& fileMng, SceneManager& sceneMng) : SceneSuper(fileMng, sceneMng)
+SceneStageSelect::SceneStageSelect(FileManager& fileMng, SceneManager& sceneMng, const std::string& ip) : SceneSuper(fileMng, sceneMng)
 {
 	_fadeAlpha = 255.0f;
 	// 仮別フォント
@@ -34,7 +34,6 @@ SceneStageSelect::SceneStageSelect(FileManager& fileMng, SceneManager& sceneMng)
 
 	// ネットワーク初期化
 	bool isHost = sceneMng.GetIsHost();
-	std::string ip = GetConfigValue("remote_ip");
 	_networkMng.Initialize(isHost, ip);
 
 	InputManager::GetInstance().SetTriggerCallback(ActionID::MoveH,

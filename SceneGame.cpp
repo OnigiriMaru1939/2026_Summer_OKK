@@ -25,7 +25,7 @@
 // 静的変数の定義
 int SceneGame::selectedStageIndex_ = 1;
 
-SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng, bool isHost) : SceneSuper(fileMng, sceneMng), isHost_(isHost)
+SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng, bool isHost, const std::string& ip) : SceneSuper(fileMng, sceneMng), isHost_(isHost)
 {
 	_bossNameFont = fileMng.CreateFontFM(Fonts::DotGothic16::PATH,
 										 Fonts::DotGothic16::NAME,
@@ -34,10 +34,13 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng, bool isHost) 
 										 Fonts::DotGothic16::NAME,
 										 160);
 
+	networkManager_.Initialize(isHost, ip);
+
 	_pMng = std::make_unique<ParticleManager>(fileMng);
 
 	stage_ = std::make_unique<Stage>(fileMng);
-	player_ = std::make_unique<Player>(fileMng, *stage_, *this, *_pMng);
+	player_ = std::make_unique<Player>(fileMng, *stage_, *this, *_pMng, networkManager_);
+	remotePlayer_ = std::make_shared<RemotePlayer>(fileMng, *_pMng);
 
 	//ステージ固有のセットアップを実行
 	const auto& stageConfigs = GetStageConfigs();
@@ -75,8 +78,6 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng, bool isHost) 
 												   });
 
 	sceneMng_.SetTransitionDuration(45.0f);
-	std::string ip = GetConfigValue("remote_ip");
-	networkManager_.Initialize(isHost, ip);
 }
 
 SceneGame::~SceneGame()
@@ -102,13 +103,13 @@ void SceneGame::Update()
 			SetNextScene(SceneID::RESULT);
 			isEnd = true;
 		}
+		_pMng->UpdateAll();
 		return;
 	}
 	clearTime += 1.0f / 60.0f; // クリアタイムの更新
 
+	networkManager_.ReceiveData(remotePlayer_.get(), &enemyList_, this);
 
-
-	networkManager_.ReceiveData(&remotePlayer_, &enemyList_, this);
 	int outNextScene;
 	if (networkManager_.ReceiveChangeScene(outNextScene) && outNextScene == 4)
 	{
@@ -123,6 +124,11 @@ void SceneGame::Update()
 		isEnd = true;
 	}
 
+	// リモートプレイヤーの更新
+	remotePlayer_->Update();
+
+
+
 	// プレイヤーの更新
 	UpdatePlayer();
 
@@ -132,6 +138,7 @@ void SceneGame::Update()
 	p.posY = player_->GetWorldY();
 	p.vx = player_->GetVX();
 	p.vy = player_->GetVY();
+	p.angle = player_->GetAngle();
 	p.isAttack = player_->GetAliveFlag();
 	networkManager_.SendPlayerState(p);
 
@@ -158,7 +165,7 @@ void SceneGame::Update()
 		}
 	}
 
-	// ★ ギミックの更新（必要に応じて）やリストのクリーンアップ
+	// ギミックの更新（必要に応じて）やリストのクリーンアップ
 	for (auto& gimmick : gimmickList_)
 	{
 		// 必要なら gimmick->Update() など
@@ -171,6 +178,8 @@ void SceneGame::Update()
 		gimmickList_.end()
 	);
 
+	//ギミックの更新
+	UpdateGimmick();
 	//アイテムの更新
 	UpdateItem();
 
@@ -226,7 +235,7 @@ void SceneGame::Draw()
 	
 	//プレイヤーを描画
 	player_->Draw();
-	remotePlayer_.Draw(stage_->GetScrollX(), stage_->GetScrollY());
+	remotePlayer_->Draw(stage_->GetScrollX(), stage_->GetScrollY());
 	DrawClearTransition();
 	SetDrawScreen(_offScreen->GetHandle());
 	ClearDrawScreen();
@@ -291,8 +300,9 @@ void SceneGame::Draw()
 	}
 	
 	DrawGraph(0, 0, _offScreen->GetHandle(), TRUE);
+#ifdef _DEBUG
 	DrawFormatString(500, 500, 0x00ff00, isHost_ ? "Host" : "not Host");
-
+#endif
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(_fadeAlpha));
 	if (IsClear())
 	{
@@ -511,6 +521,14 @@ void SceneGame::UpdateStage()
 	if (stage_) stage_->Update();
 }
 
+void SceneGame::UpdateGimmick()
+{
+	for (auto& gimmick : gimmickList_)
+	{
+		gimmick->Update();
+	}
+}
+
 //アイテムの更新
 void SceneGame::UpdateItem()
 {
@@ -534,7 +552,7 @@ void SceneGame::UpdateDuringTransition()
 	// プレイヤーの更新
 	player_->UpdateStageScroll();
 	//UpdatePlayer();
-
+	_pMng->UpdateAll();
 	// Stageの更新
 	UpdateStage();
 
@@ -827,7 +845,7 @@ void SceneGame::BossEvent()
 	}
 	else
 	{
-		int hostEventState = remotePlayer_.GetBossEventState();
+		int hostEventState = remotePlayer_->GetBossEventState();
 		BossEventState newBossState = static_cast<BossEventState>(hostEventState);
 
 		if (bossEventState != newBossState)
@@ -899,10 +917,10 @@ void SceneGame::AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y)
 		newEnemy = std::make_shared<Enemy1>(fileMng_, stage_.get(), x, y, *_pMng);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_2:
-		enemyList_.push_back(std::make_shared<Enemy2>(fileMng_, stage_.get(), x, y, *_pMng));
+		newEnemy = std::make_shared<Enemy2>(fileMng_, stage_.get(), x, y, *_pMng);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_3:
-		enemyList_.push_back(std::make_shared<Enemy3>(fileMng_, stage_.get(), x, y, *_pMng));
+		newEnemy = std::make_shared<Enemy3>(fileMng_, stage_.get(), x, y, *_pMng);
 		break;
 	default:
 		break;

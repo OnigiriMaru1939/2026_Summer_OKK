@@ -19,6 +19,7 @@ Application::Application()
 	SetDoubleStartValidFlag(TRUE);
 	SetAlwaysRunFlag(TRUE);
 
+
 	SetGraphMode(SCREEN_WID - 100, SCREEN_HIG - 100, 32);
 	ChangeWindowMode(true);
 #ifdef _DEBUG
@@ -68,6 +69,7 @@ void Application::Run()
 
 		Draw();
 #ifdef _DEBUG
+		InputManager::GetInstance().DrawDebug(0, 40);
 		fps.Draw();
 #endif // DEBUG_
 
@@ -85,8 +87,6 @@ void Application::Update()
 void Application::Draw()
 {
 	sceneMng->Draw();
-
-	InputManager::GetInstance().DrawDebug(0, 40);
 }
 
 void Application::DebugMoveX()

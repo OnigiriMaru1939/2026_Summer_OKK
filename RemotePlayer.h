@@ -2,16 +2,33 @@
 #include <DxLib.h>
 #include "Protocol.h"
 
+class FileManager;
+class ImageFile;
+class SoundFile;
+class ParticleManager;
+class ParticleEmitter;
+
 class RemotePlayer
 {
 private:
 	float posX, posY;
 	float vx, vy;
+	float angle;
+	float scale;
 	bool isAttack;
 	int bossEventState_ = 0;
 
+	std::shared_ptr<ImageFile> _image;
+	std::shared_ptr<SoundFile> sodaAttackSE;		//炭酸攻撃のサウンド
+	ParticleManager& _pMng;
+	std::weak_ptr<ParticleEmitter> sodaParticle;		// 炭酸攻撃のパーティクルエミッター 
+
+	int _width;
+	int _height;
+
 public:
-	RemotePlayer() : posX(0), posY(0), vx(0), vy(0), isAttack(false) {}
+	RemotePlayer(FileManager& fileMng, ParticleManager& pMng);
+	~RemotePlayer();
 
 	// 通信パケットを受け取って状態を更新するメソッド
 	void SyncState(const PlayerPacket& packet);
@@ -20,5 +37,6 @@ public:
 	void SetBossEventState(int state) { bossEventState_ = state; }
 	int GetBossEventState() const { return bossEventState_; }
 
+	void Update();
 	void Draw(float scrollX, float scrollY); // 描画処理
 };

@@ -207,6 +207,7 @@ void EnemyBase::Draw() const
 {
 	if (!isAlive_ || !image_) return; // 生存していないか画像がない場合は描画しない
 
+#ifdef _DEBUG
 	//当たり判定の矩形を描画
 	RECT rc = GetRect();
 
@@ -218,7 +219,7 @@ void EnemyBase::Draw() const
 		GetColor(0, 255, 0),
 		FALSE
 	);
-
+#endif
 	//無敵時間中は点滅させる
 	if (_noDamageTime > 0)
 	{

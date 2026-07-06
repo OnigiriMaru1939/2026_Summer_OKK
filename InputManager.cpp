@@ -288,12 +288,12 @@ float InputManager::GetActionValue(ActionID action, int padNo) const
 {
 	const std::vector<KeyMapping> mappings = KeyConfig::GetInstance().GetMappings(action);
 	if (mappings.empty()) return 0.0f; // アクションにマッピングがない場合は0を返す
-	//printfDx("Mappings size for Action %d: %d\n", (int)action, mappings.size());
+
 	float total = 0.0f;
 
 	for (const auto& m : mappings)
 	{
-		//printfDx("Type: %d, Code: %d\n", (int)m.inputType, m.code);
+
 		float val = 0.0f;
 		switch (m.inputType)
 		{

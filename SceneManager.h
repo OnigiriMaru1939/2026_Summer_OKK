@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <list>
+#include <string>
 #include "SceneSuper.h"
 
 class FileManager;
@@ -49,6 +50,7 @@ public:
 
 	bool IsTransitioning() const { return transition_.state != TransitionState::None; }
 
+	void SetRemoteIp(const std::string& ip) { _remoteIp = ip; }
 private:
 	std::unique_ptr<SceneSuper> CreateScene(SceneSuper::SceneID sceneID, bool isHost = true);
 	void ChangeScene(SceneSuper::SceneID nextSceneID, bool isHost = true);
@@ -62,6 +64,8 @@ private:
 	bool isExit;
 	bool _isClear;
 	bool _isHost = true;
+
+	std::string _remoteIp;
 
 	Transition transition_;
 
