@@ -34,6 +34,7 @@ networkManager_(sceneMng.GetNetworkManager())
 	_warningFont = fileMng.CreateFontFM(Fonts::DotGothic16::PATH,
 										 Fonts::DotGothic16::NAME,
 										 160);
+	_PauseImg = fileMng.LoadImageFM("Resource/Image/Game/Pause.png");
 
 	_pMng = std::make_unique<ParticleManager>(fileMng);
 
@@ -216,6 +217,7 @@ void SceneGame::Draw()
 	// Stageを描画
 	if (stage_) stage_->Draw();
 
+#ifdef _DEBUG
 	//ボスエリアを描画
 	RECT area = bossArea;
 
@@ -224,8 +226,12 @@ void SceneGame::Draw()
 			area.right - stage_->GetScrollX(),
 			area.bottom - stage_->GetScrollY(),
 			0xff0000, false);
+#endif
 
-
+	for (auto& t : _tutorialPanelList)
+	{
+		DrawGraph(static_cast<int>(t.x) - stage_->GetScrollX(), static_cast<int>(t.y) - stage_->GetScrollY(), t.path->GetHandle(), true);
+	}
 	_pMng->DrawAll(stage_->GetScrollX(), stage_->GetScrollY());
 
 	for (auto& gimmick : gimmickList_) { gimmick->Draw(); }
@@ -238,17 +244,19 @@ void SceneGame::Draw()
 	//プレイヤーを描画
 	player_->Draw();
 	remotePlayer_->Draw(stage_->GetScrollX(), stage_->GetScrollY());
-	DrawClearTransition();
-	SetDrawScreen(_offScreen->GetHandle());
-	ClearDrawScreen();
-
-	// 画面揺れなどの影響を受けないものはこっちへ描画
 
 	//アイテムを描画
 	for (auto& item : itemList_)
 	{
 		item->Draw();
 	}
+
+	DrawClearTransition();
+
+	SetDrawScreen(_offScreen->GetHandle());
+	ClearDrawScreen();
+
+	// 画面揺れなどの影響を受けないものはこっちへ描画
 
 	//ボスイベントの描画
 	BossEventDraw();
@@ -300,6 +308,13 @@ void SceneGame::Draw()
 	{
 		DrawGraph(0, 0, _gameScreen->GetHandle(), false);
 	}
+
+	if (CollisionPauseImg())
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
+	}
+	DrawGraph(0, 0, _PauseImg->GetHandle(), true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	
 	DrawGraph(0, 0, _offScreen->GetHandle(), TRUE);
 #ifdef _DEBUG
@@ -993,6 +1008,16 @@ void SceneGame::AddItem(ItemBase::ITEM_TYPE type, float x, float y)
 	}
 }
 
+void SceneGame::SetTutorial(std::string path, float x, float y)
+{
+	tutorialPanel newTutorialPanel;
+	newTutorialPanel.path = fileMng_.LoadImageFM(path);
+	newTutorialPanel.x = x;
+	newTutorialPanel.y = y;
+
+	_tutorialPanelList.push_back(newTutorialPanel);
+}
+
 void SceneGame::TransitionOut(float t)
 {
 	if (IsClear())
@@ -1027,4 +1052,24 @@ void SceneGame::StartBossEvent()
 	packet.type = PACKET_SYNC_EVENT;
 	packet.eventState = static_cast<int>(BossEventState::WARNING);
 	networkManager_.SendBossEvent(packet);
+}
+
+bool SceneGame::CollisionPauseImg()
+{
+	RECT rc = player_->GetRect();
+	rc.left -= stage_->GetScrollX();
+	rc.right -= stage_->GetScrollX();
+	rc.top -= stage_->GetScrollY();
+	rc.bottom -= stage_->GetScrollY();
+
+	RECT pauseRc;
+	pauseRc.left = 0;
+	pauseRc.top = 0;
+	pauseRc.right = _PauseImg->GetWidth();
+	pauseRc.bottom = _PauseImg->GetHeight();
+
+	return rc.right  > pauseRc.left &&
+		   rc.left   < pauseRc.right &&
+		   rc.bottom > pauseRc.top &&
+		   rc.top    < pauseRc.bottom;
 }

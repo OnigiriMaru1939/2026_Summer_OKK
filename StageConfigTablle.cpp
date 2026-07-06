@@ -14,6 +14,10 @@ const std::vector<StageConfig>& GetStageConfigs()
 			{
 				scene.GetStage()->SetBgImage("Resource/Image/Game/Stage1_bg.png");
 				scene.GetStage()->SetMchipImage("Resource/MapChip/Mapchip_neon.png");
+				// チュートリアル作成
+				scene.SetTutorial("Resource/Image/Game/Tutorial/Tutorial_Space.png", 150.0f, 1960.0f);
+				scene.SetTutorial("Resource/Image/Game/Tutorial/Tutorial_AD.png", 320.0f, 1960.0f);
+				scene.SetTutorial("Resource/Image/Game/Tutorial/Tutorial_LClick.png", 490.0f, 1960.0f);
 				//プレイヤーの初期化
 				scene.GetPlayer()->SetPosition(150.0f, 2050.0f);
 				//ボスエリアの初期設定
