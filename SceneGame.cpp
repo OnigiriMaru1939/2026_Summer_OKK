@@ -183,10 +183,6 @@ void SceneGame::Update()
 	{
 		player_->SetCanMoveFlag(false);
 	}
-	else if (bossEventState == BossEventState::BATTLE)
-	{
-		player_->SetCanMoveFlag(true);
-	}
 	//プレイヤーと敵の衝突判定
 	CheckPlayerEnemyCollision();
 	//プレイヤーとギミックの衝突判定
@@ -806,6 +802,8 @@ void SceneGame::BossEvent()
 					{
 						boss->SetAppearFlag(false);
 					}
+
+					player_->SetCanMoveFlag(true);
 
 					bossEventState = BossEventState::BATTLE;
 				}

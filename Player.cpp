@@ -14,7 +14,11 @@
 
 
 constexpr auto WATER_PARTICLE_PATH = "Resource/ParticleJsonData/waterParameter.json";
-Player::Player(FileManager& fileMng, Stage& stage, SceneGame& game, ParticleManager& pMng) : fileManager(fileMng), stage_(stage), sceneGame(game), particleManager(pMng)
+Player::Player(FileManager& fileMng, Stage& stage, SceneGame& game, ParticleManager& pMng) 
+	: fileManager(fileMng),
+	stage_(stage), 
+	sceneGame(game),
+	particleManager(pMng)
 {
 	AddFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
 	hpFontHandle = CreateFontToHandle("DotGothic16", 30, -1, DX_FONTTYPE_EDGE);
@@ -330,18 +334,6 @@ void Player::Draw()
 		SetDrawBright(255, 255, 255);
 	}
 
-	//当たり判定の矩形を描画
-	RECT rc = GetRect();
-
-	DrawBox(
-		rc.left - stage_.GetScrollX(),
-		rc.top - stage_.GetScrollY(),
-		rc.right - stage_.GetScrollX(),
-		rc.bottom - stage_.GetScrollY(),
-		GetColor(0, 255, 0),
-		FALSE
-	);
-
 	//ゲージの描画
 	if (CollisionHpBar())
 	{
@@ -365,8 +357,23 @@ void Player::Draw()
 		DrawGauge(static_cast<int>(canvasX) - 75, static_cast<int>(canvasY) - 50, 20, 100, sodaHeatShakeGauge, SODA_HEAT_SHAKE_GAUGE_MAX, GetColor(255, 0, 0), 1);
 	}
 
+	//プレイヤーの振動処理
+	PlayerShake();
+
 	DrawCircle(static_cast<int>(canvasX), static_cast<int>(canvasY), 3, 0X0000ff);
 	// デバッグ
+	//当たり判定の矩形を描画
+	RECT rc = GetRect();
+
+	DrawBox(
+		rc.left - stage_.GetScrollX(),
+		rc.top - stage_.GetScrollY(),
+		rc.right - stage_.GetScrollX(),
+		rc.bottom - stage_.GetScrollY(),
+		GetColor(0, 255, 0),
+		FALSE
+	);
+
 	DrawFormatString(1000, 1000, GetColor(255, 0, 0), "SodaGauge: %d", static_cast<int>(sodaShakeGauge));
 	DrawFormatString(1000, 1020, GetColor(255, 0, 0), "_noDamageTime: %d", static_cast<int>(_noDamageTime));
 	DrawFormatString(1000, 1040, GetColor(255, 0, 0), "sodaAttackFlag: %d", sodaAttackFlag);
@@ -374,12 +381,10 @@ void Player::Draw()
 	DrawFormatString(1000, 1080, GetColor(255, 0, 0), "playerSpeed: %d", static_cast<int>(playerSpeed));
 	DrawFormatString(1150, 1000, GetColor(255, 0, 0), "playerJumpMag: %.2f", playerJumpMag);
 	DrawFormatString(1150, 1020, GetColor(255, 0, 0), "sodaAttackFlag: %d", sodaAttackFlag);
+	DrawFormatString(1150, 1040, GetColor(255, 0, 0), "stunFlag: %d", stunFlag);
 
 	DrawFormatString(0, 300, 0x00ff00, "PlayerPos X: %f,Y: %f", posX, posY);
 	DrawFormatString(0, 320, 0x00ff00, "PlayerMapChip X: %d,Y: %d", stage_.WorldToChipX(posX), stage_.WorldToChipY(posY));
-
-	//プレイヤーの振動処理
-	PlayerShake();
 }
 
 //重力処理

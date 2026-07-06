@@ -9,6 +9,7 @@
 #include "ScreenFile.h"
 #include "GimmickBase.h"
 #include "ItemBase.h"
+#include "BulletBase.h"
 #include "NetworkManager.h"
 #include "RemotePlayer.h"
 
@@ -86,9 +87,10 @@ private:
 
 	std::unique_ptr<ParticleManager> _pMng;
 
-	std::vector<std::shared_ptr<EnemyBase>> enemyList_;		//敵のリスト
-	std::vector<std::shared_ptr<GimmickBase>> gimmickList_; //ギミックのリスト
-	std::vector<std::shared_ptr<ItemBase>> itemList_;		//アイテムのリスト
+	std::vector<std::shared_ptr<EnemyBase>> enemyList_;			//敵のリスト
+	std::vector<std::shared_ptr<GimmickBase>> gimmickList_;		//ギミックのリスト
+	std::vector<std::shared_ptr<ItemBase>> itemList_;			//アイテムのリスト
+	std::vector<std::shared_ptr<BulletBase>> bulletList_;		//弾のリスト
 
 	NetworkManager networkManager_;
 	RemotePlayer remotePlayer_;

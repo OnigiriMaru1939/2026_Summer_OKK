@@ -41,6 +41,8 @@ EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, float x, float y, Parti
 	, hpMax_(200)
 	, isAlive_(true)
 	, jumpFlag(false)
+	, isAppearing(false)
+	, enemyType_(ENEMY_TYPE::E_TYPE_NON)
 {
 	particleManager.RegisterConfig(ENEMY_KILL_PARTICLE_PATH);
 }
