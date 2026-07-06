@@ -5,6 +5,7 @@
 #include "FileManager.h"
 #include "ImageFile.h"
 #include "SoundFile.h"
+#include "NetworkManager.h"
 #include "ParticleManager.h"
 #include "ParticleEmitter.h"
 #include "SceneGame.h"
@@ -14,7 +15,7 @@
 
 
 constexpr auto WATER_PARTICLE_PATH = "Resource/ParticleJsonData/waterParameter.json";
-Player::Player(FileManager& fileMng, Stage& stage, SceneGame& game, ParticleManager& pMng) : fileManager(fileMng), stage_(stage), sceneGame(game), particleManager(pMng)
+Player::Player(FileManager& fileMng, Stage& stage, SceneGame& game, ParticleManager& pMng, NetworkManager& nMng) : fileManager(fileMng), stage_(stage), sceneGame(game), particleManager(pMng), networkManager_(nMng)
 {
 	AddFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
 	hpFontHandle = CreateFontToHandle("DotGothic16", 30, -1, DX_FONTTYPE_EDGE);
@@ -330,6 +331,8 @@ void Player::Draw()
 		SetDrawBright(255, 255, 255);
 	}
 
+#ifdef _DEBUG
+
 	//当たり判定の矩形を描画
 	RECT rc = GetRect();
 
@@ -341,7 +344,7 @@ void Player::Draw()
 		GetColor(0, 255, 0),
 		FALSE
 	);
-
+#endif // DEBUG
 	//ゲージの描画
 	if (CollisionHpBar())
 	{
@@ -365,6 +368,7 @@ void Player::Draw()
 		DrawGauge(static_cast<int>(canvasX) - 75, static_cast<int>(canvasY) - 50, 20, 100, sodaHeatShakeGauge, SODA_HEAT_SHAKE_GAUGE_MAX, GetColor(255, 0, 0), 1);
 	}
 
+#ifdef _DEBUG
 	DrawCircle(static_cast<int>(canvasX), static_cast<int>(canvasY), 3, 0X0000ff);
 	// デバッグ
 	DrawFormatString(1000, 1000, GetColor(255, 0, 0), "SodaGauge: %d", static_cast<int>(sodaShakeGauge));
@@ -377,7 +381,7 @@ void Player::Draw()
 
 	DrawFormatString(0, 300, 0x00ff00, "PlayerPos X: %f,Y: %f", posX, posY);
 	DrawFormatString(0, 320, 0x00ff00, "PlayerMapChip X: %d,Y: %d", stage_.WorldToChipX(posX), stage_.WorldToChipY(posY));
-
+#endif
 	//プレイヤーの振動処理
 	PlayerShake();
 }
@@ -583,6 +587,14 @@ void Player::ClickSodaJump()
 			sodaAttackSE->SetVolume((int)(sodaRatio * 255)); // 音量を炭酸ゲージの割合に応じて変化させる
 			sodaAttackSE->PlayOneShot();
 		}
+
+		SodaJumpPacket sjp;
+		sjp.type = PACKET_SODA;
+		sjp.startX = posX;
+		sjp.startY = posY;
+		sjp.angle = angle;
+		sjp.sodaRatio = sodaRatio;
+		networkManager_.SendSodaJump(sjp);
 	}
 }
 

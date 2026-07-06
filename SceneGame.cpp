@@ -34,10 +34,13 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng, bool isHost, 
 										 Fonts::DotGothic16::NAME,
 										 160);
 
+	networkManager_.Initialize(isHost, ip);
+
 	_pMng = std::make_unique<ParticleManager>(fileMng);
 
 	stage_ = std::make_unique<Stage>(fileMng);
-	player_ = std::make_unique<Player>(fileMng, *stage_, *this, *_pMng);
+	player_ = std::make_unique<Player>(fileMng, *stage_, *this, *_pMng, networkManager_);
+	remotePlayer_ = std::make_shared<RemotePlayer>(fileMng, *_pMng);
 
 	//ステージ固有のセットアップを実行
 	const auto& stageConfigs = GetStageConfigs();
@@ -75,8 +78,6 @@ SceneGame::SceneGame(FileManager& fileMng, SceneManager& sceneMng, bool isHost, 
 												   });
 
 	sceneMng_.SetTransitionDuration(45.0f);
-
-	networkManager_.Initialize(isHost, ip);
 }
 
 SceneGame::~SceneGame()
@@ -107,9 +108,8 @@ void SceneGame::Update()
 	}
 	clearTime += 1.0f / 60.0f; // クリアタイムの更新
 
+	networkManager_.ReceiveData(remotePlayer_.get(), &enemyList_, this);
 
-
-	networkManager_.ReceiveData(&remotePlayer_, &enemyList_, this);
 	int outNextScene;
 	if (networkManager_.ReceiveChangeScene(outNextScene) && outNextScene == 4)
 	{
@@ -124,6 +124,11 @@ void SceneGame::Update()
 		isEnd = true;
 	}
 
+	// リモートプレイヤーの更新
+	remotePlayer_->Update();
+
+
+
 	// プレイヤーの更新
 	UpdatePlayer();
 
@@ -133,6 +138,7 @@ void SceneGame::Update()
 	p.posY = player_->GetWorldY();
 	p.vx = player_->GetVX();
 	p.vy = player_->GetVY();
+	p.angle = player_->GetAngle();
 	p.isAttack = player_->GetAliveFlag();
 	networkManager_.SendPlayerState(p);
 
@@ -159,7 +165,7 @@ void SceneGame::Update()
 		}
 	}
 
-	// ★ ギミックの更新（必要に応じて）やリストのクリーンアップ
+	// ギミックの更新（必要に応じて）やリストのクリーンアップ
 	for (auto& gimmick : gimmickList_)
 	{
 		// 必要なら gimmick->Update() など
@@ -233,7 +239,7 @@ void SceneGame::Draw()
 	
 	//プレイヤーを描画
 	player_->Draw();
-	remotePlayer_.Draw(stage_->GetScrollX(), stage_->GetScrollY());
+	remotePlayer_->Draw(stage_->GetScrollX(), stage_->GetScrollY());
 	DrawClearTransition();
 	SetDrawScreen(_offScreen->GetHandle());
 	ClearDrawScreen();
@@ -298,8 +304,9 @@ void SceneGame::Draw()
 	}
 	
 	DrawGraph(0, 0, _offScreen->GetHandle(), TRUE);
+#ifdef _DEBUG
 	DrawFormatString(500, 500, 0x00ff00, isHost_ ? "Host" : "not Host");
-
+#endif
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(_fadeAlpha));
 	if (IsClear())
 	{
@@ -840,7 +847,7 @@ void SceneGame::BossEvent()
 	}
 	else
 	{
-		int hostEventState = remotePlayer_.GetBossEventState();
+		int hostEventState = remotePlayer_->GetBossEventState();
 		BossEventState newBossState = static_cast<BossEventState>(hostEventState);
 
 		if (bossEventState != newBossState)

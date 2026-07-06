@@ -12,6 +12,7 @@ class ImageFile;
 class SoundFile;
 class ParticleManager;
 class ParticleEmitter;
+class NetworkManager;
 
 class Player
 {
@@ -28,7 +29,7 @@ public:
 	static constexpr float SODA_SHAKE_GAUGE_MAX = 1000.0f;		//炭酸蓄積ゲージの最大値
 	static constexpr float SODA_HEAT_SHAKE_GAUGE_MAX = 1000.0f;	//炭酸蓄積ゲージの最大値
 	
-	Player(FileManager& fileMng, Stage& stage, SceneGame& game, ParticleManager& pMng);
+	Player(FileManager& fileMng, Stage& stage, SceneGame& game, ParticleManager& pMng, NetworkManager& nMng);
 	~Player();
 	bool SetImage(const std::string& path);			//画像のセット
 	void SetPosition(float x, float y);				//プレイヤーの位置を設定
@@ -78,6 +79,8 @@ public:
 	float GetY() const { return canvasY; }
 	float GetVX() const { return velocityX; }
 	float GetVY() const { return velocityY; }
+	float GetAngle() const { return angle; }
+	float GetSodaRatio() const { return sodaRatio; }
 	int GetWidth() const { return width_; }				//プレイヤーの画像の幅を取得
 	int GetHeight() const { return height_; }			//プレイヤーの画像の高さを取得
 	float GetSpeed() const { return playerSpeed; };		//プレイヤーの速度を取得
@@ -113,6 +116,7 @@ private:
 	ParticleManager& particleManager;
 	FileManager& fileManager;					//ファイルマネージャー
 	SceneGame& sceneGame;
+	NetworkManager& networkManager_;
 
 	std::shared_ptr<ImageFile> image_;			//プレイヤーの画像
 

@@ -76,6 +76,7 @@ void GimmickBase::Draw() const
 {
 	if (!isAlive_ /*|| !image_*/) return; // 生存していないか画像がない場合は描画しない
 
+#ifdef _DEBUG
 	//当たり判定の矩形を描画
 	RECT rc = GetRect();
 
@@ -87,7 +88,7 @@ void GimmickBase::Draw() const
 		GetColor(0, 255, 0),
 		FALSE
 	);
-
+#endif
 
 	if (!image_) return;
 
