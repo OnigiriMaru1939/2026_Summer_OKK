@@ -27,7 +27,7 @@ public:
 		E_TYPE_BOSS_2,
 		E_TYPE_BOSS_3,
 
-		E_TYPE_MAX,
+		E_TYPE_MAX
 	};
 
 	EnemyBase(FileManager& fileMng, Stage* stage, float x, float y, ParticleManager& pMng);
