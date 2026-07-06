@@ -21,7 +21,8 @@ public:
 
 	int GetHandle() const
 	{
- 		return handle_;
+
+		return handle_;
    	}
 
 private:

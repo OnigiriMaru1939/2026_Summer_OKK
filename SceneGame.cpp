@@ -785,6 +785,13 @@ void SceneGame::BossEvent()
 								5000.0f
 							);
 							break;
+						case 3:
+							AddBoss(
+								EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2,
+								1000.0f,
+								6000.0f
+							);
+							break;
 					}
 					bossEventState = BossEventState::APPEAR;
 					bossTimer = 0;
