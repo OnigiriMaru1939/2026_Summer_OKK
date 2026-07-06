@@ -123,27 +123,29 @@ void NetworkManager::ReceiveData(RemotePlayer* remotePlayer, std::vector<std::sh
 
 		if (recvLen > 0)
 		{
+			targetIP = senderIP;
+			targetPort = senderPort;
 			// 最初の4バイトをPacketTypeとして読み取る
 			int type = *reinterpret_cast<int*>(buffer);
 
 			switch (type)
 			{
 				case PACKET_SYNC_PLAYER:
-					if (recvLen == sizeof(PlayerPacket))
+					if (remotePlayer && recvLen == sizeof(PlayerPacket))
 					{
 						PlayerPacket* p = reinterpret_cast<PlayerPacket*>(buffer);
 						remotePlayer->SyncState(*p);
 					}
 					break;
 				case PACKET_SODA:
-					if (recvLen == sizeof(SodaJumpPacket))
+					if (remotePlayer && recvLen == sizeof(SodaJumpPacket))
 					{
 						SodaJumpPacket* p = reinterpret_cast<SodaJumpPacket*>(buffer);
 						remotePlayer->SyncState(*p);
 					}
 					break;
 				case PACKET_SYNC_ENEMY:
-					if (recvLen == sizeof(EnemyPacket))
+					if (enemyList && recvLen == sizeof(EnemyPacket))
 					{
 						EnemyPacket* e = reinterpret_cast<EnemyPacket*>(buffer);
 						for (auto& enemy : *enemyList)
@@ -157,7 +159,7 @@ void NetworkManager::ReceiveData(RemotePlayer* remotePlayer, std::vector<std::sh
 					}
 					break;
 				case PACKET_ENEMY_DEATH:
-					if (recvLen == sizeof(EnemyDeathPacket))
+					if (enemyList && recvLen == sizeof(EnemyDeathPacket))
 					{
 						EnemyDeathPacket* edp = reinterpret_cast<EnemyDeathPacket*>(buffer);
 						for (auto& enemy : *enemyList)
@@ -172,7 +174,7 @@ void NetworkManager::ReceiveData(RemotePlayer* remotePlayer, std::vector<std::sh
 					}
 					break;
 				case PACKET_SYNC_EVENT:
-					if (recvLen == sizeof(BossEventPacket))
+					if (remotePlayer && recvLen == sizeof(BossEventPacket))
 					{
 						BossEventPacket* bep = reinterpret_cast<BossEventPacket*>(buffer);
 
@@ -189,22 +191,22 @@ void NetworkManager::ReceiveData(RemotePlayer* remotePlayer, std::vector<std::sh
 					break;
 				}
 				case PACKET_APPLY_DAMAGE:
-					if (recvLen == sizeof(DamagePacket))
+					if (sceneGame && recvLen == sizeof(DamagePacket))
 					{
 						DamagePacket* dp = reinterpret_cast<DamagePacket*>(buffer);
-						if (sceneGame)
-						{
-							// sceneGame に敵を探してダメージを与えるメソッドを実装
-							sceneGame->ApplyDamageToEnemy(dp->enemyID, dp->damage);
-						}
+						// sceneGame に敵を探してダメージを与えるメソッドを実装
+						sceneGame->ApplyDamageToEnemy(dp->enemyID, dp->damage);
 					}
 					break;
-				// クライアントへ
+					// クライアントへ
 				case PACKET_HIT_CONFIRMED:
 				{
-					HitConfirmedPacket* hcp = reinterpret_cast<HitConfirmedPacket*>(buffer);
-					// ここでクライアント側のプレイヤーをノックバックさせる
-					sceneGame->GetPlayer()->PlayerKnockBack(hcp->enemyX, hcp->enemyY, 10.0f);
+					if (sceneGame)
+					{
+						HitConfirmedPacket* hcp = reinterpret_cast<HitConfirmedPacket*>(buffer);
+						// ここでクライアント側のプレイヤーをノックバックさせる
+						sceneGame->GetPlayer()->PlayerKnockBack(hcp->enemyX, hcp->enemyY, 10.0f);
+					}
 				}
 				break;
 				case PACKET_CHANGE_SCENE:
@@ -215,7 +217,10 @@ void NetworkManager::ReceiveData(RemotePlayer* remotePlayer, std::vector<std::sh
 					}
 					break;
 				case PACKET_PAUSE:
-					sceneGame->RequestPause();
+					if (sceneGame)
+					{
+						sceneGame->RequestPause();
+					}
 			}
 		}
 	}
