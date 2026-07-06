@@ -4,9 +4,11 @@
 #include "Stage.h"
 #include "ParticleManager.h"
 #include "ParticleEmitter.h"
+#include "BulletBase.h"
 
 class FileManager;
 class ImageFile;
+class SceneGame;
 
 class EnemyBase
 {
@@ -30,7 +32,7 @@ public:
 		E_TYPE_MAX
 	};
 
-	EnemyBase(FileManager& fileMng, Stage* stage, float x, float y, ParticleManager& pMng);
+	EnemyBase(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng);
 	virtual ~EnemyBase();
 
 	virtual void Update() = 0; // 更新処理
@@ -44,9 +46,10 @@ public:
 	void MoveX();
 	void MoveY();
 	void AddGravity();
-	void NoDamageCountDown();	//無敵時間のカウントダウン
-	void EnemyShake();			//敵の振動処理
-	void EnemyResetShake();		//敵の振動リセット処理
+	void Shot(BulletBase::BULLET_TYPE type, float dirX, float dirY, float scale);		//敵の弾を撃つ処理
+	void NoDamageCountDown();				//無敵時間のカウントダウン
+	void EnemyShake();						//敵の振動処理
+	void EnemyResetShake();					//敵の振動リセット処理
 
 	//ダメージ管理
 	void ApplyDamage(int dmg);
@@ -56,7 +59,7 @@ public:
 	bool WillCollide(int newX, int newY);
 	RECT GetRect() const;
 	
-	// 情報取得
+	//情報取得
 	std::string GetName() const { return name_; }
 	float GetX() const { return x_; }
 	float GetY() const { return y_; }
@@ -84,6 +87,7 @@ protected:
 	std::weak_ptr<ParticleEmitter> eKillParticle;
 	FileManager& fileManager_;
 	std::shared_ptr<ImageFile> image_;	//画像データ
+	SceneGame* sceneGame_;				//シーンゲームへのポインタ
 	Stage* stage_;						//ステージへのポインタ
 	ENEMY_TYPE enemyType_;				//敵の種類
 	

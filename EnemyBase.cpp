@@ -1,7 +1,7 @@
 ﻿#include "EnemyBase.h"
 #include "FileManager.h"
 #include "ImageFile.h"
-#include "Player.h"
+#include "SceneGame.h"
 #include "ParticleManager.h"
 #include "ParticleEmitter.h"
 #include <DxLib.h>
@@ -17,9 +17,10 @@ void EnemyBase::SyncNetworkState(float x, float y, int hp, bool isAlive, int noD
 	_noDamageTime = noDamageTime;
 }
 
-EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, float x, float y, ParticleManager& pMng)
+EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng)
 	: fileManager_(fileMng)
 	, stage_(stage)
+	, sceneGame_(sceneGame)
 	, particleManager(pMng)
 	, x_(x)
 	, y_(y)
@@ -132,6 +133,14 @@ void EnemyBase::MoveY()
 void EnemyBase::AddGravity()
 {
 	vy_ += gravity; //y方向の速度に重力を加算
+}
+
+//敵の弾を撃つ処理
+void EnemyBase::Shot(BulletBase::BULLET_TYPE type, float dirX, float dirY, float scale)
+{
+	float shotSpeed = 8.0f;
+
+	sceneGame_->AddEnemyShot(type, x_, y_, dirX * shotSpeed, dirY * shotSpeed, scale);
 }
 
 void EnemyBase::NoDamageCountDown()

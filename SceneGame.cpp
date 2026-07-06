@@ -168,6 +168,9 @@ void SceneGame::Update()
 		}
 	}
 
+	//敵の弾の更新
+	UpdateEnemyShot();
+
 	// ギミックの更新（必要に応じて）やリストのクリーンアップ
 	for (auto& gimmick : gimmickList_)
 	{
@@ -201,6 +204,8 @@ void SceneGame::Update()
 	CheckPlayerGimmickCollision();
 	//プレイヤーとアイテムの衝突判定
 	CheckPlayerItemCollision();
+	//プレイヤーと敵の弾の衝突判定
+	CheckPlayerEnemyShotCollision();
 
 	_pMng->UpdateAll();
 	// Stageの更新
@@ -240,7 +245,13 @@ void SceneGame::Draw()
 	{
 		enemy->Draw();
 	}
-	
+
+	//敵の弾を描画
+	for (auto& bullet : bulletList_)
+	{
+		bullet->Draw();
+	}
+
 	//プレイヤーを描画
 	player_->Draw();
 	remotePlayer_->Draw(stage_->GetScrollX(), stage_->GetScrollY());
@@ -532,6 +543,26 @@ void SceneGame::UpdateEnemy()
 	);
  }
 
+//敵の弾の更新
+void SceneGame::UpdateEnemyShot()
+{
+	for (auto& shot : bulletList_)
+	{
+		if (shot->IsAlive())
+		{
+			shot->Update();
+		}
+		else
+		{
+			//敵の弾がなくなったらリストから削除
+			shot = nullptr;
+		}
+	}
+	bulletList_.erase(
+		std::remove(bulletList_.begin(), bulletList_.end(), nullptr), 
+		bulletList_.end());
+}
+
 //ステージの更新
 void SceneGame::UpdateStage()
 {
@@ -697,6 +728,32 @@ void SceneGame::CheckPlayerItemCollision()
 	}
 }
 
+
+void SceneGame::CheckPlayerEnemyShotCollision()
+{
+	RECT p = player_->GetRect();
+
+	for (auto& bullet : bulletList_)
+	{
+		if (!bullet->IsAlive())
+			continue;
+
+		RECT b = bullet->GetRect();
+
+		bool hit =
+			p.right > b.left &&
+			p.left < b.right &&
+			p.bottom > b.top &&
+			p.top < b.bottom;
+		if (hit)
+		{
+			player_->Damage(bullet->GetApplyDamage());
+			player_->PlayerKnockBack(bullet->GetX(), bullet->GetY(), 10.0f);
+			bullet->SetAliveFlag(false);
+		}
+	}
+}
+
 //ボスエリアの矩形を設定
 void SceneGame::SetBossArea(int left, int top, int right, int bottom)
 {
@@ -713,7 +770,6 @@ RECT SceneGame::GetBossArea() const
 	return bossArea;
 }
 
-//ボスの生成判定
 //ボスの生成判定
 void SceneGame::CheckBossSpawn()
 {
@@ -939,13 +995,13 @@ void SceneGame::AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y)
 	switch (type)
 	{
 	case EnemyBase::ENEMY_TYPE::E_TYPE_1:
-		newEnemy = std::make_shared<Enemy1>(fileMng_, stage_.get(), x, y, *_pMng);
+		newEnemy = std::make_shared<Enemy1>(fileMng_, stage_.get(), this, x, y, *_pMng);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_2:
-		newEnemy = std::make_shared<Enemy2>(fileMng_, stage_.get(), x, y, *_pMng);
+		newEnemy = std::make_shared<Enemy2>(fileMng_, stage_.get(), this, x, y, *_pMng);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_3:
-		newEnemy = std::make_shared<Enemy3>(fileMng_, stage_.get(), x, y, *_pMng);
+		newEnemy = std::make_shared<Enemy3>(fileMng_, stage_.get(), this, x, y, *_pMng);
 		break;
 	default:
 		break;
@@ -967,10 +1023,10 @@ void SceneGame::AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y)
 	switch (type)
 	{
 	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1:
-		newBoss = std::make_shared<Boss1>(fileMng_, stage_.get(), x, y, *_pMng);
+		newBoss = std::make_shared<Boss1>(fileMng_, stage_.get(), this, x, y, *_pMng);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2:
-		newBoss = std::make_shared<Boss2>(fileMng_, stage_.get(), x, y, *_pMng);
+		newBoss = std::make_shared<Boss2>(fileMng_, stage_.get(), this, x, y, *_pMng);
 		break;
 	default:
 		break;
@@ -984,13 +1040,31 @@ void SceneGame::AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y)
 	}
 }
 
+//敵弾生成関数
+void SceneGame::AddEnemyShot(BulletBase::BULLET_TYPE type, float x, float y, float vx, float vy, float scale)
+{
+	switch (type)
+	{
+		case BulletBase::BULLET_TYPE::B_TYPE_NON:
+			break;
+		case BulletBase::BULLET_TYPE::B_TYPE_1:
+			bulletList_.push_back(std::make_shared<Bullet>(fileMng_, stage_.get(), x, y, vx, vy, scale));
+			break;
+		case BulletBase::BULLET_TYPE::B_TYPE_2:
+			break;
+		case BulletBase::BULLET_TYPE::B_TYPE_3:
+			break;
+		case BulletBase::BULLET_TYPE::B_TYPE_MAX:
+			break;
+		default:
+			break;
+	}
+}
+
 //テレポートギミック生成関数
 void SceneGame::AddTeleport(float x, float y, float targetX, float targetY)
 {
 	gimmickList_.push_back(std::make_shared<GimmickTeleport>(fileMng_, stage_.get(), x, y, targetX, targetY));
-
-
-
 }
 
 //アイテム生成関数
