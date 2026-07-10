@@ -66,7 +66,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 				scene.GetStage()->SetMchipImage("Resource/MapChip/Mapchip_neon.png");
 
 				//プレイヤーの初期化
-				scene.GetPlayer()->SetPosition(200.0f, 6300.0f);
+				scene.GetPlayer()->SetPosition(200.0f, 4500.0f);
 				//敵の生成
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 1200.0f, 1500.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 800.0f, 1200.0f);
@@ -94,6 +94,15 @@ const std::vector<StageConfig>& GetStageConfigs()
 				scene.GetPlayer()->SetPosition(100.0f, 8000.0f);
 				//ボスエリアの初期設定
 				scene.SetBossArea(80, 8500, 1900, 10500);
+				//敵の生成
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 1200.0f, 1500.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 800.0f, 1200.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 500.0f, 1800.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_3, 400.0f, 1800.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 120.0f, 3000.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 700.0f, 100.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 500.0f, 500.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_3, 400.0f, 2800.0f);
 				//テレポートギミックの生成
 				scene.AddTeleport(1700.0f, 7500.0f, 200.0f, 6500.0f);
 				scene.AddTeleport(950.0f, 6000.0f, 200.0f, 5000.0f);

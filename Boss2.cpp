@@ -75,7 +75,6 @@ void Boss2::Draw() const
 		//HPゲージの描画
 		//DrawGauge(1300, 100, 500, 40, hp_, hpMax_, GetColor(255, 0, 0));		//ボスのHPゲージ
 	}
-	DrawFormatString(100, 1000, GetColor(255, 0, 0), "stateChangeTimer: %d", stateChangeTimer);
 }
 
 //ボスの出現処理
