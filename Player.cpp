@@ -690,8 +690,8 @@ bool Player::CollisionHpBar()
 	RECT hpBar;
 	hpBar.left = 1350;
 	hpBar.top = 1000;
-	hpBar.right = 850;
-	hpBar.bottom = 1040;
+	hpBar.right = 1850;
+	hpBar.bottom = 1080;
 
 	return
 		rc.right > hpBar.left &&
