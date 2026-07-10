@@ -6,7 +6,6 @@
 #include "EnemyBase.h"
 #include "BulletBase.h"
 #include "Bullet.h"
-#include "Boss1.h"
 #include "FontFile.h"
 #include "ScreenFile.h"
 #include "GimmickBase.h"
@@ -60,7 +59,7 @@ public:
 				   float maxValue,
 				   int color);
 
-	void CheckPlayerEnemyCollision();
+	void CheckPlayerEnemyCollision();									//プレイヤーと敵の衝突判定
 	void CheckPlayerGimmickCollision();									//プレイヤーとギミックの衝突判定
 	void CheckPlayerItemCollision();									//プレイヤーとアイテムの衝突判定
 	void CheckPlayerEnemyShotCollision();								//プレイヤーと敵の弾の衝突判定
@@ -98,6 +97,9 @@ public:
 	bool IsHost() const { return isHost_; }
 
 	void Teleport2BossArea();
+
+	//HPバーの増加させる時間
+	static constexpr float HP_GAUGE_ANIM_TIME = 120.0f;
 private:
 	std::unique_ptr<Stage> stage_;
 	std::unique_ptr<Player> player_;

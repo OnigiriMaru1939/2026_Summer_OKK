@@ -40,8 +40,6 @@ void Boss2::Update()
 
 	switch (bossState_)
 	{
-		case Boss2::NON:
-			break;
 		case Boss2::WAIT:
 			Wait();
 			break;

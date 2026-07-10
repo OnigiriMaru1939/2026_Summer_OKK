@@ -9,6 +9,7 @@
 #include "Enemy3.h"
 #include "Boss1.h"
 #include "Boss2.h"
+#include "Boss3.h"
 #include "ItemBase.h"
 #include "Mentos.h"
 #include "Stage.h"
@@ -633,9 +634,8 @@ void SceneGame::CheckPlayerEnemyCollision()
 		}
 		if (!player_->GetAttakFlag())
 		{
-			//プレイヤーにダメージを与える
+			//ダメージ・ノックバック
 			player_->Damage(10.0f);
-			//プレイヤーをノックバックさせる
 			player_->PlayerKnockBack(enemy->GetX(), enemy->GetY(), 10.0f);
 		}
 		else if (player_->GetAttakFlag() && player_->GetSpeed() >= Player::ATTACK_SPEED_THRESHOLD)
@@ -743,7 +743,7 @@ void SceneGame::CheckPlayerItemCollision()
 	}
 }
 
-
+//プレイヤーと敵の弾の衝突判定
 void SceneGame::CheckPlayerEnemyShotCollision()
 {
 	RECT p = player_->GetRect();
@@ -857,26 +857,13 @@ void SceneGame::BossEvent()
 					switch (selectedStageIndex_)
 					{
 						case 1:
-							AddBoss(
-								EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1,
-								1800.0f,
-								3300.0f
-							);
+							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1,1800.0f,3300.0f);
 							break;
-
 						case 2:
-							AddBoss(
-								EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2,
-								950.0f,
-								5000.0f
-							);
+							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2,950.0f,5000.0f);
 							break;
 						case 3:
-							AddBoss(
-								EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2,
-								1000.0f,
-								6000.0f
-							);
+							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_3,1000.0f,6000.0f);
 							break;
 					}
 					bossEventState = BossEventState::APPEAR;
@@ -885,6 +872,10 @@ void SceneGame::BossEvent()
 				break;
 
 			case SceneGame::BossEventState::APPEAR:
+				if (boss)
+				{
+					boss->SetAppearFlag(true);
+				}
 				bossTimer++;
 				//2秒後にUIを表示
 				if (bossTimer > 120)
@@ -901,9 +892,11 @@ void SceneGame::BossEvent()
 				break;
 
 			case SceneGame::BossEventState::UIDRAW:
+				//HPバーを徐々に表示させる
 				if (bossHpGauge < bossHpGaugeMax)
 				{
-					bossHpGauge += 2.0f;
+					float addHp = bossHpGaugeMax / HP_GAUGE_ANIM_TIME;
+					bossHpGauge += addHp;
 				}
 
 				if (bossHpGauge >= bossHpGaugeMax)
@@ -952,6 +945,10 @@ void SceneGame::BossEvent()
 					Teleport2BossArea();
 					break;
 				case SceneGame::BossEventState::APPEAR:
+					if (boss)
+					{
+						boss->SetAppearFlag(true);
+					}
 					switch (selectedStageIndex_)
 					{
 						case 1:
@@ -959,6 +956,9 @@ void SceneGame::BossEvent()
 							break;
 						case 2:
 							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2, 950.0f,5000.0f);
+							break;
+						case 3:
+							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_3,1000.0f,6000.0f);
 							break;
 					}
 					bossTimer = 0;
@@ -997,7 +997,8 @@ void SceneGame::BossEvent()
 		{
 			if (bossHpGauge < bossHpGaugeMax)
 			{
-				bossHpGauge += 2.0f;
+				float addHp = bossHpGaugeMax / HP_GAUGE_ANIM_TIME;
+				bossHpGauge += addHp;
 			}
 		}
 	}
@@ -1043,6 +1044,9 @@ void SceneGame::AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y)
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2:
 		newBoss = std::make_shared<Boss2>(fileMng_, stage_.get(), this, x, y, *_pMng);
+		break;
+	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_3:
+		newBoss = std::make_shared<Boss3>(fileMng_, stage_.get(), this, x, y, *_pMng);
 		break;
 	default:
 		break;
