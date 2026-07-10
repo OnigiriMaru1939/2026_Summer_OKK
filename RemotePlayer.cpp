@@ -56,6 +56,8 @@ void RemotePlayer::SyncState(const PlayerPacket& packet)
 void RemotePlayer::SyncState(const SodaJumpPacket& packet)
 {
 
+
+
 	const ParticleConfig* masterCfg = _pMng.GetConfig(WATER_PARTICLE_PATH);
 	if (masterCfg)
 	{
