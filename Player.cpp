@@ -107,6 +107,7 @@ Player::Player(FileManager& fileMng, Stage& stage, SceneGame& game, ParticleMana
 	sodaAttackFlag = false;
 	canMoveFlag = true;
 	stunFlag = false;
+	noDamageFlag = false;
 }
 
 Player::~Player()
@@ -171,7 +172,12 @@ void Player::Update()
 	//無敵時間のカウントダウン
 	if (_noDamageTime > 0)
 	{
+		noDamageFlag = true;
 		_noDamageTime--;
+	}
+	else
+	{
+		noDamageFlag = false;
 	}
 
 	//炭酸ゲージ減衰待機タイマー
@@ -542,6 +548,7 @@ void Player::SodaShake()
 	//上限
 	if (sodaShakeGauge > SODA_SHAKE_GAUGE_MAX) sodaShakeGauge = SODA_SHAKE_GAUGE_MAX;
 
+	//オーバーヒート処理
 	if (sodaHeatShakeGauge >= SODA_HEAT_SHAKE_GAUGE_MAX)
 	{
 		sodaShakeGauge = 0;
@@ -622,6 +629,9 @@ void Player::PlayerExplosion()
 //プレイヤーのノックバック処理
 void Player::PlayerKnockBack(float enemyX, float enemyY, float power)
 {
+	//無敵時間中はノックバックしない
+	if (GetNoDamageFlag()) return;
+
 	//敵より右にいる
 	if (posX > enemyX)
 	{
@@ -631,8 +641,15 @@ void Player::PlayerKnockBack(float enemyX, float enemyY, float power)
 	{
 		velocityX = -power;
 	}
-	//上方向へ吹っ飛ばす
-	velocityY = -power;
+	//敵より上にいる
+	if (posY < enemyY)
+	{
+		velocityY = -power;
+	}
+	else
+	{
+		velocityY = power;
+	}
 }
 
 //プレイヤーの矩形衝突判定
