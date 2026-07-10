@@ -213,6 +213,7 @@ void NetworkManager::ReceiveData(RemotePlayer* remotePlayer, std::vector<std::sh
 					if (recvLen == sizeof(ChangeScenePacket))
 					{
 						ChangeScenePacket* csp = reinterpret_cast<ChangeScenePacket*>(buffer);
+						//パケットで受け取った次シーンIDを代入
 						receivedNextScene = csp->nextScene;
 					}
 					break;

@@ -14,6 +14,10 @@ const std::vector<StageConfig>& GetStageConfigs()
 			{
 				scene.GetStage()->SetBgImage("Resource/Image/Game/Stage1_bg.png");
 				scene.GetStage()->SetMchipImage("Resource/MapChip/Mapchip_neon.png");
+				// チュートリアル作成
+				scene.SetTutorial("Resource/Image/Game/Tutorial/Tutorial_Space.png", 150.0f, 1960.0f);
+				scene.SetTutorial("Resource/Image/Game/Tutorial/Tutorial_AD.png", 320.0f, 1960.0f);
+				scene.SetTutorial("Resource/Image/Game/Tutorial/Tutorial_LClick.png", 490.0f, 1960.0f);
 				//プレイヤーの初期化
 				scene.GetPlayer()->SetPosition(150.0f, 2050.0f);
 				//ボスエリアの初期設定
@@ -23,7 +27,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 1200.0f,1500.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 800.0f, 1200.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 500.0f, 1800.0f);
-				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_3, 400.0f, 1800.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_3, 1400.0f, 1600.0f);
 				//アイテムの生成
 				scene.AddItem(ItemBase::ITEM_TYPE::MENTOS, 1200.0f,1600.0f);
 				//テレポートギミックの生成
@@ -62,7 +66,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 				scene.GetStage()->SetMchipImage("Resource/MapChip/Mapchip_neon.png");
 
 				//プレイヤーの初期化
-				scene.GetPlayer()->SetPosition(100.0f, 4000.0f);
+				scene.GetPlayer()->SetPosition(200.0f, 6300.0f);
 				//敵の生成
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 1200.0f, 1500.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 800.0f, 1200.0f);

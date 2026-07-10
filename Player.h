@@ -92,6 +92,7 @@ public:
 
 	bool GetAttakFlag() const { return sodaAttackFlag; }			//炭酸攻撃フラグを取得
 	float GetAttackDamage() const { return attackDamage; }			//攻撃のダメージを取得
+	bool GetNoDamageFlag() const { return noDamageFlag; }			//無敵フラグを取得
 	bool GetAliveFlag() const { return aliveFlag; }					//生存フラグを取得
 	//移動可能フラグを設定・取得
 	bool GetCanMoveFlag() const { return canMoveFlag; }
@@ -100,6 +101,7 @@ public:
 	void UpdateStageScroll();
 	//プレイヤージャンプ倍率を設定
 	void SetPlayerJumpMag(float mag) { playerJumpMag = mag; }
+	void PlayHitSE();
 private:
 	
 	bool GetJumpFlag() const { return jumpFlag; }					//ジャンプフラグを取得
@@ -122,6 +124,7 @@ private:
 
 	std::shared_ptr<SoundFile> sodaAttackSE;		//炭酸攻撃のサウンド
 	std::shared_ptr<SoundFile> sodaChargeSE;		//炭酸蓄積のサウンド
+	std::shared_ptr<SoundFile> _hitSE;
 
 	Stage& stage_;								//ステージへのポインタ
 	std::weak_ptr<ParticleEmitter> sodaParticle;		// 炭酸攻撃のパーティクルエミッター weak_ptrにすることで、エミッターが削除された後も安全にアクセスできるようにする
@@ -138,6 +141,7 @@ private:
 	bool stunFlag;				//気絶フラグ
 	bool jumpFlag;				//ジャンプフラグ
 	bool sodaAttackFlag;		//炭酸攻撃フラグ
+	bool noDamageFlag;			//無敵フラグ
 	float gravity;				//重力
 	float playerSpeed;			//プレイヤー速度
 	float velocityX;			//X軸のプレイヤー速度

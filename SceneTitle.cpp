@@ -62,7 +62,7 @@ SceneTitle::SceneTitle(FileManager& fileMng, SceneManager& sceneMng) : SceneSupe
 															   if (_selectedIndex == 2)
 															   {
 																   _isInputActive = true;
-																   //_inputIp = "";
+																   _inputIp = "";
 																   ClearInputCharBuf();
 															   }
 															   else
@@ -140,7 +140,7 @@ void SceneTitle::Draw()
 	DrawRotaGraph(Application::SCREEN_WID / 2, Application::SCREEN_HIG / 2, 1.0f, 0.0f, _bgImg->GetHandle(), true);
 	DrawRotaGraph(Application::SCREEN_WID / 2, LOGO_Y, 1.0f, 0.0f, _TitleLogoImg->GetHandle(), true);
 
-	// ─── 選択肢の描画 (選択中なら黄色、それ以外は白) ───
+	// 選択肢の描画 (選択中なら黄色、それ以外は白)
 	unsigned int colorIP = (_selectedIndex == 2) ? GetColor(255, 255, 0) : GetColor(255, 255, 255);
 
 	DrawRotaGraph(Application::SCREEN_WID / 2, MENU_Y, 1.0f, 0.0f, _Title1PImg->GetHandle(), true);

@@ -3,7 +3,7 @@
 #include "IBoss.h"
 #include "EnemyBase.h"
 
-class Boss2 : public EnemyBase, public IBoss
+class Boss3 : public EnemyBase, public IBoss
 {
 public:
 	enum BOSS_STATE
@@ -12,24 +12,24 @@ public:
 
 		WAIT,
 		MOVE,
-		JUMP,
-		DASH,
+		SHOT,
 
 		MAX
 	};
-	Boss2(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng);
-	~Boss2() override;
+
+	Boss3(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng);
+	~Boss3() override;
 	void Update() override;
 	void Draw() const override;
 	void BossAppear();
 	void Wait();
 	void Move();
-	void Jump();
-	void Dash();
+	void ShotAttack();
 	void BossStateChange();
 	void SelectNextState();
 private:
 	BOSS_STATE bossState_;
 	int stateChangeTimer;
-	float rotateSpeed;
+	int shotTimer = 0;
 };
+

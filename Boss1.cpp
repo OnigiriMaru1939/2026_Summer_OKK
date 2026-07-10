@@ -1,13 +1,13 @@
 ﻿#include "Boss1.h"
 
 
-Boss1::Boss1(FileManager& fileMng, Stage* stage, float x, float y, ParticleManager& pMng) : EnemyBase(fileMng, stage, x, y, pMng)
+Boss1::Boss1(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng) : EnemyBase(fileMng, stage, sceneGame, x, y, pMng)
 {
-	SetImage("Resource/Image/Enemys/RedBull.png");
+	SetImage("Resource/Image/Enemys/Wingbull.png");
 	enemyType_ = ENEMY_TYPE::E_TYPE_BOSS_1;
 	SetPosition(x, y);				//初期位置を設定
 	SetVelocity(-1.0f, 0.0f);        //初期速度を設定
-	name_ = "RedBull";                //名前を設定
+	name_ = "Wingbull";                //名前を設定
 	hp_ = 200;
 	hpMax_ = 200;
 	scale = 2.0f;

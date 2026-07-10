@@ -45,8 +45,9 @@ public:
 	// ループ内で呼び出し、届いたパケットに応じて各オブジェクトを更新する
 	void ReceiveData(RemotePlayer* remotePlayer = nullptr, std::vector<std::shared_ptr<EnemyBase>>* enemyList = nullptr, SceneGame* sceneGame = nullptr);
 	void ReceivePauseData(ScenePause* pauseScene);
-	// ステージ
+	// ステージインデックスの同期用関数
 	bool ReceiveStageSelect(int& outStageIndex);
+	// シーンチェンジの同期用関数
 	bool ReceiveChangeScene(int& outNextSceneID);
 
 	bool IsConnected() const { return isConnected; }

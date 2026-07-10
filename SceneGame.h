@@ -4,12 +4,12 @@
 #include "Application.h"
 #include "Stage.h"
 #include "EnemyBase.h"
-#include "Boss1.h"
+#include "BulletBase.h"
+#include "Bullet.h"
 #include "FontFile.h"
 #include "ScreenFile.h"
 #include "GimmickBase.h"
 #include "ItemBase.h"
-#include "BulletBase.h"
 #include "NetworkManager.h"
 #include "RemotePlayer.h"
 #include "SceneManager.h"
@@ -21,6 +21,12 @@ class SceneGame :
     public SceneSuper
 {
 public:
+	struct tutorialPanel
+	{
+		std::shared_ptr<ImageFile> path;
+		float x;
+		float y;
+	};
 	//ボスイベントの状態
 	enum class BossEventState
 	{
@@ -36,15 +42,15 @@ public:
 	~SceneGame() override;
 
 	void Update() override;
-	void Draw() override;
 	void UpdatePlayer();
 	void UpdateEnemy();
+	void UpdateEnemyShot();
 	void UpdateStage();
 	void UpdateGimmick();
 	void UpdateItem();
 	void UpdateDuringTransition() override; // トランジション中の更新処理
-	void CheckPlayerEnemyCollision();
-	void ApplyDamageToEnemy(int enemyID, int damage);
+
+	void Draw() override;
 	void DrawGauge(int x,
 				   int y,
 				   int width,
@@ -52,25 +58,33 @@ public:
 				   float value,
 				   float maxValue,
 				   int color);
+
+	void CheckPlayerEnemyCollision();									//プレイヤーと敵の衝突判定
 	void CheckPlayerGimmickCollision();									//プレイヤーとギミックの衝突判定
 	void CheckPlayerItemCollision();									//プレイヤーとアイテムの衝突判定
+	void CheckPlayerEnemyShotCollision();								//プレイヤーと敵の弾の衝突判定
+
 	void CheckBossSpawn();												//ボスの生成判定
+	void StartBossEvent();
 	void BossEvent();                                                   //ボスイベントの処理
 	void BossEventDraw();                                               //ボスイベントの描画
 	void SetBossArea(int left, int top, int right, int bottom);         //ボスエリアの矩形を設定
-	RECT GetBossArea() const;                                           //ボスエリアの矩形を取得
-	std::shared_ptr<EnemyBase> GetBoss();                                   //ボス1の取得
+	void ApplyDamageToEnemy(int enemyID, int damage);
 
-	//敵生成関数
+	// 生成関数
 	void AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y);
 	void AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y);
+	void AddEnemyShot(BulletBase::BULLET_TYPE type, float x, float y, float vx, float vy, float scale);
 	void AddTeleport(float x, float y, float targetX, float targetY);
 	void AddItem(ItemBase::ITEM_TYPE type, float x, float y);
+	void SetTutorial(std::string path, float x, float y);
 
 	Stage* GetStage() { return stage_.get(); }
 	Player* GetPlayer() { return player_.get(); }
 	auto& GetEnemyList() { return enemyList_; }
 	FileManager& GetFileManager() { return fileMng_; }
+	RECT GetBossArea() const;                                           //ボスエリアの矩形を取得
+	std::shared_ptr<EnemyBase> GetBoss();                               //ボスの取得
 
 
 	void RequestPause() { sceneMng_.PushScene(SceneID::PAUSE); }
@@ -82,17 +96,28 @@ public:
 
 	bool IsHost() const { return isHost_; }
 
-	void StartBossEvent();
+	void Teleport2BossArea();
+
+	//HPバーの増加させる時間
+	static constexpr float HP_GAUGE_ANIM_TIME = 120.0f;
 private:
+	bool CollisionPauseImg();
+	void DrawClearTransition();
+
 	std::unique_ptr<Stage> stage_;
 	std::unique_ptr<Player> player_;
 
 	std::unique_ptr<ParticleManager> _pMng;
 
+	std::vector<tutorialPanel> _tutorialPanelList; // チュートリアルの画像リスト
+
+	std::shared_ptr<ImageFile> _PauseImg;
+
+
 	std::vector<std::shared_ptr<EnemyBase>> enemyList_;			//敵のリスト
 	std::vector<std::shared_ptr<GimmickBase>> gimmickList_;		//ギミックのリスト
 	std::vector<std::shared_ptr<ItemBase>> itemList_;			//アイテムのリスト
-	std::vector<std::shared_ptr<BulletBase>> bulletList_;		//弾のリスト
+	std::vector<std::shared_ptr<BulletBase>> bulletList_;		//敵の弾のリスト
 
 	NetworkManager& networkManager_;
 	std::shared_ptr<RemotePlayer> remotePlayer_;
@@ -125,7 +150,6 @@ private:
 	int gaussRatio;
 	int filterRatio;
 
-	void DrawClearTransition();
 	// -------------------------------------
 
 	//ボスが出現したかどうかのフラグ

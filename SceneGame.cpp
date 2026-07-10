@@ -9,6 +9,7 @@
 #include "Enemy3.h"
 #include "Boss1.h"
 #include "Boss2.h"
+#include "Boss3.h"
 #include "ItemBase.h"
 #include "Mentos.h"
 #include "Stage.h"
@@ -34,6 +35,7 @@ networkManager_(sceneMng.GetNetworkManager())
 	_warningFont = fileMng.CreateFontFM(Fonts::DotGothic16::PATH,
 										 Fonts::DotGothic16::NAME,
 										 160);
+	_PauseImg = fileMng.LoadImageFM("Resource/Image/Game/Pause.png");
 
 	_pMng = std::make_unique<ParticleManager>(fileMng);
 
@@ -126,9 +128,11 @@ void SceneGame::Update()
 		isEnd = true;
 	}
 
-	// リモートプレイヤーの更新
-	remotePlayer_->Update();
-
+	if (remotePlayer_->IsActive())
+	{
+		// リモートプレイヤーの更新
+		remotePlayer_->Update();
+	}
 
 
 	// プレイヤーの更新
@@ -167,6 +171,9 @@ void SceneGame::Update()
 		}
 	}
 
+	//敵の弾の更新
+	UpdateEnemyShot();
+
 	// ギミックの更新（必要に応じて）やリストのクリーンアップ
 	for (auto& gimmick : gimmickList_)
 	{
@@ -200,6 +207,8 @@ void SceneGame::Update()
 	CheckPlayerGimmickCollision();
 	//プレイヤーとアイテムの衝突判定
 	CheckPlayerItemCollision();
+	//プレイヤーと敵の弾の衝突判定
+	CheckPlayerEnemyShotCollision();
 
 	_pMng->UpdateAll();
 	// Stageの更新
@@ -216,6 +225,7 @@ void SceneGame::Draw()
 	// Stageを描画
 	if (stage_) stage_->Draw();
 
+#ifdef _DEBUG
 	//ボスエリアを描画
 	RECT area = bossArea;
 
@@ -224,8 +234,12 @@ void SceneGame::Draw()
 			area.right - stage_->GetScrollX(),
 			area.bottom - stage_->GetScrollY(),
 			0xff0000, false);
+#endif
 
-
+	for (auto& t : _tutorialPanelList)
+	{
+		DrawGraph(static_cast<int>(t.x) - stage_->GetScrollX(), static_cast<int>(t.y) - stage_->GetScrollY(), t.path->GetHandle(), true);
+	}
 	_pMng->DrawAll(stage_->GetScrollX(), stage_->GetScrollY());
 
 	for (auto& gimmick : gimmickList_) { gimmick->Draw(); }
@@ -234,21 +248,31 @@ void SceneGame::Draw()
 	{
 		enemy->Draw();
 	}
-	
+
+	//敵の弾を描画
+	for (auto& bullet : bulletList_)
+	{
+		bullet->Draw();
+	}
+
 	//プレイヤーを描画
 	player_->Draw();
-	remotePlayer_->Draw(stage_->GetScrollX(), stage_->GetScrollY());
-	DrawClearTransition();
-	SetDrawScreen(_offScreen->GetHandle());
-	ClearDrawScreen();
-
-	// 画面揺れなどの影響を受けないものはこっちへ描画
-
+	if (remotePlayer_->IsActive())
+	{
+		remotePlayer_->Draw(stage_->GetScrollX(), stage_->GetScrollY());
+	}
 	//アイテムを描画
 	for (auto& item : itemList_)
 	{
 		item->Draw();
 	}
+
+	DrawClearTransition();
+
+	SetDrawScreen(_offScreen->GetHandle());
+	ClearDrawScreen();
+
+	// 画面揺れなどの影響を受けないものはこっちへ描画
 
 	//ボスイベントの描画
 	BossEventDraw();
@@ -300,6 +324,13 @@ void SceneGame::Draw()
 	{
 		DrawGraph(0, 0, _gameScreen->GetHandle(), false);
 	}
+
+	if (CollisionPauseImg())
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
+	}
+	DrawGraph(0, 0, _PauseImg->GetHandle(), true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	
 	DrawGraph(0, 0, _offScreen->GetHandle(), TRUE);
 #ifdef _DEBUG
@@ -517,6 +548,26 @@ void SceneGame::UpdateEnemy()
 	);
  }
 
+//敵の弾の更新
+void SceneGame::UpdateEnemyShot()
+{
+	for (auto& shot : bulletList_)
+	{
+		if (shot->IsAlive())
+		{
+			shot->Update();
+		}
+		else
+		{
+			//敵の弾がなくなったらリストから削除
+			shot = nullptr;
+		}
+	}
+	bulletList_.erase(
+		std::remove(bulletList_.begin(), bulletList_.end(), nullptr), 
+		bulletList_.end());
+}
+
 //ステージの更新
 void SceneGame::UpdateStage()
 {
@@ -563,6 +614,7 @@ void SceneGame::UpdateDuringTransition()
 //プレイヤーと敵の衝突判定
 void SceneGame::CheckPlayerEnemyCollision()
 {
+
 	for (auto& enemy : enemyList_)
 	{
 		if (!enemy->IsAlive()) continue;
@@ -575,14 +627,18 @@ void SceneGame::CheckPlayerEnemyCollision()
 			p.bottom > e.top &&
 			p.top < e.bottom;
 
-		if (hit && !player_->GetAttakFlag())
+		if (!hit)
 		{
-			//プレイヤーにダメージを与える
+			enemy->SetHitPlayerAlready(false);
+			continue;
+		}
+		if (!player_->GetAttakFlag())
+		{
+			//ダメージ・ノックバック
 			player_->Damage(10.0f);
-			//プレイヤーをノックバックさせる
 			player_->PlayerKnockBack(enemy->GetX(), enemy->GetY(), 10.0f);
 		}
-		else if (hit && player_->GetAttakFlag() && player_->GetSpeed() >= Player::ATTACK_SPEED_THRESHOLD)
+		else if (player_->GetAttakFlag() && player_->GetSpeed() >= Player::ATTACK_SPEED_THRESHOLD)
 		{
 			if (isHost_)
 			{
@@ -600,7 +656,12 @@ void SceneGame::CheckPlayerEnemyCollision()
 				dp.damage = static_cast<int>(player_->GetAttackDamage());
 				networkManager_.SendDamage(dp);
 			}
+		}
 
+		if (!enemy->GetHitPlayerAlready())
+		{
+			player_->PlayHitSE();
+			enemy->SetHitPlayerAlready(true);
 		}
 	}
 }
@@ -682,6 +743,32 @@ void SceneGame::CheckPlayerItemCollision()
 	}
 }
 
+//プレイヤーと敵の弾の衝突判定
+void SceneGame::CheckPlayerEnemyShotCollision()
+{
+	RECT p = player_->GetRect();
+
+	for (auto& bullet : bulletList_)
+	{
+		if (!bullet->IsAlive())
+			continue;
+
+		RECT b = bullet->GetRect();
+
+		bool hit =
+			p.right > b.left &&
+			p.left < b.right &&
+			p.bottom > b.top &&
+			p.top < b.bottom;
+		if (hit)
+		{
+			player_->Damage(bullet->GetApplyDamage());
+			player_->PlayerKnockBack(bullet->GetX(), bullet->GetY(), 10.0f);
+			bullet->SetAliveFlag(false);
+		}
+	}
+}
+
 //ボスエリアの矩形を設定
 void SceneGame::SetBossArea(int left, int top, int right, int bottom)
 {
@@ -698,7 +785,6 @@ RECT SceneGame::GetBossArea() const
 	return bossArea;
 }
 
-//ボスの生成判定
 //ボスの生成判定
 void SceneGame::CheckBossSpawn()
 {
@@ -771,26 +857,13 @@ void SceneGame::BossEvent()
 					switch (selectedStageIndex_)
 					{
 						case 1:
-							AddBoss(
-								EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1,
-								1800.0f,
-								3300.0f
-							);
+							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1,1800.0f,3300.0f);
 							break;
-
 						case 2:
-							AddBoss(
-								EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2,
-								950.0f,
-								5000.0f
-							);
+							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2,950.0f,5000.0f);
 							break;
 						case 3:
-							AddBoss(
-								EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2,
-								1000.0f,
-								6000.0f
-							);
+							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_3,1000.0f,6000.0f);
 							break;
 					}
 					bossEventState = BossEventState::APPEAR;
@@ -799,6 +872,10 @@ void SceneGame::BossEvent()
 				break;
 
 			case SceneGame::BossEventState::APPEAR:
+				if (boss)
+				{
+					boss->SetAppearFlag(true);
+				}
 				bossTimer++;
 				//2秒後にUIを表示
 				if (bossTimer > 120)
@@ -815,9 +892,11 @@ void SceneGame::BossEvent()
 				break;
 
 			case SceneGame::BossEventState::UIDRAW:
+				//HPバーを徐々に表示させる
 				if (bossHpGauge < bossHpGaugeMax)
 				{
-					bossHpGauge += 2.0f;
+					float addHp = bossHpGaugeMax / HP_GAUGE_ANIM_TIME;
+					bossHpGauge += addHp;
 				}
 
 				if (bossHpGauge >= bossHpGaugeMax)
@@ -863,8 +942,13 @@ void SceneGame::BossEvent()
 			{
 				case SceneGame::BossEventState::WARNING:
 					bossTimer = 0;
+					Teleport2BossArea();
 					break;
 				case SceneGame::BossEventState::APPEAR:
+					if (boss)
+					{
+						boss->SetAppearFlag(true);
+					}
 					switch (selectedStageIndex_)
 					{
 						case 1:
@@ -872,6 +956,9 @@ void SceneGame::BossEvent()
 							break;
 						case 2:
 							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2, 950.0f,5000.0f);
+							break;
+						case 3:
+							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_3,1000.0f,6000.0f);
 							break;
 					}
 					bossTimer = 0;
@@ -910,7 +997,8 @@ void SceneGame::BossEvent()
 		{
 			if (bossHpGauge < bossHpGaugeMax)
 			{
-				bossHpGauge += 2.0f;
+				float addHp = bossHpGaugeMax / HP_GAUGE_ANIM_TIME;
+				bossHpGauge += addHp;
 			}
 		}
 	}
@@ -924,13 +1012,13 @@ void SceneGame::AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y)
 	switch (type)
 	{
 	case EnemyBase::ENEMY_TYPE::E_TYPE_1:
-		newEnemy = std::make_shared<Enemy1>(fileMng_, stage_.get(), x, y, *_pMng);
+		newEnemy = std::make_shared<Enemy1>(fileMng_, stage_.get(), this, x, y, *_pMng);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_2:
-		newEnemy = std::make_shared<Enemy2>(fileMng_, stage_.get(), x, y, *_pMng);
+		newEnemy = std::make_shared<Enemy2>(fileMng_, stage_.get(), this, x, y, *_pMng);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_3:
-		newEnemy = std::make_shared<Enemy3>(fileMng_, stage_.get(), x, y, *_pMng);
+		newEnemy = std::make_shared<Enemy3>(fileMng_, stage_.get(), this, x, y, *_pMng);
 		break;
 	default:
 		break;
@@ -952,10 +1040,13 @@ void SceneGame::AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y)
 	switch (type)
 	{
 	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1:
-		newBoss = std::make_shared<Boss1>(fileMng_, stage_.get(), x, y, *_pMng);
+		newBoss = std::make_shared<Boss1>(fileMng_, stage_.get(), this, x, y, *_pMng);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2:
-		newBoss = std::make_shared<Boss2>(fileMng_, stage_.get(), x, y, *_pMng);
+		newBoss = std::make_shared<Boss2>(fileMng_, stage_.get(), this, x, y, *_pMng);
+		break;
+	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_3:
+		newBoss = std::make_shared<Boss3>(fileMng_, stage_.get(), this, x, y, *_pMng);
 		break;
 	default:
 		break;
@@ -969,13 +1060,31 @@ void SceneGame::AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y)
 	}
 }
 
+//敵弾生成関数
+void SceneGame::AddEnemyShot(BulletBase::BULLET_TYPE type, float x, float y, float vx, float vy, float scale)
+{
+	switch (type)
+	{
+		case BulletBase::BULLET_TYPE::B_TYPE_NON:
+			break;
+		case BulletBase::BULLET_TYPE::B_TYPE_1:
+			bulletList_.push_back(std::make_shared<Bullet>(fileMng_, stage_.get(), x, y, vx, vy, scale));
+			break;
+		case BulletBase::BULLET_TYPE::B_TYPE_2:
+			break;
+		case BulletBase::BULLET_TYPE::B_TYPE_3:
+			break;
+		case BulletBase::BULLET_TYPE::B_TYPE_MAX:
+			break;
+		default:
+			break;
+	}
+}
+
 //テレポートギミック生成関数
 void SceneGame::AddTeleport(float x, float y, float targetX, float targetY)
 {
 	gimmickList_.push_back(std::make_shared<GimmickTeleport>(fileMng_, stage_.get(), x, y, targetX, targetY));
-
-
-
 }
 
 //アイテム生成関数
@@ -991,6 +1100,16 @@ void SceneGame::AddItem(ItemBase::ITEM_TYPE type, float x, float y)
 		default:
 			break;
 	}
+}
+
+void SceneGame::SetTutorial(std::string path, float x, float y)
+{
+	tutorialPanel newTutorialPanel;
+	newTutorialPanel.path = fileMng_.LoadImageFM(path);
+	newTutorialPanel.x = x;
+	newTutorialPanel.y = y;
+
+	_tutorialPanelList.push_back(newTutorialPanel);
 }
 
 void SceneGame::TransitionOut(float t)
@@ -1022,9 +1141,60 @@ void SceneGame::StartBossEvent()
 	//player_->SetCanMoveFlag(false);
 	isBossSpawned_ = true;
 
+	// ボスエリアに強制合流させる
+	Teleport2BossArea();
+
 	// 全クライアントへ開始命令を同期
 	BossEventPacket packet;
 	packet.type = PACKET_SYNC_EVENT;
 	packet.eventState = static_cast<int>(BossEventState::WARNING);
 	networkManager_.SendBossEvent(packet);
+}
+
+void SceneGame::Teleport2BossArea()
+{
+	// 念のためボスエリアの矩形を最新化
+	bossArea = GetBossArea();
+
+	float myX = player_->GetWorldX();
+	float myY = player_->GetWorldY();
+
+	// 自分がすでにボスエリア内にいるか判定
+	bool amIInBossArea = (myX >= bossArea.left && myX <= bossArea.right &&
+						  myY >= bossArea.top && myY <= bossArea.bottom);
+
+	if (amIInBossArea)
+	{
+		// 自分が先に到着した側のためワープはしない
+		return;
+	}
+
+	// 相手の座標を取得
+	float targetX = remotePlayer_->GetPosX();
+	float targetY = remotePlayer_->GetPosY();
+
+	player_->SetPosition(targetX, targetY);
+
+	// ジャンプ中などにワープした場合に備えて速度をリセット
+	player_->SetVelocity(0.0f, 0.0f);
+}
+
+bool SceneGame::CollisionPauseImg()
+{
+	RECT rc = player_->GetRect();
+	rc.left -= stage_->GetScrollX();
+	rc.right -= stage_->GetScrollX();
+	rc.top -= stage_->GetScrollY();
+	rc.bottom -= stage_->GetScrollY();
+
+	RECT pauseRc;
+	pauseRc.left = 0;
+	pauseRc.top = 0;
+	pauseRc.right = _PauseImg->GetWidth();
+	pauseRc.bottom = _PauseImg->GetHeight();
+
+	return rc.right  > pauseRc.left &&
+		   rc.left   < pauseRc.right &&
+		   rc.bottom > pauseRc.top &&
+		   rc.top    < pauseRc.bottom;
 }
