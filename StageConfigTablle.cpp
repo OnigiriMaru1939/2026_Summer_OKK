@@ -91,7 +91,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 				scene.GetStage()->SetBgImage("Resource/Image/Game/Stage1_bg.png");
 				scene.GetStage()->SetMchipImage("Resource/MapChip/Mapchip_neon.png");
 				//プレイヤーの初期化
-				scene.GetPlayer()->SetPosition(100.0f, 9500.0f);
+				scene.GetPlayer()->SetPosition(100.0f, 8000.0f);
 				//ボスエリアの初期設定
 				scene.SetBossArea(80, 8500, 1900, 10500);
 				//テレポートギミックの生成
