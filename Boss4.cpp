@@ -1,15 +1,15 @@
-﻿#include "Boss2.h"
+﻿#include "Boss4.h"
 
 
-Boss2::Boss2(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng) : EnemyBase(fileMng, stage, sceneGame, x, y, pMng)
+Boss4::Boss4(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng) : EnemyBase(fileMng, stage, sceneGame, x, y, pMng)
 {
-	SetImage("Resource/Image/Enemys/Monster.png");
-	enemyType_ = ENEMY_TYPE::E_TYPE_BOSS_2;
+	SetImage("Resource/Image/Enemys/Cola.png");
+	enemyType_ = ENEMY_TYPE::E_TYPE_BOSS_4;
 	SetPosition(x, y);				//初期位置を設定
 	SetVelocity(-5.0f, 0.0f);		//初期速度を設定
-	name_ = "Monster";              //名前を設定
-	hp_ = 200;
-	hpMax_ = 200;
+	name_ = "Cola";              //名前を設定
+	hp_ = 300;
+	hpMax_ = 300;
 	scale = 2.0f;
 	jumpFlag = false;
 	bossState_ = BOSS_STATE::NON;
@@ -17,11 +17,11 @@ Boss2::Boss2(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, 
 	rotateSpeed = 0.0f;
 }
 
-Boss2::~Boss2()
+Boss4::~Boss4()
 {
 }
 
-void Boss2::Update()
+void Boss4::Update()
 {
 	//ボス状態ステータス変化処理
 	BossStateChange();
@@ -40,21 +40,21 @@ void Boss2::Update()
 
 	switch (bossState_)
 	{
-		case Boss2::WAIT:
+		case Boss4::WAIT:
 			Wait();
 			break;
-		case Boss2::MOVE:
+		case Boss4::MOVE:
 			//横移動
 			Move();
 			break;
-		case Boss2::JUMP:
+		case Boss4::JUMP:
 			if (!GetJumpFlag())
 			{
 				Jump();
 			}
 			Move();
 			break;
-		case Boss2::DASH:
+		case Boss4::DASH:
 			Dash();
 			break;
 		default:
@@ -65,7 +65,7 @@ void Boss2::Update()
 	NoDamageCountDown();
 }
 
-void Boss2::Draw() const
+void Boss4::Draw() const
 {
 	EnemyBase::Draw(); // 基底クラスの描画処理を呼び出す
 
@@ -79,14 +79,14 @@ void Boss2::Draw() const
 }
 
 //ボスの出現処理
-void Boss2::BossAppear()
+void Boss4::BossAppear()
 {
 	//落下だけ
 	MoveY();
 }
 
 //ボス状態ステータス変化処理
-void Boss2::BossStateChange()
+void Boss4::BossStateChange()
 {
 	//ボス状態ステータスタイマーを進める
 	stateChangeTimer++;
@@ -138,7 +138,7 @@ void Boss2::BossStateChange()
 }
 
 //次の行動パターンを決める関数
-void Boss2::SelectNextState()
+void Boss4::SelectNextState()
 {
 	int randomStateNum_ = rand() % (BOSS_STATE::MAX - 2);
 
@@ -159,20 +159,20 @@ void Boss2::SelectNextState()
 }
 
 //ボス待機
-void Boss2::Wait()
+void Boss4::Wait()
 {
 	MoveY();
 	EnemyShake();
 }
 
 //ボスの移動処理
-void Boss2::Move()
+void Boss4::Move()
 {
 	EnemyBase::Move();		//基底クラスの移動処理を呼び出す
 }
 
 //ジャンプ処理
-void Boss2::Jump()
+void Boss4::Jump()
 {
 	if (GetJumpFlag()) return;		//二段ジャンプを防止
 
@@ -181,7 +181,7 @@ void Boss2::Jump()
 }
 
 //ダッシュ処理
-void Boss2::Dash()
+void Boss4::Dash()
 {
 	rotateSpeed = 0.2f;
 

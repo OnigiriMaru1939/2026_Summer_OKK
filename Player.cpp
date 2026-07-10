@@ -317,7 +317,7 @@ void Player::Draw()
 	bool drawPlayer = true;
 
 	//無敵時間中は点滅させる
-	if (_noDamageTime > 0)
+	if (GetNoDamageFlag())
 	{
 		if ((_noDamageTime / 4) % 2 == 0)
 		{
@@ -589,6 +589,8 @@ void Player::ClickSodaJump()
 	//移動禁止フラグが立っているときは攻撃できない
 	if (!canMoveFlag) return;
 
+	PlayerResetShake();
+
 	if (sodaShakeGauge > 0)
 	{
 		//炭酸蓄積・炭酸ヒートゲージの割合を炭酸攻撃の威力に変換
@@ -638,6 +640,13 @@ void Player::PlayerShake()
 
 	shakeOffsetX = (GetRand(10) - 5) * playerShakePower;
 	shakeOffsetY = (GetRand(10) - 5) * playerShakePower;
+}
+
+//プレイヤーの振動リセット処理
+void Player::PlayerResetShake()
+{
+	shakeOffsetX = 0.0f;
+	shakeOffsetY = 0.0f;
 }
 
 //プレイヤー破裂処理

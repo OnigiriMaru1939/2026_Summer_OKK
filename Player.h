@@ -51,6 +51,7 @@ public:
 	void SodaAttack(float power);	//炭酸攻撃処理
 	void Damage(float damage);		//ダメージ処理
 	void PlayerShake();				//プレイヤーの振動処理
+	void PlayerResetShake();		//プレイヤーの振動リセット処理
 	void PlayerExplosion();			//破裂処理
 	void PlayerKnockBack(float enemyX, float enemyY, float power);			//プレイヤーのノックバック処理
 	RECT GetRect() const;			//プレイヤーの当たり判定の矩形を取得

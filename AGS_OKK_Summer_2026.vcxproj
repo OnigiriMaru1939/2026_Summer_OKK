@@ -151,6 +151,7 @@
     <ClCompile Include="Boss1.cpp" />
     <ClCompile Include="Boss2.cpp" />
     <ClCompile Include="Boss3.cpp" />
+    <ClCompile Include="Boss4.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="BulletBase.cpp" />
     <ClCompile Include="Enemy1.cpp" />
@@ -186,6 +187,7 @@
     <ClInclude Include="Boss1.h" />
     <ClInclude Include="Boss2.h" />
     <ClInclude Include="Boss3.h" />
+    <ClInclude Include="Boss4.h" />
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="BulletBase.h" />
     <ClInclude Include="Enemy1.h" />

@@ -10,6 +10,7 @@
 #include "Boss1.h"
 #include "Boss2.h"
 #include "Boss3.h"
+#include "Boss4.h"
 #include "ItemBase.h"
 #include "Mentos.h"
 #include "Stage.h"
@@ -546,6 +547,15 @@ void SceneGame::UpdateEnemy()
 		std::remove(enemyList_.begin(), enemyList_.end(), nullptr),
 		enemyList_.end()
 	);
+
+	//追加待ちの敵を登録
+	enemyList_.insert(
+		enemyList_.end(),
+		addEnemyList_.begin(),
+		addEnemyList_.end()
+	);
+
+	addEnemyList_.clear();
  }
 
 //敵の弾の更新
@@ -636,7 +646,7 @@ void SceneGame::CheckPlayerEnemyCollision()
 		{
 			//ダメージ・ノックバック
 			player_->Damage(10.0f);
-			player_->PlayerKnockBack(enemy->GetX(), enemy->GetY(), 10.0f);
+			player_->PlayerKnockBack(enemy->GetX(),enemy->GetY(),10.0f);
 		}
 		else if (player_->GetAttakFlag() && player_->GetSpeed() >= Player::ATTACK_SPEED_THRESHOLD)
 		{
@@ -865,6 +875,9 @@ void SceneGame::BossEvent()
 						case 3:
 							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_3,1000.0f,6000.0f);
 							break;
+						case 4:
+							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_4, 1000.0f, 6000.0f);
+							break;
 					}
 					bossEventState = BossEventState::APPEAR;
 					bossTimer = 0;
@@ -960,6 +973,9 @@ void SceneGame::BossEvent()
 						case 3:
 							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_3,1000.0f,6000.0f);
 							break;
+						case 4:
+							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_4, 1000.0f, 6000.0f);
+							break;
 					}
 					bossTimer = 0;
 					break;
@@ -1005,7 +1021,7 @@ void SceneGame::BossEvent()
 }
 
 //敵生成関数(雑魚敵)
-void SceneGame::AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y)
+std::shared_ptr<EnemyBase> SceneGame::AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y)
 {
 	std::shared_ptr<EnemyBase> newEnemy = nullptr;
 
@@ -1028,8 +1044,10 @@ void SceneGame::AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y)
 	{
 		newEnemy->SetNetworkId(_nextEnemyId);
 		_nextEnemyId++;
-		enemyList_.push_back(newEnemy);
+		addEnemyList_.push_back(newEnemy);
 	}
+
+	return newEnemy;
 }
 
 //敵生成関数(ボス敵)
@@ -1047,6 +1065,9 @@ void SceneGame::AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y)
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_3:
 		newBoss = std::make_shared<Boss3>(fileMng_, stage_.get(), this, x, y, *_pMng);
+		break;
+	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_4:
+		newBoss = std::make_shared<Boss4>(fileMng_, stage_.get(), this, x, y, *_pMng);
 		break;
 	default:
 		break;
