@@ -66,7 +66,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 				scene.GetStage()->SetMchipImage("Resource/MapChip/Mapchip_neon.png");
 
 				//プレイヤーの初期化
-				scene.GetPlayer()->SetPosition(100.0f, 4000.0f);
+				scene.GetPlayer()->SetPosition(200.0f, 6300.0f);
 				//敵の生成
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 1200.0f, 1500.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 800.0f, 1200.0f);

@@ -92,6 +92,7 @@ public:
 
 	bool GetAttakFlag() const { return sodaAttackFlag; }			//炭酸攻撃フラグを取得
 	float GetAttackDamage() const { return attackDamage; }			//攻撃のダメージを取得
+	bool GetNoDamageFlag() const { return noDamageFlag; }			//無敵フラグを取得
 	bool GetAliveFlag() const { return aliveFlag; }					//生存フラグを取得
 	//移動可能フラグを設定・取得
 	bool GetCanMoveFlag() const { return canMoveFlag; }
@@ -138,6 +139,7 @@ private:
 	bool stunFlag;				//気絶フラグ
 	bool jumpFlag;				//ジャンプフラグ
 	bool sodaAttackFlag;		//炭酸攻撃フラグ
+	bool noDamageFlag;			//無敵フラグ
 	float gravity;				//重力
 	float playerSpeed;			//プレイヤー速度
 	float velocityX;			//X軸のプレイヤー速度
