@@ -15,7 +15,7 @@ enum class NextScenePause
 	Retry = 1,
 	StageSelect = 2,
 	Title = 3,
-	Exit = 5,
+	Exit = 4,
 	Max
 };
 
