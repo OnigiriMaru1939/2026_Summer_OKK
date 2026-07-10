@@ -13,7 +13,8 @@ RemotePlayer::RemotePlayer(FileManager& fileMng, ParticleManager& pMng)
 	angle(0), scale(1.0f),
 	isAttack(false),
 	_width(64), _height(64),
-	_pMng(pMng)
+	_pMng(pMng),
+	_isActive(false)
 {
 	sodaAttackSE = fileMng.LoadSoundFM("Resource/Sound/SE/Soda_SE.wav");
 
@@ -42,6 +43,7 @@ void RemotePlayer::Update()
 
 void RemotePlayer::SyncState(const PlayerPacket& packet)
 {
+	_isActive = true;
 	// 受信したデータを自身の変数にコピー
 	posX = packet.posX;
 	posY = packet.posY;
@@ -53,6 +55,8 @@ void RemotePlayer::SyncState(const PlayerPacket& packet)
 
 void RemotePlayer::SyncState(const SodaJumpPacket& packet)
 {
+
+
 
 	const ParticleConfig* masterCfg = _pMng.GetConfig(WATER_PARTICLE_PATH);
 	if (masterCfg)

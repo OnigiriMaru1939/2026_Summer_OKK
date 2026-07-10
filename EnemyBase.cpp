@@ -42,6 +42,7 @@ EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, f
 	, hpMax_(200)
 	, isAlive_(true)
 	, jumpFlag(false)
+	, hitPlayerAlready_(false)
 	, isAppearing(false)
 	, noDamageFlag(false)
 	, enemyType_(ENEMY_TYPE::E_TYPE_NON)

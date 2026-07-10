@@ -21,12 +21,13 @@ Player::Player(FileManager& fileMng, Stage& stage, SceneGame& game, ParticleMana
 	AddFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
 	hpFontHandle = CreateFontToHandle("DotGothic16", 30, -1, DX_FONTTYPE_EDGE);
 	SetImage("Resource/Image/Player/Cider_Player.png");
-
+	arrowImage_ = fileMng.LoadImageFM("Resource/Image/Player/Arrow.png");
 
 	particleManager.RegisterConfig(WATER_PARTICLE_PATH);
 
 	sodaAttackSE = fileMng.LoadSoundFM("Resource/Sound/SE/Soda_SE.wav");
 	sodaChargeSE = fileMng.LoadSoundFM("Resource/Sound/SE/Soda_Charge_SE.wav");
+	_hitSE = fileMng.LoadSoundFM("Resource/Sound/SE/hit_SE.wav");
 
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Jump, [this]()
 												   { 
@@ -301,6 +302,11 @@ void Player::UpdateStageScroll()
 	}
 }
 
+void Player::PlayHitSE()
+{
+	_hitSE->PlayOneShot();
+}
+
 void Player::Draw()
 {
 	//DrawFormatString(1000, 1000, GetColor(255,0, 0), "HP %d", (int)playerHp);
@@ -367,6 +373,24 @@ void Player::Draw()
 	{
 		//炭酸蓄積ゲージ
 		DrawGauge(static_cast<int>(canvasX) - 75, static_cast<int>(canvasY) - 50, 20, 100, sodaShakeGauge, SODA_SHAKE_GAUGE_MAX, GetColor(0, 0, 255), 1);
+
+		//矢印画像を描画
+		float headOffset = (height_ * scale / 1.0f);
+
+		float targetAngle = angle - DX_PI_F / 2.0f;
+
+
+		float headX = canvasX + cosf(targetAngle) * headOffset;
+		float headY = canvasY + sinf(targetAngle) * headOffset;
+
+		DrawRotaGraph(
+			static_cast<int>(headX),
+			static_cast<int>(headY),
+			1.0f,          // 拡大率
+			angle,   // プレイヤーの回転角度と同期
+			arrowImage_->GetHandle(),
+			TRUE
+		);
 	}
 	if (sodaHeatShakeGauge > 0 && canMoveFlag)
 	{
@@ -377,6 +401,7 @@ void Player::Draw()
 	//プレイヤーの振動処理
 	PlayerShake();
 
+#ifdef _DEBUG
 	DrawCircle(static_cast<int>(canvasX), static_cast<int>(canvasY), 3, 0X0000ff);
 	// デバッグ
 	DrawFormatString(1000, 1000, GetColor(255, 0, 0), "SodaGauge: %d", static_cast<int>(sodaShakeGauge));
@@ -390,6 +415,7 @@ void Player::Draw()
 
 	DrawFormatString(0, 300, 0x00ff00, "PlayerPos X: %f,Y: %f", posX, posY);
 	DrawFormatString(0, 320, 0x00ff00, "PlayerMapChip X: %d,Y: %d", stage_.WorldToChipX(posX), stage_.WorldToChipY(posY));
+#endif
 }
 
 //重力処理
@@ -691,8 +717,8 @@ bool Player::CollisionHpBar()
 	RECT hpBar;
 	hpBar.left = 1350;
 	hpBar.top = 1000;
-	hpBar.right = 850;
-	hpBar.bottom = 1040;
+	hpBar.right = 1850;
+	hpBar.bottom = 1080;
 
 	return
 		rc.right > hpBar.left &&

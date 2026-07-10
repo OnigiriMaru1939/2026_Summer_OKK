@@ -102,6 +102,7 @@ public:
 	void UpdateStageScroll();
 	//プレイヤージャンプ倍率を設定
 	void SetPlayerJumpMag(float mag) { playerJumpMag = mag; }
+	void PlayHitSE();
 private:
 	
 	bool GetJumpFlag() const { return jumpFlag; }					//ジャンプフラグを取得
@@ -122,8 +123,11 @@ private:
 
 	std::shared_ptr<ImageFile> image_;			//プレイヤーの画像
 
+	std::shared_ptr<ImageFile> arrowImage_;
+
 	std::shared_ptr<SoundFile> sodaAttackSE;		//炭酸攻撃のサウンド
 	std::shared_ptr<SoundFile> sodaChargeSE;		//炭酸蓄積のサウンド
+	std::shared_ptr<SoundFile> _hitSE;
 
 	Stage& stage_;								//ステージへのポインタ
 	std::weak_ptr<ParticleEmitter> sodaParticle;		// 炭酸攻撃のパーティクルエミッター weak_ptrにすることで、エミッターが削除された後も安全にアクセスできるようにする
