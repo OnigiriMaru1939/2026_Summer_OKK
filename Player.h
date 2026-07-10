@@ -122,6 +122,8 @@ private:
 
 	std::shared_ptr<ImageFile> image_;			//プレイヤーの画像
 
+	std::shared_ptr<ImageFile> arrowImage_;
+
 	std::shared_ptr<SoundFile> sodaAttackSE;		//炭酸攻撃のサウンド
 	std::shared_ptr<SoundFile> sodaChargeSE;		//炭酸蓄積のサウンド
 	std::shared_ptr<SoundFile> _hitSE;

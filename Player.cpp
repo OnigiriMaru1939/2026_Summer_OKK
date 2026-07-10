@@ -21,7 +21,7 @@ Player::Player(FileManager& fileMng, Stage& stage, SceneGame& game, ParticleMana
 	AddFontResourceExA("Resource/fonts/DotGothic16-Regular.ttf", FR_PRIVATE, NULL);
 	hpFontHandle = CreateFontToHandle("DotGothic16", 30, -1, DX_FONTTYPE_EDGE);
 	SetImage("Resource/Image/Player/Cider_Player.png");
-
+	arrowImage_ = fileMng.LoadImageFM("Resource/Image/Player/Arrow.png");
 
 	particleManager.RegisterConfig(WATER_PARTICLE_PATH);
 
@@ -373,6 +373,24 @@ void Player::Draw()
 	{
 		//炭酸蓄積ゲージ
 		DrawGauge(static_cast<int>(canvasX) - 75, static_cast<int>(canvasY) - 50, 20, 100, sodaShakeGauge, SODA_SHAKE_GAUGE_MAX, GetColor(0, 0, 255), 1);
+
+		//矢印画像を描画
+		float headOffset = (height_ * scale / 1.0f);
+
+		float targetAngle = angle - DX_PI_F / 2.0f;
+
+
+		float headX = canvasX + cosf(targetAngle) * headOffset;
+		float headY = canvasY + sinf(targetAngle) * headOffset;
+
+		DrawRotaGraph(
+			static_cast<int>(headX),
+			static_cast<int>(headY),
+			1.0f,          // 拡大率
+			angle,   // プレイヤーの回転角度と同期
+			arrowImage_->GetHandle(),
+			TRUE
+		);
 	}
 	if (sodaHeatShakeGauge > 0 && canMoveFlag)
 	{
