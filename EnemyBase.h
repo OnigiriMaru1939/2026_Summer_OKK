@@ -87,7 +87,6 @@ public:
 
 	bool GetHitPlayerAlready() const { return hitPlayerAlready_; }
 	void SetHitPlayerAlready(bool hit) { hitPlayerAlready_ = hit; }
-	int GetNoDamageTime() const { return _noDamageTime; }
 
 	void SetAppearFlag(bool flag) { isAppearing = flag; } //出現フラグを設定する関数
 
