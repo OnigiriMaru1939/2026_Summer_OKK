@@ -42,7 +42,6 @@ public:
 	~SceneGame() override;
 
 	void Update() override;
-	void Draw() override;
 	void UpdatePlayer();
 	void UpdateEnemy();
 	void UpdateEnemyShot();
@@ -50,7 +49,8 @@ public:
 	void UpdateGimmick();
 	void UpdateItem();
 	void UpdateDuringTransition() override; // トランジション中の更新処理
-	void ApplyDamageToEnemy(int enemyID, int damage);
+
+	void Draw() override;
 	void DrawGauge(int x,
 				   int y,
 				   int width,
@@ -58,16 +58,18 @@ public:
 				   float value,
 				   float maxValue,
 				   int color);
+
 	void CheckPlayerEnemyCollision();									//プレイヤーと敵の衝突判定
 	void CheckPlayerGimmickCollision();									//プレイヤーとギミックの衝突判定
 	void CheckPlayerItemCollision();									//プレイヤーとアイテムの衝突判定
 	void CheckPlayerEnemyShotCollision();								//プレイヤーと敵の弾の衝突判定
+
 	void CheckBossSpawn();												//ボスの生成判定
+	void StartBossEvent();
 	void BossEvent();                                                   //ボスイベントの処理
 	void BossEventDraw();                                               //ボスイベントの描画
 	void SetBossArea(int left, int top, int right, int bottom);         //ボスエリアの矩形を設定
-	RECT GetBossArea() const;                                           //ボスエリアの矩形を取得
-	std::shared_ptr<EnemyBase> GetBoss();                               //ボス1の取得
+	void ApplyDamageToEnemy(int enemyID, int damage);
 
 	// 生成関数
 	void AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y);
@@ -81,6 +83,8 @@ public:
 	Player* GetPlayer() { return player_.get(); }
 	auto& GetEnemyList() { return enemyList_; }
 	FileManager& GetFileManager() { return fileMng_; }
+	RECT GetBossArea() const;                                           //ボスエリアの矩形を取得
+	std::shared_ptr<EnemyBase> GetBoss();                               //ボスの取得
 
 
 	void RequestPause() { sceneMng_.PushScene(SceneID::PAUSE); }
@@ -92,7 +96,7 @@ public:
 
 	bool IsHost() const { return isHost_; }
 
-	void StartBossEvent();
+	void Teleport2BossArea();
 
 	//HPバーの増加させる時間
 	static constexpr float HP_GAUGE_ANIM_TIME = 120.0f;

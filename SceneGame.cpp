@@ -128,9 +128,11 @@ void SceneGame::Update()
 		isEnd = true;
 	}
 
-	// リモートプレイヤーの更新
-	remotePlayer_->Update();
-
+	if (remotePlayer_->IsActive())
+	{
+		// リモートプレイヤーの更新
+		remotePlayer_->Update();
+	}
 
 
 	// プレイヤーの更新
@@ -255,8 +257,10 @@ void SceneGame::Draw()
 
 	//プレイヤーを描画
 	player_->Draw();
-	remotePlayer_->Draw(stage_->GetScrollX(), stage_->GetScrollY());
-
+	if (remotePlayer_->IsActive())
+	{
+		remotePlayer_->Draw(stage_->GetScrollX(), stage_->GetScrollY());
+	}
 	//アイテムを描画
 	for (auto& item : itemList_)
 	{
@@ -610,6 +614,7 @@ void SceneGame::UpdateDuringTransition()
 //プレイヤーと敵の衝突判定
 void SceneGame::CheckPlayerEnemyCollision()
 {
+
 	for (auto& enemy : enemyList_)
 	{
 		if (!enemy->IsAlive()) continue;
@@ -622,13 +627,18 @@ void SceneGame::CheckPlayerEnemyCollision()
 			p.bottom > e.top &&
 			p.top < e.bottom;
 
-		if (hit && !player_->GetAttakFlag())
+		if (!hit)
+		{
+			enemy->SetHitPlayerAlready(false);
+			continue;
+		}
+		if (!player_->GetAttakFlag())
 		{
 			//ダメージ・ノックバック
 			player_->Damage(10.0f);
 			player_->PlayerKnockBack(enemy->GetX(), enemy->GetY(), 10.0f);
 		}
-		else if (hit && player_->GetAttakFlag() && player_->GetSpeed() >= Player::ATTACK_SPEED_THRESHOLD)
+		else if (player_->GetAttakFlag() && player_->GetSpeed() >= Player::ATTACK_SPEED_THRESHOLD)
 		{
 			if (isHost_)
 			{
@@ -646,7 +656,12 @@ void SceneGame::CheckPlayerEnemyCollision()
 				dp.damage = static_cast<int>(player_->GetAttackDamage());
 				networkManager_.SendDamage(dp);
 			}
+		}
 
+		if (!enemy->GetHitPlayerAlready())
+		{
+			player_->PlayHitSE();
+			enemy->SetHitPlayerAlready(true);
 		}
 	}
 }
@@ -927,6 +942,7 @@ void SceneGame::BossEvent()
 			{
 				case SceneGame::BossEventState::WARNING:
 					bossTimer = 0;
+					Teleport2BossArea();
 					break;
 				case SceneGame::BossEventState::APPEAR:
 					if (boss)
@@ -1125,11 +1141,42 @@ void SceneGame::StartBossEvent()
 	//player_->SetCanMoveFlag(false);
 	isBossSpawned_ = true;
 
+	// ボスエリアに強制合流させる
+	Teleport2BossArea();
+
 	// 全クライアントへ開始命令を同期
 	BossEventPacket packet;
 	packet.type = PACKET_SYNC_EVENT;
 	packet.eventState = static_cast<int>(BossEventState::WARNING);
 	networkManager_.SendBossEvent(packet);
+}
+
+void SceneGame::Teleport2BossArea()
+{
+	// 念のためボスエリアの矩形を最新化
+	bossArea = GetBossArea();
+
+	float myX = player_->GetWorldX();
+	float myY = player_->GetWorldY();
+
+	// 自分がすでにボスエリア内にいるか判定
+	bool amIInBossArea = (myX >= bossArea.left && myX <= bossArea.right &&
+						  myY >= bossArea.top && myY <= bossArea.bottom);
+
+	if (amIInBossArea)
+	{
+		// 自分が先に到着した側のためワープはしない
+		return;
+	}
+
+	// 相手の座標を取得
+	float targetX = remotePlayer_->GetPosX();
+	float targetY = remotePlayer_->GetPosY();
+
+	player_->SetPosition(targetX, targetY);
+
+	// ジャンプ中などにワープした場合に備えて速度をリセット
+	player_->SetVelocity(0.0f, 0.0f);
 }
 
 bool SceneGame::CollisionPauseImg()
