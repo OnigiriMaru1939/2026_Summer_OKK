@@ -28,6 +28,7 @@ public:
 		E_TYPE_BOSS_1,
 		E_TYPE_BOSS_2,
 		E_TYPE_BOSS_3,
+		E_TYPE_BOSS_4,
 
 		E_TYPE_MAX
 	};
@@ -52,7 +53,7 @@ public:
 	void EnemyResetShake();					//敵の振動リセット処理
 
 	//ダメージ管理
-	void ApplyDamage(int dmg);
+	virtual void ApplyDamage(int dmg);
 	bool IsAlive() const;
 
 	//衝突判定
@@ -78,7 +79,10 @@ public:
 	int GetHpMax() const { return hpMax_; }
 	//フラグを取得
 	bool GetJumpFlag() const { return jumpFlag; }
-	int GetNoDamageTime() const { return _noDamageTime; }
+	int GetNoDamageTime() const { return noDamageTime_; }
+	bool GetNoDamageFlag() const { return noDamageFlag; }
+	//フラグを設定
+	void SetNoDamageFlag(bool flag);
 	void SetAppearFlag(bool flag) { isAppearing = flag; } //出現フラグを設定する関数
 
 	void KillEffect();
@@ -102,7 +106,7 @@ protected:
 	float angle;		//回転角度
 	float gravity;		//重力加速度
 	int AttckDamage;	//攻撃力
-	int _noDamageTime;	//無敵時間
+	int noDamageTime_;	//無敵時間
 	int noDamageMaxTime;//無敵時間の最大値
 
 	int width_;			//画像の幅
@@ -117,6 +121,7 @@ protected:
 	bool isAlive_;			//生存フラグ
 	bool jumpFlag;			//ジャンプフラグ
 	bool isAppearing;       //ボスが出現中かどうかのフラグ
+	bool noDamageFlag;		//無敵フラグ
 	std::string name_;		//敵の名前
 };
 

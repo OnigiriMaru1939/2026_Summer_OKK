@@ -13,6 +13,7 @@ public:
 		WAIT,
 		MOVE,
 		SHOT,
+		SUMMON,
 
 		MAX
 	};
@@ -25,11 +26,17 @@ public:
 	void Wait();
 	void Move();
 	void ShotAttack();
+	void EnemySummon();
 	void BossStateChange();
 	void SelectNextState();
+	void ApplyDamage(int dmg) override;
 private:
+	//敵の召喚リスト
+	std::vector<std::weak_ptr<EnemyBase>> summonEnemyList_;
+
 	BOSS_STATE bossState_;
 	int stateChangeTimer;
 	int shotTimer = 0;
+	bool summonFlag_;
 };
 

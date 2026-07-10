@@ -14,7 +14,7 @@ void EnemyBase::SyncNetworkState(float x, float y, int hp, bool isAlive, int noD
 	y_ = y;
 	hp_ = hp;
 	isAlive_ = isAlive;
-	_noDamageTime = noDamageTime;
+	noDamageTime_ = noDamageTime;
 }
 
 EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng)
@@ -34,7 +34,7 @@ EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, f
 	, angle(0.0f)
 	, gravity(0.5f)
 	, AttckDamage(20)
-	, _noDamageTime(0)
+	, noDamageTime_(0)
 	, noDamageMaxTime(60)
 	, width_(0)
 	, height_(0)
@@ -43,6 +43,7 @@ EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, f
 	, isAlive_(true)
 	, jumpFlag(false)
 	, isAppearing(false)
+	, noDamageFlag(false)
 	, enemyType_(ENEMY_TYPE::E_TYPE_NON)
 {
 	particleManager.RegisterConfig(ENEMY_KILL_PARTICLE_PATH);
@@ -145,9 +146,24 @@ void EnemyBase::Shot(BulletBase::BULLET_TYPE type, float dirX, float dirY, float
 
 void EnemyBase::NoDamageCountDown()
 {
-	if (_noDamageTime > 0)
+	if (noDamageTime_ > 0)
 	{
-		_noDamageTime--; //無敵時間のカウントダウン
+		noDamageTime_--;
+
+		if (noDamageTime_ == 0)
+		{
+			noDamageFlag = false;
+		}
+	}
+}
+
+void EnemyBase::SetNoDamageFlag(bool flag)
+{
+	noDamageFlag = flag;
+
+	if (!flag)
+	{
+		noDamageTime_ = 0;
 	}
 }
 
@@ -168,7 +184,7 @@ void EnemyBase::EnemyResetShake()
 void EnemyBase::ApplyDamage(int dmg)
 {
 	if (!isAlive_) 	return;				//生存していない場合はダメージを受けない
-	if (_noDamageTime > 0) return;		//無敵時間中はダメージを受けない
+	if (GetNoDamageFlag()) return;		//無敵時間中はダメージを受けない
 
 	hp_ -= dmg; // ダメージを適用
 	if (hp_ <= 0)
@@ -178,11 +194,13 @@ void EnemyBase::ApplyDamage(int dmg)
 	}
 
 	//無敵時間開始
-	_noDamageTime = noDamageMaxTime;
+	noDamageTime_ = noDamageMaxTime;
+	noDamageFlag = true;
 }
 
 bool EnemyBase::IsAlive() const
 {
+	
 	return isAlive_; // 生存フラグを返す
 }
 
@@ -230,9 +248,9 @@ void EnemyBase::Draw() const
 	);
 #endif
 	//無敵時間中は点滅させる
-	if (_noDamageTime > 0)
+	if (noDamageTime_ > 0)
 	{
-		if ((_noDamageTime / 4) % 2 == 0)
+		if ((noDamageTime_ / 4) % 2 == 0)
 		{
 			return;
 		}

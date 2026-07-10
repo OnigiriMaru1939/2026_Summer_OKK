@@ -11,10 +11,11 @@ Boss3::Boss3(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, 
 	SetPosition(x, y);				//初期位置を設定
 	SetVelocity(-3.0f, 0.0f);		//初期速度を設定
 	name_ = "Fantagy";              //名前を設定
-	hp_ = 400;
-	hpMax_ = 400;
+	hp_ = 250;
+	hpMax_ = 250;
 	scale = 2.0f;
 	jumpFlag = false;
+	summonFlag_ = false;
 	bossState_ = BOSS_STATE::NON;
 	stateChangeTimer = 0;
 }
@@ -55,6 +56,9 @@ void Boss3::Update()
 		case Boss3::SHOT:
 			ShotAttack();
 			break;
+		case Boss3::SUMMON:
+			EnemySummon();
+			break;
 		default:
 			break;
 	}
@@ -65,6 +69,15 @@ void Boss3::Update()
 
 void Boss3::Draw() const
 {
+	if (summonFlag_)
+	{
+		// 約0.1秒ごとに表示/非表示
+		if ((GetNowCount() / 100) % 2 == 0)
+		{
+			return;
+		}
+	}
+
 	EnemyBase::Draw();
 }
 
@@ -87,6 +100,7 @@ void Boss3::BossStateChange()
 
 			if (stateChangeTimer > 90)
 			{
+				EnemyResetShake();
 				SelectNextState();
 			}
 			break;
@@ -108,13 +122,16 @@ void Boss3::BossStateChange()
 				stateChangeTimer = 0;
 			}
 			break;
+
+		case BOSS_STATE::SUMMON:
+			break;
 	}
 }
 
 //次の行動パターンを決める関数
 void Boss3::SelectNextState()
 {
-	int randomStateNum_ = rand() % 2;
+	int randomStateNum_ = rand() % (BOSS_STATE::MAX - 2);
 
 	switch (randomStateNum_)
 	{
@@ -123,6 +140,9 @@ void Boss3::SelectNextState()
 			break;
 		case 1:
 			bossState_ = BOSS_STATE::SHOT;
+			break;
+		case 2:
+			bossState_ = BOSS_STATE::SUMMON;
 			break;
 		default:
 			break;
@@ -149,7 +169,7 @@ void Boss3::ShotAttack()
 {
 	shotTimer++;
 
-	if (shotTimer >= 0.1)
+	if (shotTimer >= 30)
 	{
 		shotTimer = 0;
 
@@ -168,4 +188,58 @@ void Boss3::ShotAttack()
 			Shot(BulletBase::BULLET_TYPE::B_TYPE_1, dx, dy, 0.5f);
 		}
 	}
+}
+
+//敵を召喚
+void Boss3::EnemySummon()
+{
+	if (!summonFlag_)
+	{
+		//無敵
+		SetNoDamageFlag(true);
+		summonFlag_ = true;
+
+		auto e1 = sceneGame_->AddEnemy(ENEMY_TYPE::E_TYPE_3, 350, 5900);
+		auto e2 = sceneGame_->AddEnemy(ENEMY_TYPE::E_TYPE_3, 1550, 5900);
+
+		summonEnemyList_.push_back(e1);
+		summonEnemyList_.push_back(e2);
+	}
+
+	bool allDead = true;
+
+	//召喚した敵が生きているか確認
+	for (auto& weak : summonEnemyList_)
+	{
+		auto enemy = weak.lock();
+
+		if (enemy && enemy->IsAlive())
+		{
+			allDead = false;
+			break;
+		}
+	}
+
+	//死んでいたら召喚フラグをおろす
+	if (allDead)
+	{
+		summonEnemyList_.clear();
+		summonFlag_ = false;
+		SetNoDamageFlag(false);
+		bossState_ = WAIT;
+		stateChangeTimer = 0;
+	}
+
+	EnemyBase::Move();
+}
+
+void Boss3::ApplyDamage(int dmg)
+{
+	// 召喚中は無敵
+	if (summonFlag_)
+	{
+		return;
+	}
+
+	EnemyBase::ApplyDamage(dmg);
 }

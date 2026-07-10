@@ -70,7 +70,7 @@ public:
 	std::shared_ptr<EnemyBase> GetBoss();                               //ボス1の取得
 
 	// 生成関数
-	void AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y);
+	std::shared_ptr<EnemyBase> AddEnemy(EnemyBase::ENEMY_TYPE type, float x, float y);
 	void AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y);
 	void AddEnemyShot(BulletBase::BULLET_TYPE type, float x, float y, float vx, float vy, float scale);
 	void AddTeleport(float x, float y, float targetX, float targetY);
@@ -108,6 +108,7 @@ private:
 	bool CollisionPauseImg();
 
 	std::vector<std::shared_ptr<EnemyBase>> enemyList_;			//敵のリスト
+	std::vector<std::shared_ptr<EnemyBase>> addEnemyList_;		//敵の追加リスト
 	std::vector<std::shared_ptr<GimmickBase>> gimmickList_;		//ギミックのリスト
 	std::vector<std::shared_ptr<ItemBase>> itemList_;			//アイテムのリスト
 	std::vector<std::shared_ptr<BulletBase>> bulletList_;		//敵の弾のリスト
