@@ -836,6 +836,7 @@ std::shared_ptr<EnemyBase> SceneGame::GetBoss()
 			case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1:
 			case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2:
 			case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_3:
+			case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_4:
 				return enemy;
 
 			default:
@@ -876,7 +877,7 @@ void SceneGame::BossEvent()
 							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_3,1000.0f,6000.0f);
 							break;
 						case 4:
-							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_4, 1000.0f, 6000.0f);
+							AddBoss(EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_4, 1000.0f, 9500.0f);
 							break;
 					}
 					bossEventState = BossEventState::APPEAR;
