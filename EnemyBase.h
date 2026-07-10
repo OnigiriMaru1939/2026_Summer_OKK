@@ -78,6 +78,8 @@ public:
 	int GetHpMax() const { return hpMax_; }
 	//フラグを取得
 	bool GetJumpFlag() const { return jumpFlag; }
+	bool GetHitPlayerAlready() const { return hitPlayerAlready_; }
+	void SetHitPlayerAlready(bool hit) { hitPlayerAlready_ = hit; }
 	int GetNoDamageTime() const { return _noDamageTime; }
 	void SetAppearFlag(bool flag) { isAppearing = flag; } //出現フラグを設定する関数
 
@@ -116,6 +118,7 @@ protected:
 	int hpMax_;				//HPの最大値
 	bool isAlive_;			//生存フラグ
 	bool jumpFlag;			//ジャンプフラグ
+	bool hitPlayerAlready_; //プレイヤーに当たり続けているかのフラグ
 	bool isAppearing;       //ボスが出現中かどうかのフラグ
 	std::string name_;		//敵の名前
 };

@@ -27,6 +27,7 @@ Player::Player(FileManager& fileMng, Stage& stage, SceneGame& game, ParticleMana
 
 	sodaAttackSE = fileMng.LoadSoundFM("Resource/Sound/SE/Soda_SE.wav");
 	sodaChargeSE = fileMng.LoadSoundFM("Resource/Sound/SE/Soda_Charge_SE.wav");
+	_hitSE = fileMng.LoadSoundFM("Resource/Sound/SE/hit_SE.wav");
 
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Jump, [this]()
 												   { 
@@ -295,6 +296,11 @@ void Player::UpdateStageScroll()
 	}
 }
 
+void Player::PlayHitSE()
+{
+	_hitSE->PlayOneShot();
+}
+
 void Player::Draw()
 {
 	//DrawFormatString(1000, 1000, GetColor(255,0, 0), "HP %d", (int)playerHp);
@@ -371,6 +377,7 @@ void Player::Draw()
 	//プレイヤーの振動処理
 	PlayerShake();
 
+#ifdef _DEBUG
 	DrawCircle(static_cast<int>(canvasX), static_cast<int>(canvasY), 3, 0X0000ff);
 	// デバッグ
 	DrawFormatString(1000, 1000, GetColor(255, 0, 0), "SodaGauge: %d", static_cast<int>(sodaShakeGauge));
@@ -384,6 +391,7 @@ void Player::Draw()
 
 	DrawFormatString(0, 300, 0x00ff00, "PlayerPos X: %f,Y: %f", posX, posY);
 	DrawFormatString(0, 320, 0x00ff00, "PlayerMapChip X: %d,Y: %d", stage_.WorldToChipX(posX), stage_.WorldToChipY(posY));
+#endif
 }
 
 //重力処理

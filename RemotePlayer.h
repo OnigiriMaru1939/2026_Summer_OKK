@@ -26,6 +26,7 @@ private:
 	int _width;
 	int _height;
 
+	bool _isActive = false;
 public:
 	RemotePlayer(FileManager& fileMng, ParticleManager& pMng);
 	~RemotePlayer();
@@ -36,6 +37,10 @@ public:
 
 	void SetBossEventState(int state) { bossEventState_ = state; }
 	int GetBossEventState() const { return bossEventState_; }
+
+	float GetPosX() const { return posX; }
+	float GetPosY() const { return posY; }
+	bool IsActive() const { return _isActive; }
 
 	void Update();
 	void Draw(float scrollX, float scrollY); // 描画処理
