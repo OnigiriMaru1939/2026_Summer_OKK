@@ -101,6 +101,9 @@ public:
 	//HPバーの増加させる時間
 	static constexpr float HP_GAUGE_ANIM_TIME = 120.0f;
 private:
+	bool CollisionPauseImg();
+	void DrawClearTransition();
+
 	std::unique_ptr<Stage> stage_;
 	std::unique_ptr<Player> player_;
 
@@ -109,7 +112,7 @@ private:
 	std::vector<tutorialPanel> _tutorialPanelList; // チュートリアルの画像リスト
 
 	std::shared_ptr<ImageFile> _PauseImg;
-	bool CollisionPauseImg();
+
 
 	std::vector<std::shared_ptr<EnemyBase>> enemyList_;			//敵のリスト
 	std::vector<std::shared_ptr<GimmickBase>> gimmickList_;		//ギミックのリスト
@@ -147,7 +150,6 @@ private:
 	int gaussRatio;
 	int filterRatio;
 
-	void DrawClearTransition();
 	// -------------------------------------
 
 	//ボスが出現したかどうかのフラグ
