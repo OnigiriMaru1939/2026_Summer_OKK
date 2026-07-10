@@ -89,6 +89,16 @@ const std::vector<StageConfig>& GetStageConfigs()
 			[](SceneGame& scene)
 			{
 				scene.GetStage()->SetBgImage("Resource/Image/Game/Stage1_bg.png");
+				scene.GetStage()->SetMchipImage("Resource/MapChip/Mapchip_neon.png");
+				//プレイヤーの初期化
+				scene.GetPlayer()->SetPosition(100.0f, 9500.0f);
+				//ボスエリアの初期設定
+				scene.SetBossArea(80, 8500, 1900, 10500);
+				//テレポートギミックの生成
+				scene.AddTeleport(1700.0f, 7500.0f, 200.0f, 6500.0f);
+				scene.AddTeleport(950.0f, 6000.0f, 200.0f, 5000.0f);
+				scene.AddTeleport(150.0f, 1650.0f, 100.0f,800.0f);
+				scene.AddTeleport(960.0f, 900.0f, 100.0f, 9500.0f);
 			},
 
 		}
