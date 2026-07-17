@@ -17,15 +17,7 @@ NetworkManager::~NetworkManager()
 
 bool NetworkManager::Initialize(bool isHost, const std::string& targetIPString)
 {
-	if (udpSocket != -1) return true;
-
-	// ホストは8080で待ち受け、クライアントは8081で待ち受ける例
-	int myPort = isHost ? 8080 : 8081;
 	targetPort = isHost ? 8081 : 8080;
-
-	// ソケット作成
-	udpSocket = MakeUDPSocket(myPort);
-	if (udpSocket == -1) return false;
 
 	// 送信先IPの解析（デフォルト"127.0.0.1"）
 	int d1 = 127, d2 = 0, d3 = 0, d4 = 1;
@@ -37,6 +29,13 @@ bool NetworkManager::Initialize(bool isHost, const std::string& targetIPString)
 	targetIP.d2 = d2;
 	targetIP.d3 = d3;
 	targetIP.d4 = d4;
+
+	if (udpSocket != -1) return true;
+	// ホストは8080で待ち受け、クライアントは8081で待ち受ける例
+	int myPort = isHost ? 8080 : 8081;
+	// ソケット作成
+	udpSocket = MakeUDPSocket(myPort);
+	if (udpSocket == -1) return false;
 
 	isConnected = true;
 	return true;
@@ -241,6 +240,8 @@ void NetworkManager::ReceivePauseData(ScenePause* pauseScene)
 
 		if (recvLen > 0)
 		{
+			targetIP = senderIP;
+			targetPort = senderPort;
 			int type = *reinterpret_cast<int*>(buffer);
 
 			if (type == PACKET_RESUME)
@@ -272,6 +273,9 @@ bool NetworkManager::ReceiveStageSelect(int& outStageIndex)
 		int recvLen = NetWorkRecvUDP(udpSocket, &senderIP, &senderPort, buffer, sizeof(buffer), FALSE);
 		if (recvLen == sizeof(int))
 		{
+			targetIP = senderIP;
+			targetPort = senderPort;
+
 			outStageIndex = *reinterpret_cast<int*>(buffer);
 			received = true;
 		}
