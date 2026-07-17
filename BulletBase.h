@@ -20,11 +20,11 @@ public:
 		B_TYPE_MAX
 	};
 
-	BulletBase(FileManager& fileMng, Stage* stage, float x, float y, float vx, float vy, float scale);
+	BulletBase(FileManager& fileMng, Stage& stage, float x, float y, float vx, float vy, float scale);
 	virtual ~BulletBase();
 
 	virtual void Update();						//更新処理
-	virtual void Draw() const;					//描画処理
+	virtual void Draw();						//描画処理
 	bool SetImage(const std::string& path);		//画像のセット
 
 	//基本操作
@@ -54,7 +54,7 @@ public:
 	void SetAliveFlag(bool alive) { isAlive_ = alive; }
 
 protected:
-	Stage* stage_;
+	Stage& stage_;
 	FileManager& fileManager;
 	std::shared_ptr<ImageFile> image_;
 

@@ -17,7 +17,7 @@ public:
 
 		MAX
 	};
-	Boss4(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng);
+	Boss4(FileManager& fileMng, Stage& stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng);
 	~Boss4() override;
 	void Update() override;
 	void Draw() const override;

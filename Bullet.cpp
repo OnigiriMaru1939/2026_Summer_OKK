@@ -2,7 +2,7 @@
 #include "Stage.h"
 
 
-Bullet::Bullet(FileManager& fileMng, Stage* stage, float x, float y, float vx, float vy, float scale)
+Bullet::Bullet(FileManager& fileMng, Stage& stage, float x, float y, float vx, float vy, float scale)
 	: BulletBase(fileMng, stage, x, y, vx, vy, scale)
 {
 	SetImage("Resource/Image/Bullet/Fantagy_bullet.png");

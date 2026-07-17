@@ -1,7 +1,7 @@
 ﻿#include "Boss4.h"
 
 
-Boss4::Boss4(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng) : EnemyBase(fileMng, stage, sceneGame, x, y, pMng)
+Boss4::Boss4(FileManager& fileMng, Stage& stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng) : EnemyBase(fileMng, stage, sceneGame, x, y, pMng)
 {
 	SetImage("Resource/Image/Enemys/Cola.png");
 	enemyType_ = ENEMY_TYPE::E_TYPE_BOSS_4;

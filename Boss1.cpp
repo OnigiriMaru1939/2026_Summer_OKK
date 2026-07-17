@@ -1,7 +1,7 @@
 ﻿#include "Boss1.h"
 
 
-Boss1::Boss1(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng) : EnemyBase(fileMng, stage, sceneGame, x, y, pMng)
+Boss1::Boss1(FileManager& fileMng, Stage& stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng) : EnemyBase(fileMng, stage, sceneGame, x, y, pMng)
 {
 	SetImage("Resource/Image/Enemys/Wingbull.png");
 	enemyType_ = ENEMY_TYPE::E_TYPE_BOSS_1;

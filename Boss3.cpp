@@ -4,7 +4,7 @@
 
 
 
-Boss3::Boss3(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng) : EnemyBase(fileMng, stage, sceneGame, x, y, pMng)
+Boss3::Boss3(FileManager& fileMng, Stage& stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng) : EnemyBase(fileMng, stage, sceneGame, x, y, pMng)
 {
 	SetImage("Resource/Image/Enemys/Fantagy.png");
 	enemyType_ = ENEMY_TYPE::E_TYPE_BOSS_3;
@@ -165,6 +165,7 @@ void Boss3::Move()
 	EnemyBase::Move();		//基底クラスの移動処理を呼び出す
 }
 
+//射撃処理
 void Boss3::ShotAttack()
 {
 	shotTimer++;

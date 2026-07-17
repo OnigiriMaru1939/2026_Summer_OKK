@@ -3,7 +3,7 @@
 #include "Player.h"
 
 
-Enemy3::Enemy3(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng) : EnemyBase(fileMng, stage, sceneGame, x, y, pMng)
+Enemy3::Enemy3(FileManager& fileMng, Stage& stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng) : EnemyBase(fileMng, stage, sceneGame, x, y, pMng)
 {
 	SetImage("Resource/Image/Enemys/Fantagy.png");
 	enemyType_ = ENEMY_TYPE::E_TYPE_3;

@@ -33,7 +33,7 @@ public:
 		E_TYPE_MAX
 	};
 
-	EnemyBase(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng);
+	EnemyBase(FileManager& fileMng, Stage& stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng);
 	virtual ~EnemyBase();
 
 	virtual void Update() = 0; // 更新処理
@@ -97,7 +97,7 @@ protected:
 	FileManager& fileManager_;
 	std::shared_ptr<ImageFile> image_;	//画像データ
 	SceneGame* sceneGame_;				//シーンゲームへのポインタ
-	Stage* stage_;						//ステージへのポインタ
+	Stage& stage_;						//ステージへのポインタ
 	ENEMY_TYPE enemyType_;				//敵の種類
 	
 	//ゲージの描画

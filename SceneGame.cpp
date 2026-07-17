@@ -1029,13 +1029,13 @@ std::shared_ptr<EnemyBase> SceneGame::AddEnemy(EnemyBase::ENEMY_TYPE type, float
 	switch (type)
 	{
 	case EnemyBase::ENEMY_TYPE::E_TYPE_1:
-		newEnemy = std::make_shared<Enemy1>(fileMng_, stage_.get(), this, x, y, *_pMng);
+		newEnemy = std::make_shared<Enemy1>(fileMng_, *stage_, this, x, y, *_pMng);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_2:
-		newEnemy = std::make_shared<Enemy2>(fileMng_, stage_.get(), this, x, y, *_pMng);
+		newEnemy = std::make_shared<Enemy2>(fileMng_, *stage_, this, x, y, *_pMng);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_3:
-		newEnemy = std::make_shared<Enemy3>(fileMng_, stage_.get(), this, x, y, *_pMng);
+		newEnemy = std::make_shared<Enemy3>(fileMng_, *stage_, this, x, y, *_pMng);
 		break;
 	default:
 		break;
@@ -1059,16 +1059,16 @@ void SceneGame::AddBoss(EnemyBase::ENEMY_TYPE type, float x, float y)
 	switch (type)
 	{
 	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_1:
-		newBoss = std::make_shared<Boss1>(fileMng_, stage_.get(), this, x, y, *_pMng);
+		newBoss = std::make_shared<Boss1>(fileMng_, *stage_, this, x, y, *_pMng);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_2:
-		newBoss = std::make_shared<Boss2>(fileMng_, stage_.get(), this, x, y, *_pMng);
+		newBoss = std::make_shared<Boss2>(fileMng_, *stage_, this, x, y, *_pMng);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_3:
-		newBoss = std::make_shared<Boss3>(fileMng_, stage_.get(), this, x, y, *_pMng);
+		newBoss = std::make_shared<Boss3>(fileMng_, *stage_, this, x, y, *_pMng);
 		break;
 	case EnemyBase::ENEMY_TYPE::E_TYPE_BOSS_4:
-		newBoss = std::make_shared<Boss4>(fileMng_, stage_.get(), this, x, y, *_pMng);
+		newBoss = std::make_shared<Boss4>(fileMng_, *stage_, this, x, y, *_pMng);
 		break;
 	default:
 		break;
@@ -1090,7 +1090,7 @@ void SceneGame::AddEnemyShot(BulletBase::BULLET_TYPE type, float x, float y, flo
 		case BulletBase::BULLET_TYPE::B_TYPE_NON:
 			break;
 		case BulletBase::BULLET_TYPE::B_TYPE_1:
-			bulletList_.push_back(std::make_shared<Bullet>(fileMng_, stage_.get(), x, y, vx, vy, scale));
+			bulletList_.push_back(std::make_shared<Bullet>(fileMng_, *stage_, x, y, vx, vy, scale));
 			break;
 		case BulletBase::BULLET_TYPE::B_TYPE_2:
 			break;

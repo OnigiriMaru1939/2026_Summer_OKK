@@ -64,6 +64,11 @@ public:
 
 	float playerHp;				//プレイヤーのHP
 	float playerHpMax;			//プレイヤーのHPの最大値
+	float playerHpRate;			//プレイヤーのHPの割合
+	int playerHpColor;			//プレイヤーのHPカラー
+	int hpGreenColor;
+	int hpYellowColor;
+	int hpRedColor;
 	float sodaRatio;            //炭酸蓄積ゲージの割合
 	float sodaHeatRatio;		//炭酸ヒートゲージの割合
 	float sodaShakeGauge;		//炭酸蓄積ゲージ
@@ -114,7 +119,8 @@ private:
 				   float value,
 				   float maxValue,
 				   int color,
-				   int mode);
+				   int mode,
+				   bool backGround);
 
 	ParticleManager& particleManager;
 	FileManager& fileManager;					//ファイルマネージャー

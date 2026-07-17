@@ -5,7 +5,7 @@
 #include <DxLib.h>
 
 
-BulletBase::BulletBase(FileManager& fileMng, Stage* stage, float x, float y, float vx, float vy, float scale)
+BulletBase::BulletBase(FileManager& fileMng, Stage& stage, float x, float y, float vx, float vy, float scale)
 	: fileManager(fileMng), stage_(stage), x_(x), y_(y), vx_(vx), vy_(vy), scale_(scale), isAlive_(true)
 {
 }
@@ -53,21 +53,22 @@ void BulletBase::Update()
 
 	x_ += vx_;
 	y_ += vy_;
-	if (stage_->CheckHitWallRect(static_cast<int>(x_), static_cast<int>(y_), width_, height_))
+	
+	if (WillCollide(static_cast<int>(x_), static_cast<int>(y_)))
 	{
 		isAlive_ = false;
 	}
 }
 
 //描画処理
-void BulletBase::Draw() const
+void BulletBase::Draw()
 {
 	if (!isAlive_ || !image_) return;
 
 	int handle = image_->GetHandle();
 	DrawRotaGraph(
-		static_cast<int>(x_) - stage_->GetScrollX(),
-		static_cast<int>(y_) - stage_->GetScrollY(),
+		static_cast<int>(x_) - stage_.GetScrollX(),
+		static_cast<int>(y_) - stage_.GetScrollY(),
 		scale_,
 		0.0,
 		handle,
@@ -100,7 +101,7 @@ bool BulletBase::IsAlive() const
 //衝突判定
 bool BulletBase::WillCollide(int newX, int newY)
 {
-	return stage_->CheckHitWallRect(
+	return stage_.CheckHitWallRect(
 		newX,
 		newY,
 		static_cast<int>(width_ * scale_),
