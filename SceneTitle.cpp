@@ -62,7 +62,6 @@ SceneTitle::SceneTitle(FileManager& fileMng, SceneManager& sceneMng) : SceneSupe
 															   if (_selectedIndex == 2)
 															   {
 																   _isInputActive = true;
-																   _inputIp = "";
 																   ClearInputCharBuf();
 															   }
 															   else
