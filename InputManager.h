@@ -144,6 +144,8 @@ public:
 	bool IsPadPressed(int no, PadButton btn) const;
 	bool IsPadTriggered(int no, PadButton btn) const;
 	bool IsPadReleased(int no, PadButton btn) const;
+	// パッドが接続されているかどうか
+	bool IsPadConnect() const;
 private:
 	struct InputLayer
 	{
