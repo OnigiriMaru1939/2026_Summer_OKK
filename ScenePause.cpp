@@ -28,6 +28,15 @@ _networkMng(sceneMng.GetNetworkManager())
 	_decideSE = fileMng_.LoadSoundFM("Resource/Sound/SE/Decide_SE.wav");
 	_cursorSE = fileMng_.LoadSoundFM("Resource/Sound/SE/Cursor_SE.wav");
 
+	SetTutorial("Resource/Image/Game/Tutorial/Tutorial_Jump.png", Application::SCREEN_WID / 4 * 3, 260.0f, false);
+	SetTutorial("Resource/Image/Game/Tutorial/Tutorial_Jump_Pad.png", Application::SCREEN_WID / 4 * 3, 260.0f, true);
+	SetTutorial("Resource/Image/Game/Tutorial/Tutorial_Rot.png", Application::SCREEN_WID / 4 * 3, 420.0f, false);
+	SetTutorial("Resource/Image/Game/Tutorial/Tutorial_Rot_Pad.png", Application::SCREEN_WID / 4 * 3, 420.0f, true);
+	SetTutorial("Resource/Image/Game/Tutorial/Tutorial_SodaAdd.png", Application::SCREEN_WID / 4 * 3, 580.0f, false);
+	SetTutorial("Resource/Image/Game/Tutorial/Tutorial_SodaAdd_Pad.png", Application::SCREEN_WID / 4 * 3, 580.0f, true);
+	SetTutorial("Resource/Image/Game/Tutorial/Tutorial_SodaJump.png", Application::SCREEN_WID / 4 * 3, 740.0f, false);
+	SetTutorial("Resource/Image/Game/Tutorial/Tutorial_SodaJump_Pad.png", Application::SCREEN_WID / 4 * 3, 740.0f, true);
+
 	InputManager::GetInstance().PushLayer(); // 新しい入力レイヤーを追加
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Cancel,
 												   [this]()
@@ -71,6 +80,17 @@ ScenePause::~ScenePause()
 	InputManager::GetInstance().PopLayer();
 }
 
+void ScenePause::SetTutorial(std::string path, float x, float y, bool isPad)
+{
+	SceneGame::tutorialPanel newTutorialPanel;
+	newTutorialPanel.path = fileMng_.LoadImageFM(path);
+	newTutorialPanel.x = x;
+	newTutorialPanel.y = y;
+	newTutorialPanel.isPad = isPad;
+
+	_tutorialPanelList.push_back(newTutorialPanel);
+}
+
 void ScenePause::Update()
 {
 	sceneMng_.GetNetworkManager().ReceivePauseData(this);
@@ -108,6 +128,14 @@ void ScenePause::Draw()
 		{
 			DrawGraph(BUTTON_X, BUTTON_Y + (BUTTON_HIG + BUTTON_MARGIN) * i, _blockImg->GetHandle(), true);
 			DrawStringToHandle(BUTTON_X + BUTTON_WID / 2 - width / 2, BUTTON_Y + (BUTTON_HIG + BUTTON_MARGIN) * i + BUTTON_HIG / 2 - GetFontSizeToHandle(_textFont->GetHandle()) / 2, text.c_str(), color, _textFont->GetHandle());
+		}
+	}
+
+	for (auto& t : _tutorialPanelList)
+	{
+		if (t.isPad == InputManager::GetInstance().IsPadConnect())
+		{
+			DrawExtendGraph(static_cast<int>(t.x), static_cast<int>(t.y), static_cast<int>(t.x + t.path->GetWidth() * 1.9f), static_cast<int>(t.y + t.path->GetHeight() * 1.9f),  t.path->GetHandle(), true);
 		}
 	}
 }
