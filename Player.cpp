@@ -90,6 +90,11 @@ Player::Player(FileManager& fileMng, Stage& stage, SceneGame& game, ParticleMana
 	//体力を初期化
 	playerHpMax = 100.0f;
 	playerHp = playerHpMax;
+	playerHpRate = 0.0f;
+	playerHpColor = 0;
+	hpGreenColor = GetColor(0, 255, 0);
+	hpYellowColor = GetColor(255, 255, 0);
+	hpRedColor = GetColor(255, 0, 0);
 
 	//ゲージ等の初期化
 	sodaShakeGauge = 0.0f;
@@ -363,8 +368,34 @@ void Player::Draw()
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
 	}
 
+	//プレイヤーのHPゲージ
 	DrawStringToHandle(1350, 965, "HP", 0x00ff00, hpFontHandle);
-	DrawGauge(1350, 1000, 500, 40, playerHp, playerHpMax, GetColor(0, 255, 0), 0);        //プレイヤーのHPゲージ
+	//残り体力によって色を変化
+	playerHpRate = playerHp / playerHpMax;
+	if (playerHpRate <= 0.1f)
+	{
+		if ((GetNowCount() / 100) % 2 == 0)
+		{
+			playerHpColor = hpRedColor;
+		}
+		else
+		{
+			playerHpColor = GetColor(255, 255, 255);
+		}
+	}
+	else if (playerHpRate <= 0.2f)
+	{
+		playerHpColor = hpRedColor;
+	}
+	else if (playerHpRate <= 0.5f)
+	{
+		playerHpColor = hpYellowColor;
+	}
+	else
+	{
+		playerHpColor = hpGreenColor;
+	}
+	DrawGauge(1350, 1000, 500, 40, playerHp, playerHpMax, playerHpColor, 0, true);
 
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
@@ -372,7 +403,12 @@ void Player::Draw()
 	if (sodaShakeGauge > 0 && canMoveFlag)
 	{
 		//炭酸蓄積ゲージ
-		DrawGauge(static_cast<int>(canvasX) - 75, static_cast<int>(canvasY) - 50, 20, 100, sodaShakeGauge, SODA_SHAKE_GAUGE_MAX, GetColor(0, 0, 255), 1);
+		DrawGauge(static_cast<int>(canvasX) - 75, static_cast<int>(canvasY) - 50, 20, 100, sodaShakeGauge, SODA_SHAKE_GAUGE_MAX, GetColor(0, 0, 255), 1, true);
+		if (sodaShakeGauge >= SODA_SHAKE_GAUGE_MAX)
+		{
+			//炭酸ヒートゲージ
+			DrawGauge(static_cast<int>(canvasX) - 75, static_cast<int>(canvasY) - 50, 20, 100, sodaHeatShakeGauge, SODA_HEAT_SHAKE_GAUGE_MAX, GetColor(255, 0, 0), 1, false);
+		}
 
 		//矢印画像を描画
 		float headOffset = (height_ * scale / 1.0f);
@@ -391,11 +427,6 @@ void Player::Draw()
 			arrowImage_->GetHandle(),
 			TRUE
 		);
-	}
-	if (sodaHeatShakeGauge > 0 && canMoveFlag)
-	{
-		//炭酸ヒートゲージ
-		DrawGauge(static_cast<int>(canvasX) - 75, static_cast<int>(canvasY) - 50, 20, 100, sodaHeatShakeGauge, SODA_HEAT_SHAKE_GAUGE_MAX, GetColor(255, 0, 0), 1);
 	}
   
 	//プレイヤーの振動処理
@@ -727,7 +758,7 @@ bool Player::CollisionHpBar()
 		rc.top < hpBar.bottom;
 }
 
-//横ゲージの描画
+//ゲージの描画
 void Player::DrawGauge(
 	int x,
 	int y,
@@ -736,7 +767,8 @@ void Player::DrawGauge(
 	float value,
 	float maxValue,
 	int color,
-	int mode)			//mode 0:横ゲージ、1:縦ゲージ
+	int mode,					//mode 0:横ゲージ、1:縦ゲージ
+	bool backGround)			//bg true:背景あり、false:背景なし
 {
 	//ゲージの枠
 	DrawBox(x - 1,
@@ -751,6 +783,19 @@ void Player::DrawGauge(
 	{
 		//横ゲージ割合
 		int barWidth = (int)((value / maxValue) * width);
+
+		//背景
+		if (backGround == true)
+		{
+			DrawBox(
+				x,
+				y,
+				x + width,
+				y + height,
+				GetColor(128, 128, 128),
+				TRUE
+			);
+		}
 
 		//中身
 		DrawBox(
@@ -767,6 +812,20 @@ void Player::DrawGauge(
 	{
 		//縦ゲージ割合
 		int barHeight = (int)((value / maxValue) * height);
+
+		//背景
+		if (backGround == true)
+		{
+			DrawBox(
+				x,
+				y,
+				x + width,
+				y + height,
+				GetColor(128, 128, 128),
+				TRUE
+			);
+		}
+		
 		//中身
 		DrawBox(
 			x,

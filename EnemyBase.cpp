@@ -17,7 +17,7 @@ void EnemyBase::SyncNetworkState(float x, float y, int hp, bool isAlive, int noD
 	noDamageTime_ = noDamageTime;
 }
 
-EnemyBase::EnemyBase(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng)
+EnemyBase::EnemyBase(FileManager& fileMng, Stage& stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng)
 	: fileManager_(fileMng)
 	, stage_(stage)
 	, sceneGame_(sceneGame)
@@ -208,7 +208,7 @@ bool EnemyBase::IsAlive() const
 //衝突判定
 bool EnemyBase::WillCollide(int newX, int newY)
 {
-	return stage_->CheckHitWallRect(
+	return stage_.CheckHitWallRect(
 		newX,
 		newY,
 		(int)(width_ * scale),
@@ -260,8 +260,8 @@ void EnemyBase::Draw() const
 	int handle = 0;
 	handle = image_->GetHandle(); //画像のハンドルを取得
 	DrawRotaGraph(
-		x_ - stage_->GetScrollX() + shakeOffsetX,
-		y_ - stage_->GetScrollY() + shakeOffsetY,
+		x_ - stage_.GetScrollX() + shakeOffsetX,
+		y_ - stage_.GetScrollY() + shakeOffsetY,
 		scale,
 		angle,
 		handle,
