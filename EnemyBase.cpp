@@ -284,12 +284,22 @@ void EnemyBase::DrawGauge(
 			y - 1,
 			x + width + 1,
 			y + height + 1,
-			GetColor(255, 0, 0),
+			GetColor(255, 215, 0),
 			FALSE
 	);
 
 	//横ゲージ割合
 	int barWidth = (int)((value / maxValue) * width);
+
+	//背景
+	DrawBox(
+		x,
+		y,
+		x + width,
+		y + height,
+		GetColor(128, 128, 128),
+		TRUE
+	);
 
 	//中身
 	DrawBox(
