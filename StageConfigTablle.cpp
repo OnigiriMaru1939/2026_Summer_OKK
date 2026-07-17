@@ -15,9 +15,14 @@ const std::vector<StageConfig>& GetStageConfigs()
 				scene.GetStage()->SetBgImage("Resource/Image/Game/Stage1_bg.png");
 				scene.GetStage()->SetMchipImage("Resource/MapChip/Mapchip_neon.png");
 				// チュートリアル作成
-				scene.SetTutorial("Resource/Image/Game/Tutorial/Tutorial_Space.png", 150.0f, 1960.0f);
-				scene.SetTutorial("Resource/Image/Game/Tutorial/Tutorial_AD.png", 320.0f, 1960.0f);
-				scene.SetTutorial("Resource/Image/Game/Tutorial/Tutorial_LClick.png", 490.0f, 1960.0f);
+				scene.SetTutorial("Resource/Image/Game/Tutorial/Tutorial_Jump.png", 150.0f, 1960.0f, false);
+				scene.SetTutorial("Resource/Image/Game/Tutorial/Tutorial_Jump_Pad.png", 150.0f, 1960.0f, true);
+				scene.SetTutorial("Resource/Image/Game/Tutorial/Tutorial_Rot.png", 320.0f, 1960.0f, false);
+				scene.SetTutorial("Resource/Image/Game/Tutorial/Tutorial_Rot_Pad.png", 320.0f, 1960.0f, true);
+				scene.SetTutorial("Resource/Image/Game/Tutorial/Tutorial_SodaAdd.png", 490.0f, 1960.0f, false);
+				scene.SetTutorial("Resource/Image/Game/Tutorial/Tutorial_SodaAdd_Pad.png", 490.0f, 1960.0f, true);
+				scene.SetTutorial("Resource/Image/Game/Tutorial/Tutorial_SodaJump.png", 660.0f, 1960.0f, false);
+				scene.SetTutorial("Resource/Image/Game/Tutorial/Tutorial_SodaJump_Pad.png", 660.0f, 1960.0f, true);
 				//プレイヤーの初期化
 				scene.GetPlayer()->SetPosition(150.0f, 2050.0f);
 				//ボスエリアの初期設定
@@ -49,7 +54,6 @@ const std::vector<StageConfig>& GetStageConfigs()
 			//敵の生成
 			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 500.0f, 200.0f);
 			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 800.0f, 1700.0f);
-			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 1400.0f, 3000.0f);
 			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 800.0f, 500.0f);
 			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 100.0f, 500.0f);
 

@@ -237,9 +237,13 @@ void SceneGame::Draw()
 			0xff0000, false);
 #endif
 
+	// チュートリアル画像描画
 	for (auto& t : _tutorialPanelList)
 	{
-		DrawGraph(static_cast<int>(t.x) - stage_->GetScrollX(), static_cast<int>(t.y) - stage_->GetScrollY(), t.path->GetHandle(), true);
+		if (t.isPad == InputManager::GetInstance().IsPadConnect())
+		{
+			DrawGraph(static_cast<int>(t.x) - stage_->GetScrollX(), static_cast<int>(t.y) - stage_->GetScrollY(), t.path->GetHandle(), true);
+		}
 	}
 	_pMng->DrawAll(stage_->GetScrollX(), stage_->GetScrollY());
 
@@ -1124,12 +1128,13 @@ void SceneGame::AddItem(ItemBase::ITEM_TYPE type, float x, float y)
 	}
 }
 
-void SceneGame::SetTutorial(std::string path, float x, float y)
+void SceneGame::SetTutorial(std::string path, float x, float y, bool isPad)
 {
 	tutorialPanel newTutorialPanel;
 	newTutorialPanel.path = fileMng_.LoadImageFM(path);
 	newTutorialPanel.x = x;
 	newTutorialPanel.y = y;
+	newTutorialPanel.isPad = isPad;
 
 	_tutorialPanelList.push_back(newTutorialPanel);
 }

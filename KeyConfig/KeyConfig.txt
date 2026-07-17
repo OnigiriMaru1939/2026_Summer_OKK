@@ -11,7 +11,7 @@ SJump, GamepadButton, Pad_L_Trigger, 1.0
 SJump, GamepadButton, Pad_R_Trigger, 1.0
 
 Shake, MouseAxis, Mouse_Dist, 1.0
-Shake, GamepadAxis, Pad_R_Dist, 300.0
+Shake, GamepadAxis, Pad_R_Dist, 400.0
 
 Rotate, Keyboard, KEY_INPUT_D, 1.0
 Rotate, Keyboard, KEY_INPUT_A, -1.0
