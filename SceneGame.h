@@ -26,6 +26,7 @@ public:
 		std::shared_ptr<ImageFile> path;
 		float x;
 		float y;
+		bool isPad;
 	};
 	//ボスイベントの状態
 	enum class BossEventState
@@ -77,7 +78,7 @@ public:
 	void AddEnemyShot(BulletBase::BULLET_TYPE type, float x, float y, float vx, float vy, float scale);
 	void AddTeleport(float x, float y, float targetX, float targetY);
 	void AddItem(ItemBase::ITEM_TYPE type, float x, float y);
-	void SetTutorial(std::string path, float x, float y);
+	void SetTutorial(std::string path, float x, float y, bool isPad);
 
 	Stage* GetStage() { return stage_.get(); }
 	Player* GetPlayer() { return player_.get(); }

@@ -281,6 +281,11 @@ bool InputManager::IsPadReleased(int no, PadButton btn) const
 	return IsInputReleased(padButton[no][(int)btn], prevPadButton[no][(int)btn]);
 }
 
+bool InputManager::IsPadConnect() const
+{
+	return GetJoypadNum() > 0;
+}
+
 
 // アクションに対する入力値を取得する関数
 // ボタン
