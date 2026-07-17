@@ -90,6 +90,11 @@ public:
 	int GetWidth() const { return width_; }				//プレイヤーの画像の幅を取得
 	int GetHeight() const { return height_; }			//プレイヤーの画像の高さを取得
 	float GetSpeed() const { return playerSpeed; };		//プレイヤーの速度を取得
+
+	void SetPlayerHp(float hp) { playerHp = hp; }		//プレイヤーのHPを設定
+	float GetPlayerHp() const { return playerHp; }		//プレイヤーのHPを取得
+	float GetPlayerHpMax() const { return playerHpMax; }//プレイヤーのHPの最大値を取得
+
 	//プレイヤーの当たり判定の座標を取得
 	int GetLeft() const { return static_cast<int>(canvasX - width_ / 2); }
 	int GetRight() const { return static_cast<int>(canvasX + width_ / 2); }

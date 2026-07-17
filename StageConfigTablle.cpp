@@ -34,6 +34,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 
 				//アイテムの生成
 				scene.AddItem(ItemBase::ITEM_TYPE::MENTOS, 1200.0f,1600.0f);
+				scene.AddItem(ItemBase::ITEM_TYPE::APPLE, 1000.0f, 1600.0f);
 				//テレポートギミックの生成
 				scene.AddTeleport(1700.0f, 500.0f, 100.0f,3300.0f);
 			},

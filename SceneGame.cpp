@@ -13,6 +13,7 @@
 #include "Boss4.h"
 #include "ItemBase.h"
 #include "Mentos.h"
+#include "Apple.h"
 #include "Stage.h"
 #include "FileManager.h"
 #include "StageConfig.h"
@@ -1120,6 +1121,9 @@ void SceneGame::AddItem(ItemBase::ITEM_TYPE type, float x, float y)
 	{
 		case ItemBase::ITEM_TYPE::MENTOS:
 			itemList_.push_back(std::make_shared<Mentos>(fileMng_, stage_.get(), x, y));
+			break;
+		case ItemBase::ITEM_TYPE::APPLE:
+			itemList_.push_back(std::make_shared<Apple>(fileMng_, stage_.get(), x, y));
 			break;
 		case ItemBase::ITEM_TYPE::I_TYPE_MAX:
 			break;

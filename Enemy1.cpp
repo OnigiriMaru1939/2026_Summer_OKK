@@ -7,6 +7,7 @@ Enemy1::Enemy1(FileManager& fileMng, Stage& stage, SceneGame* sceneGame, float x
 	SetPosition(x, y);				//初期位置を設定
 	SetVelocity(2.0f, 0.0f);		//初期速度を設定
 	hp_ = 1;						//HPを1に設定
+	scale = 1.5f;
 }
 
 Enemy1::~Enemy1()

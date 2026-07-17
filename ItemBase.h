@@ -15,6 +15,7 @@ public:
 	{
 		I_TYPE_NON,
 		MENTOS,
+		APPLE,
 
 		I_TYPE_MAX
 	};
