@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Apple.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Boss1.cpp" />
     <ClCompile Include="Boss2.cpp" />
@@ -182,6 +183,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActionID.h" />
+    <ClInclude Include="Apple.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="BGMManager.h" />
     <ClInclude Include="Boss1.h" />

@@ -64,8 +64,6 @@
     <ClCompile Include="GimmickTeleport.cpp">
       <Filter>Gimmick\Teleport</Filter>
     </ClCompile>
-    <ClCompile Include="ItemBase.cpp" />
-    <ClCompile Include="Mentos.cpp" />
     <ClCompile Include="Boss2.cpp">
       <Filter>Enemy\Boss2</Filter>
     </ClCompile>
@@ -75,7 +73,21 @@
     <ClCompile Include="Enemy3.cpp" />
     <ClCompile Include="BulletBase.cpp" />
     <ClCompile Include="Bullet.cpp" />
-    <ClCompile Include="Boss3.cpp" />
+    <ClCompile Include="Apple.cpp">
+      <Filter>Item\HealApple</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemBase.cpp">
+      <Filter>Item</Filter>
+    </ClCompile>
+    <ClCompile Include="Mentos.cpp">
+      <Filter>Item\Mentos</Filter>
+    </ClCompile>
+    <ClCompile Include="Boss3.cpp">
+      <Filter>Enemy\Boss3</Filter>
+    </ClCompile>
+    <ClCompile Include="Boss4.cpp">
+      <Filter>Enemy\Boss4</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Application">
@@ -167,6 +179,21 @@
     </Filter>
     <Filter Include="Gimmick\Teleport">
       <UniqueIdentifier>{e06c239a-4c0a-4721-8b29-4f32e99d22b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Item">
+      <UniqueIdentifier>{5bbca224-bf61-4fe4-a7b2-bd1b57bf6ffc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Item\Mentos">
+      <UniqueIdentifier>{1b24b620-935e-485c-917d-08cbc17a8aa8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Item\HealApple">
+      <UniqueIdentifier>{804d4c88-6c93-4b69-85e3-e0f18776dbec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Enemy\Boss3">
+      <UniqueIdentifier>{4d255a44-63cc-45ba-90b6-ed1d18f59dc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Enemy\Boss4">
+      <UniqueIdentifier>{b3785d0d-45a6-491f-b481-fb2145184236}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -269,8 +296,6 @@
     <ClInclude Include="GimmickTeleport.h">
       <Filter>Gimmick\Teleport</Filter>
     </ClInclude>
-    <ClInclude Include="ItemBase.h" />
-    <ClInclude Include="Mentos.h" />
     <ClInclude Include="Boss2.h">
       <Filter>Enemy\Boss2</Filter>
     </ClInclude>
@@ -281,6 +306,20 @@
     <ClInclude Include="Enemy3.h" />
     <ClInclude Include="BulletBase.h" />
     <ClInclude Include="Bullet.h" />
-    <ClInclude Include="Boss3.h" />
+    <ClInclude Include="Apple.h">
+      <Filter>Item\HealApple</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemBase.h">
+      <Filter>Item</Filter>
+    </ClInclude>
+    <ClInclude Include="Mentos.h">
+      <Filter>Item\Mentos</Filter>
+    </ClInclude>
+    <ClInclude Include="Boss3.h">
+      <Filter>Enemy\Boss3</Filter>
+    </ClInclude>
+    <ClInclude Include="Boss4.h">
+      <Filter>Enemy\Boss4</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

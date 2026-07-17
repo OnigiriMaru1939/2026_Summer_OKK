@@ -15,6 +15,7 @@ public:
 	enum class GIMMICK_TYPE
 	{
 		TELEPORT,
+
 		
 		E_TYPE_MAX,
 	};
