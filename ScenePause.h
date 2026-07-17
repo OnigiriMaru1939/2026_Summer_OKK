@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "SceneSuper.h"
+#include "SceneGame.h"
 #include "SoundFile.h"
 #include "ImageFile.h"
 #include "FontFile.h"
@@ -37,6 +38,7 @@ public:
 	void SyncResume();
 	void SyncChangeScene(int nextSceneIndex);
 private:
+	void SetTutorial(std::string path, float x, float y, bool isPad);
 	void DecidePauseScene(bool isFromNetwork = false);
 	void MoveSelect(float moveValue);
 	std::shared_ptr<ImageFile> _blockImg;
@@ -47,6 +49,8 @@ private:
 	std::shared_ptr<FontFile> _textFont;
 	std::shared_ptr<FontFile> _pauseFont;
 	std::shared_ptr<FontFile> _explainFont;
+
+	std::vector<SceneGame::tutorialPanel> _tutorialPanelList; // チュートリアルの画像リスト
 
 	int _selectedIndex;
 
