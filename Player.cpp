@@ -403,7 +403,7 @@ void Player::Draw()
 	if (sodaShakeGauge > 0 && canMoveFlag)
 	{
 		//炭酸蓄積ゲージ
-		DrawGauge(static_cast<int>(canvasX) - 75, static_cast<int>(canvasY) - 50, 20, 100, sodaShakeGauge, SODA_SHAKE_GAUGE_MAX, GetColor(0, 0, 255), 1, true);
+		DrawGauge(static_cast<int>(canvasX) - 75, static_cast<int>(canvasY) - 50, 20, 100, sodaShakeGauge, SODA_SHAKE_GAUGE_MAX, GetColor(0, 208, 255), 1, true);
 		if (sodaShakeGauge >= SODA_SHAKE_GAUGE_MAX)
 		{
 			//炭酸ヒートゲージ
@@ -775,7 +775,7 @@ void Player::DrawGauge(
 			y - 1,
 			x + width + 1,
 			y + height + 1,
-			GetColor(255, 0, 0),
+			GetColor(255, 255, 255),
 			FALSE
 	);
 
@@ -792,7 +792,7 @@ void Player::DrawGauge(
 				y,
 				x + width,
 				y + height,
-				GetColor(128, 128, 128),
+				GetColor(50, 50, 50),
 				TRUE
 			);
 		}
@@ -821,7 +821,7 @@ void Player::DrawGauge(
 				y,
 				x + width,
 				y + height,
-				GetColor(128, 128, 128),
+				GetColor(50, 50, 50),
 				TRUE
 			);
 		}

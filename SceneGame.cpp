@@ -452,6 +452,16 @@ void SceneGame::DrawGauge(
 	//横ゲージ割合
 	int barWidth = (int)((value / maxValue) * width);
 
+	//背景
+	DrawBox(
+		x,
+		y,
+		x + width,
+		y + height,
+		GetColor(50, 50, 50),
+		TRUE
+	);
+
 	//中身
 	DrawBox(
 		x,
