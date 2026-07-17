@@ -54,7 +54,7 @@ const std::vector<StageConfig>& GetStageConfigs()
 			//敵の生成
 			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 500.0f, 200.0f);
 			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 800.0f, 1700.0f);
-			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 1800.0f, 3500.0f);
+			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 1800.0f, 3000.0f);
 			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 800.0f, 500.0f);
 			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 100.0f, 500.0f);
 

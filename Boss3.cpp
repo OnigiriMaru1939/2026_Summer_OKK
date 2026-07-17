@@ -6,7 +6,7 @@
 
 Boss3::Boss3(FileManager& fileMng, Stage* stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng) : EnemyBase(fileMng, stage, sceneGame, x, y, pMng)
 {
-	SetImage("Resource/Image/Enemys/Fantagy.png");
+	SetImage("Resource/Image/Enemys/Fantagy_Boss.png");
 	enemyType_ = ENEMY_TYPE::E_TYPE_BOSS_3;
 	SetPosition(x, y);				//初期位置を設定
 	SetVelocity(-3.0f, 0.0f);		//初期速度を設定
