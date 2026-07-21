@@ -234,20 +234,6 @@ RECT EnemyBase::GetRect() const
 void EnemyBase::Draw() const
 {
 	if (!isAlive_ || !image_) return; // 生存していないか画像がない場合は描画しない
-
-#ifdef _DEBUG
-	//当たり判定の矩形を描画
-	RECT rc = GetRect();
-
-	DrawBox(
-		rc.left - stage_->GetScrollX(),
-		rc.top - stage_->GetScrollY(),
-		rc.right - stage_->GetScrollX(),
-		rc.bottom - stage_->GetScrollY(),
-		GetColor(0, 255, 0),
-		FALSE
-	);
-#endif
 	//無敵時間中は点滅させる
 	if (noDamageTime_ > 0)
 	{

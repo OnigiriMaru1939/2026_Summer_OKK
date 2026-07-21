@@ -31,11 +31,23 @@ SceneManager::~SceneManager()
 void SceneManager::Update()
 {
 	InputManager::GetInstance().Update();
+
+	if (_isPopRequested)
+	{
+		_isPopRequested = false;
+		if (scenes.size() > 1)
+		{
+			scenes.pop_back();
+		}
+	}
+
 	if (scenes.empty())
 	{
 		isExit = true;
 		return;
 	}
+
+	currentScene = scenes.back().get();
 
 	if (IsTransitioning())
 	{
@@ -45,7 +57,6 @@ void SceneManager::Update()
 	}
 	else
 	{
-		currentScene = scenes.back().get();
 		currentScene->Update();
 
 		if (currentScene->IsEnd())
@@ -176,7 +187,7 @@ void SceneManager::PopScene()
 {
 	if (scenes.size() > 1)
 	{
-		scenes.pop_back();
+		_isPopRequested = true;
 	}
 }
 

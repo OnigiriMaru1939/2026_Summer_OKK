@@ -69,6 +69,7 @@ private:
 	bool isExit;
 	bool _isClear;
 	bool _isHost = true;
+	bool _isPopRequested = false;
 
 	std::string _remoteIp;
 
