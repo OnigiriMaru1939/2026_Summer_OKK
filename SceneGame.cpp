@@ -148,6 +148,8 @@ void SceneGame::Update()
 	p.vy = player_->GetVY();
 	p.angle = player_->GetAngle();
 	p.isAttack = player_->GetAliveFlag();
+	p.sodaShakeGauge = player_->GetSodaShakeGauge();
+	p.sodaHeatShakeGauge = player_->GetSodaHeatShakeGauge();
 	networkManager_.SendPlayerState(p);
 
 	//敵の更新
@@ -168,6 +170,9 @@ void SceneGame::Update()
 				ep.hp = enemy->GetHp();
 				ep.isAlive = enemy->IsAlive();
 				ep.noDamageTime = enemy->GetNoDamageTime();
+				ep.angle = enemy->GetAngle();
+				ep.shakeOffsetX = enemy->GetShakeOffsetX();
+				ep.shakeOffsetY = enemy->GetShakeOffsetY();
 				networkManager_.SendEnemyState(ep);
 			}
 		}

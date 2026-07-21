@@ -51,6 +51,23 @@ void RemotePlayer::SyncState(const PlayerPacket& packet)
 	vy = packet.vy;
 	angle = packet.angle;
 	isAttack = packet.isAttack;
+	sodaShakeGauge = packet.sodaShakeGauge;
+	sodaHeatShakeGauge = packet.sodaHeatShakeGauge;
+
+	sodaRatio = sodaShakeGauge / 1000.0f; // SODA_SHAKE_GAUGE_MAX相当
+	sodaHeatRatio = sodaHeatShakeGauge / 1000.0f; // SODA_HEAT_SHAKE_GAUGE_MAX相当
+
+	if (sodaShakeGauge > 0)
+	{
+		float playerShakePower = sodaShakeGauge / 1000.0f;
+		shakeOffsetX = (GetRand(10) - 5) * playerShakePower;
+		shakeOffsetY = (GetRand(10) - 5) * playerShakePower;
+	}
+	else
+	{
+		shakeOffsetX = 0.0f;
+		shakeOffsetY = 0.0f;
+	}
 }
 
 void RemotePlayer::SyncState(const SodaJumpPacket& packet)
@@ -90,6 +107,14 @@ void RemotePlayer::Draw(float scrollX, float scrollY)
 	float drawX = posX - scrollX;
 	float drawY = posY - scrollY;
 
-	DrawRotaGraph(static_cast<int>(drawX), static_cast<int>(drawY),
+	int greenBlue = static_cast<int>(255 * (1.0f - sodaHeatRatio));
+	SetDrawBright(255, greenBlue, greenBlue);
+
+	// ★変更：shakeOffsetX, shakeOffsetY を加算して描画
+	DrawRotaGraph(static_cast<int>(drawX) + static_cast<int>(shakeOffsetX),
+				  static_cast<int>(drawY) + static_cast<int>(shakeOffsetY),
 				  scale, angle, _image->GetHandle(), TRUE);
+
+	// 描画輝度をリセット
+	SetDrawBright(255, 255, 255);
 }

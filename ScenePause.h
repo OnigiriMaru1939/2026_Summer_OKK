@@ -55,5 +55,7 @@ private:
 	int _selectedIndex;
 
 	NetworkManager& _networkMng;
+
+	bool _isResuming = false;
 };
 

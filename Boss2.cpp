@@ -126,7 +126,7 @@ void Boss2::BossStateChange()
 			if (stateChangeTimer > 180)
 			{
 				vx_ = (vx_ > 0) ? 5.0f : -5.0f;
-				angle = 0.0f;
+				angle_ = 0.0f;
 
 				bossState_ = BOSS_STATE::MOVE;
 				stateChangeTimer = 0;
@@ -184,7 +184,7 @@ void Boss2::Dash()
 {
 	rotateSpeed = 0.2f;
 
-	angle += rotateSpeed;
+	angle_ += rotateSpeed;
 
 	Move();
 

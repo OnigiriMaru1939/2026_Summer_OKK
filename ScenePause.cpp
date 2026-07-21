@@ -41,16 +41,28 @@ _networkMng(sceneMng.GetNetworkManager())
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Cancel,
 												   [this]()
 												   {
-													   if (!isTransition)
+													   if (!isTransition && !_isResuming)
 													   {
+														   _isResuming = true;
+
+														   SystemPacket p;
+														   p.type = PACKET_RESUME;
+														   _networkMng.SendSystem(p);
+
 														   sceneMng_.PopScene();
 													   }
 												   });
 	InputManager::GetInstance().SetTriggerCallback(ActionID::Pause,
 												   [this]()
 												   {
-													   if (!isTransition)
+													   if (!isTransition && !_isResuming)
 													   {
+														   _isResuming = true;
+
+														   SystemPacket p;
+														   p.type = PACKET_RESUME;
+														   _networkMng.SendSystem(p);
+
 														   sceneMng_.PopScene();
 													   }
 												   });
@@ -148,7 +160,7 @@ void ScenePause::SyncResume()
 void ScenePause::SyncChangeScene(int nextSceneIndex)
 {
 	_selectedIndex = nextSceneIndex;
-	DecidePauseScene(this);
+	DecidePauseScene(true);
 }
 
 void ScenePause::MoveSelect(float moveValue)
@@ -178,15 +190,19 @@ void ScenePause::DecidePauseScene(bool isFromNetwork)
 
 	if (static_cast<NextScenePause>(_selectedIndex) == NextScenePause::Back)
 	{
-		// 戻る（再開）処理
-		if (!isFromNetwork)
+		if (!_isResuming)
 		{
-			SystemPacket p;
-			p.type = PACKET_RESUME;
-			sceneMng_.GetNetworkManager().SendSystem(p);
+			_isResuming = true;
+			// 戻る（再開）処理
+			if (!isFromNetwork)
+			{
+				SystemPacket p;
+				p.type = PACKET_RESUME;
+				sceneMng_.GetNetworkManager().SendSystem(p);
+			}
+			sceneMng_.PopScene();
+			return;
 		}
-		sceneMng_.PopScene();
-		return;
 	}
 
 	switch (static_cast<NextScenePause>(_selectedIndex))

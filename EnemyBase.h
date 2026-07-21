@@ -17,7 +17,7 @@ public:
 
 	int GetNetworkId() const { return _networkId; }
 	void SetNetworkId(int id) { _networkId = id; }
-	void SyncNetworkState(float x, float y, int hp, bool isAlive, int noDamageTime);
+	void SyncNetworkState(float x, float y, int hp, bool isAlive, int noDamageTime, float angle, int shakeX, int shakeY);
 
 	enum class ENEMY_TYPE
 	{
@@ -66,7 +66,10 @@ public:
 	float GetY() const { return y_; }
 	int GetWidth() const { return width_; }
 	int GetHeight() const { return height_; }
+	float GetAngle() const { return angle_; }
 	ENEMY_TYPE GetEnemyType() const { return enemyType_; }
+	int GetShakeOffsetX() const { return shakeOffsetX; }
+	int GetShakeOffsetY() const { return shakeOffsetY; }
 	//敵の当たり判定の座標を取得
 	int GetLeft() const { return static_cast<int>(x_ - width_ / 2); }
 	int GetRight() const { return static_cast<int>(x_ + width_ / 2); }
@@ -80,12 +83,13 @@ public:
 	//フラグを取得
 	bool GetJumpFlag() const { return jumpFlag; }
 
+	bool GetHitPlayerAlready() const { return hitPlayerAlready_; }
+
 	int GetNoDamageTime() const { return noDamageTime_; }
 	bool GetNoDamageFlag() const { return noDamageFlag; }
 	//フラグを設定
 	void SetNoDamageFlag(bool flag);
 
-	bool GetHitPlayerAlready() const { return hitPlayerAlready_; }
 	void SetHitPlayerAlready(bool hit) { hitPlayerAlready_ = hit; }
 
 	void SetAppearFlag(bool flag) { isAppearing = flag; } //出現フラグを設定する関数
@@ -108,7 +112,7 @@ protected:
 	float vx_;			//x方向の速度
 	float vy_;			//y方向の速度
 	float scale;		//敵の大きさ
-	float angle;		//回転角度
+	float angle_;		//回転角度
 	float gravity;		//重力加速度
 	int AttckDamage;	//攻撃力
 	int noDamageTime_;	//無敵時間

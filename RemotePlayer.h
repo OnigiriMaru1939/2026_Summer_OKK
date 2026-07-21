@@ -17,6 +17,13 @@ private:
 	float scale;
 	bool isAttack;
 	int bossEventState_ = 0;
+	float sodaShakeGauge = 0.0f;
+	float sodaHeatShakeGauge = 0.0f;
+	float sodaRatio = 0.0f;
+	float sodaHeatRatio = 0.0f;
+
+	float shakeOffsetX = 0.0f;
+	float shakeOffsetY = 0.0f;
 
 	std::shared_ptr<ImageFile> _image;
 	std::shared_ptr<SoundFile> sodaAttackSE;		//炭酸攻撃のサウンド
