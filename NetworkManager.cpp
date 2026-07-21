@@ -151,7 +151,7 @@ void NetworkManager::ReceiveData(RemotePlayer* remotePlayer, std::vector<std::sh
 						{
 							if (enemy && enemy->GetNetworkId() == e->enemyID)
 							{
-								enemy->SyncNetworkState(e->posX, e->posY, e->hp, e->isAlive, e->noDamageTime);
+								enemy->SyncNetworkState(e->posX, e->posY, e->hp, e->isAlive, e->noDamageTime, e->angle, e->shakeOffsetX, e->shakeOffsetY);
 								break;
 							}
 						}

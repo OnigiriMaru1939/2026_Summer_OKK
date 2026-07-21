@@ -90,7 +90,8 @@ struct PlayerPacket
 	float vx, vy;       // 速度（補完用）
 	float angle;         // 向き（補完用）
 	bool isAttack;      // 攻撃中か
-	// ※必要に応じてHPなども追加可能
+	float sodaShakeGauge;
+	float sodaHeatShakeGauge;
 };
 
 struct EnemyPacket
@@ -102,6 +103,9 @@ struct EnemyPacket
 	int hp;
 	bool isAlive;
 	int noDamageTime;
+	float angle;         // ボスの回転角度 (Dash時の回転など)
+	float shakeOffsetX;  // 振動オフセットX
+	float shakeOffsetY;  // 振動オフセットY
 };
 
 struct EnemyDeathPacket

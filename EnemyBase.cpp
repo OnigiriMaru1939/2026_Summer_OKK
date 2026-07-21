@@ -8,13 +8,16 @@
 
 constexpr auto ENEMY_KILL_PARTICLE_PATH = "Resource/ParticleJsonData/killParameter.json";
 
-void EnemyBase::SyncNetworkState(float x, float y, int hp, bool isAlive, int noDamageTime)
+void EnemyBase::SyncNetworkState(float x, float y, int hp, bool isAlive, int noDamageTime, float angle, int shakeX, int shakeY)
 {
 	x_ = x;
 	y_ = y;
 	hp_ = hp;
 	isAlive_ = isAlive;
 	noDamageTime_ = noDamageTime;
+	angle_ = angle;
+	shakeOffsetX = shakeX;
+	shakeOffsetY = shakeY;
 }
 
 EnemyBase::EnemyBase(FileManager& fileMng, Stage& stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng)
@@ -31,7 +34,7 @@ EnemyBase::EnemyBase(FileManager& fileMng, Stage& stage, SceneGame* sceneGame, f
 	, shakeOffsetX(0)
 	, shakeOffsetY(0)
 	, scale(1.0f)
-	, angle(0.0f)
+	, angle_(0.0f)
 	, gravity(0.5f)
 	, AttckDamage(20)
 	, noDamageTime_(0)
@@ -249,7 +252,7 @@ void EnemyBase::Draw() const
 		x_ - stage_.GetScrollX() + shakeOffsetX,
 		y_ - stage_.GetScrollY() + shakeOffsetY,
 		scale,
-		angle,
+		angle_,
 		handle,
 		TRUE
 	);

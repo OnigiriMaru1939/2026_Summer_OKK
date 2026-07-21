@@ -79,6 +79,8 @@ public:
 	int sodaGaugeDecayTime;		//炭酸ゲージ減衰待機タイマー
 	int attackTimer;			//攻撃時間
 
+	float GetSodaShakeGauge() const { return sodaShakeGauge; }
+	float GetSodaHeatShakeGauge() const { return sodaHeatShakeGauge; }
 	float GetWorldX() const { return posX; }
 	float GetWorldY() const { return posY; }
 	float GetX() const { return canvasX; }
