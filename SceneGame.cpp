@@ -108,20 +108,34 @@ void SceneGame::Update()
 			sceneMng_.SetGameResult(_isClear); // クリア
 			SetNextScene(SceneID::RESULT);
 			isEnd = true;
+
+			if (isHost_)
+			{
+				ChangeScenePacket csp;
+				csp.type = PACKET_CHANGE_SCENE;
+				csp.nextScene = static_cast<int>(NextScene::Result); // リザルト画面などの遷移先ID
+				networkManager_.SendChangeScene(csp);
+			}
 		}
 		_pMng->UpdateAll();
 		return;
 	}
-	clearTime += 1.0f / 60.0f; // クリアタイムの更新
+	if (isHost_)
+	{
+		clearTime += 1.0f / 60.0f; // クリアタイムの更新
 
+		TimePacket tp;
+		tp.type = PACKET_SYNC_TIME;
+		tp.clearTime = clearTime;
+		networkManager_.SendTime(tp);
+	}
 	networkManager_.ReceiveData(remotePlayer_.get(), &enemyList_, this);
 
 	int outNextScene;
-	if (networkManager_.ReceiveChangeScene(outNextScene) && outNextScene == 4)
+	if (networkManager_.ReceiveChangeScene(outNextScene))
 	{
 		_isClear = false;
 		ClearResult result;
-		result.time = 0.0f;
 		result.stageIndex = selectedStageIndex_;
 		sceneMng_.SetTransitionDuration(45.0f);
 		sceneMng_.SetClearResult(result);

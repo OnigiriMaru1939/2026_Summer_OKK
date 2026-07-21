@@ -107,6 +107,12 @@ void NetworkManager::SendSystem(const SystemPacket& packet)
 	NetWorkSendUDP(udpSocket, targetIP, targetPort, (void*)&packet, sizeof(SystemPacket));
 }
 
+void NetworkManager::SendTime(const TimePacket& packet)
+{
+	if (udpSocket == -1) return;
+	NetWorkSendUDP(udpSocket, targetIP, targetPort, (void*)&packet, sizeof(TimePacket));
+}
+
 void NetworkManager::ReceiveData(RemotePlayer* remotePlayer, std::vector<std::shared_ptr<EnemyBase>>* enemyList, SceneGame* sceneGame)
 {
 	if (udpSocket == -1) return;
@@ -212,8 +218,9 @@ void NetworkManager::ReceiveData(RemotePlayer* remotePlayer, std::vector<std::sh
 					if (recvLen == sizeof(ChangeScenePacket))
 					{
 						ChangeScenePacket* csp = reinterpret_cast<ChangeScenePacket*>(buffer);
-						//パケットで受け取った次シーンIDを代入
+						//パケットで受け取った次シーンIDとクリアタイムを代入
 						receivedNextScene = csp->nextScene;
+						receivedClearTime = csp->clearTime;
 					}
 					break;
 				case PACKET_PAUSE:
@@ -221,6 +228,17 @@ void NetworkManager::ReceiveData(RemotePlayer* remotePlayer, std::vector<std::sh
 					{
 						sceneGame->RequestPause();
 					}
+					break;
+				case PACKET_SYNC_TIME:
+					if (recvLen == sizeof(TimePacket))
+					{
+						TimePacket* tp = reinterpret_cast<TimePacket*>(buffer);
+						if (sceneGame)
+						{
+							sceneGame->SetClearTime(tp->clearTime);
+						}
+					}
+					break;
 			}
 		}
 	}
@@ -289,6 +307,7 @@ bool NetworkManager::ReceiveChangeScene(int& outNextScene)
 	{
 		outNextScene = receivedNextScene;
 		receivedNextScene = -1;
+		receivedClearTime = 0.0f; // 保持していたタイムもリセット
 		return true;
 	}
 	return false;
