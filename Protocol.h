@@ -48,6 +48,13 @@ enum PacketType
 	PACKET_CHANGE_SCENE = 9,
 	PACKET_PAUSE = 10,
 	PACKET_RESUME = 11,
+	PACKET_SYNC_TIME = 12,
+};
+
+struct TimePacket
+{
+	int type = PACKET_SYNC_TIME;
+	float clearTime;
 };
 
 struct SystemPacket
@@ -59,6 +66,7 @@ struct ChangeScenePacket
 {
 	int type;            // PACKET_CHANGE_SCENE
 	int nextScene;     // 遷移先のID (SceneSuper::NextScene)
+	float clearTime;
 };
 
 struct HitConfirmedPacket

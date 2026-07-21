@@ -19,7 +19,7 @@ private:
 	int targetPort = 0;
 	bool isConnected = false;
 	int receivedNextScene = -1;
-
+	float receivedClearTime = 0.0f;
 public:
 	NetworkManager() = default;
 	~NetworkManager();
@@ -40,6 +40,7 @@ public:
 	void SendHitConfirmed(const HitConfirmedPacket& packet);
 	void SendChangeScene(const ChangeScenePacket& packet);
 	void SendSystem(const SystemPacket& packet);
+	void SendTime(const TimePacket& packet);
 
 	// 受信系（ここでパケットを振り分ける）
 	// ループ内で呼び出し、届いたパケットに応じて各オブジェクトを更新する
@@ -48,7 +49,7 @@ public:
 	// ステージインデックスの同期用関数
 	bool ReceiveStageSelect(int& outStageIndex);
 	// シーンチェンジの同期用関数
-	bool ReceiveChangeScene(int& outNextSceneID);
+	bool ReceiveChangeScene(int& outNextScene);
 
 	bool IsConnected() const { return isConnected; }
 };

@@ -87,6 +87,7 @@ public:
 	RECT GetBossArea() const;                                           //ボスエリアの矩形を取得
 	std::shared_ptr<EnemyBase> GetBoss();                               //ボスの取得
 
+	void SetClearTime(float time) { clearTime = time; }
 
 	void RequestPause() { sceneMng_.PushScene(SceneID::PAUSE); }
 	static void SetSelectedStageIndex(int index) { selectedStageIndex_ = index; }
