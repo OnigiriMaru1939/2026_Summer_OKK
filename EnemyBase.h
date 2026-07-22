@@ -33,6 +33,8 @@ public:
 		E_TYPE_MAX
 	};
 
+	static constexpr float FLOOR_FRICTION = 0.9f;				//床の摩擦係数
+
 	EnemyBase(FileManager& fileMng, Stage& stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng);
 	virtual ~EnemyBase();
 
