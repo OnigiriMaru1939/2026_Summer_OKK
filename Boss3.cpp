@@ -56,6 +56,9 @@ void Boss3::Update()
 		case Boss3::SHOT:
 			ShotAttack();
 			break;
+		case Boss3::FUNSHOT:
+			FunShotAttack();
+			break;
 		case Boss3::SUMMON:
 			EnemySummon();
 			break;
@@ -103,6 +106,7 @@ void Boss3::BossStateChange()
 				EnemyResetShake();
 				SelectNextState();
 			}
+
 			break;
 
 		case BOSS_STATE::MOVE:
@@ -112,15 +116,27 @@ void Boss3::BossStateChange()
 				bossState_ = BOSS_STATE::WAIT;
 				stateChangeTimer = 0;
 			}
+
 			break;
 
 		case BOSS_STATE::SHOT:
 
 			if (stateChangeTimer > 180)
 			{
-				bossState_ = BOSS_STATE::WAIT;
+				bossState_ = BOSS_STATE::MOVE;
 				stateChangeTimer = 0;
 			}
+
+			break;
+
+		case BOSS_STATE::FUNSHOT:
+
+			if (stateChangeTimer > 180)
+			{
+				bossState_ = BOSS_STATE::MOVE;
+				stateChangeTimer = 0;
+			}
+
 			break;
 
 		case BOSS_STATE::SUMMON:
@@ -131,15 +147,15 @@ void Boss3::BossStateChange()
 //次の行動パターンを決める関数
 void Boss3::SelectNextState()
 {
-	int randomStateNum_ = rand() % (BOSS_STATE::MAX - 2);
+	int randomStateNum_ = rand() % 3;
 
 	switch (randomStateNum_)
 	{
 		case 0:
-			bossState_ = BOSS_STATE::MOVE;
+			bossState_ = BOSS_STATE::SHOT;
 			break;
 		case 1:
-			bossState_ = BOSS_STATE::SHOT;
+			bossState_ = BOSS_STATE::FUNSHOT;
 			break;
 		case 2:
 			bossState_ = BOSS_STATE::SUMMON;
@@ -191,6 +207,33 @@ void Boss3::ShotAttack()
 	}
 }
 
+//扇ショット
+void Boss3::FunShotAttack()
+{
+	shotTimer++;
+
+	if (shotTimer >= 60)
+	{
+		shotTimer = 0;
+
+		Player* player = sceneGame_->GetPlayer();
+
+		float dx = player->GetWorldX() - x_;
+		float dy = player->GetWorldY() - y_;
+
+		float angle = atan2f(dy, dx);
+
+		const float spread = DX_PI_F / 12.0f; //15°
+
+		for (int i = -2; i <= 2; i++)
+		{
+			float a = angle + spread * i;
+
+			Shot(BulletBase::BULLET_TYPE::B_TYPE_1, cosf(a), sinf(a), 0.5f);
+		}
+	}
+}
+
 //敵を召喚
 void Boss3::EnemySummon()
 {
@@ -227,7 +270,7 @@ void Boss3::EnemySummon()
 		summonEnemyList_.clear();
 		summonFlag_ = false;
 		SetNoDamageFlag(false);
-		bossState_ = WAIT;
+		bossState_ = MOVE;
 		stateChangeTimer = 0;
 	}
 

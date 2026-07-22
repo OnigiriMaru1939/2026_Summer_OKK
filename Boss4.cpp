@@ -1,5 +1,6 @@
 ﻿#include "Boss4.h"
-
+#include "SceneGame.h"
+#include "Player.h"
 
 Boss4::Boss4(FileManager& fileMng, Stage& stage, SceneGame* sceneGame, float x, float y, ParticleManager& pMng) : EnemyBase(fileMng, stage, sceneGame, x, y, pMng)
 {
@@ -15,6 +16,18 @@ Boss4::Boss4(FileManager& fileMng, Stage& stage, SceneGame* sceneGame, float x, 
 	bossState_ = BOSS_STATE::NON;
 	stateChangeTimer = 0;
 	rotateSpeed = 0.0f;
+	chargeDashTimer = 0;
+	chargeDashVX_ = 0.0f;
+	chargeDashVY_ = 0.0f;
+	stunFlag = false;
+	stunTimer = 0;
+	laserTimer = 0;
+	laserAngle = 0.0f;
+	laserFlag = false;
+	laserState_ = LASER_STATE::AIM;
+	laserTimer = 0;
+	laserDirX_ = 0.0f;
+	laserDirY_ = 0.0f;
 }
 
 Boss4::~Boss4()
@@ -27,7 +40,10 @@ void Boss4::Update()
 	BossStateChange();
 
 	//重力処理
-	AddGravity();
+	if (bossState_ != BOSS_STATE::CHARGEDASH)
+	{
+		AddGravity();
+	}
 
 	//出現処理
 	if (isAppearing)
@@ -57,6 +73,15 @@ void Boss4::Update()
 		case Boss4::DASH:
 			Dash();
 			break;
+		case Boss4::CHARGEDASH:
+			ChargeDash();
+			break;
+		case Boss4::STUN:
+			Stun();
+			break;
+		case Boss4::LASER:
+			LaserAttack();
+			break;
 		default:
 			break;
 	}
@@ -67,14 +92,22 @@ void Boss4::Update()
 
 void Boss4::Draw() const
 {
-	EnemyBase::Draw(); // 基底クラスの描画処理を呼び出す
-
-	//HPが0になると描画しない
-	if (hp_ > 0)
+	if (stunFlag)
 	{
-		//HPゲージの描画
-		//DrawGauge(1300, 100, 500, 40, hp_, hpMax_, GetColor(255, 0, 0));		//ボスのHPゲージ
+		if ((GetNowCount() / 100) % 2 == 0)
+		{
+			return;
+		}
+
+		SetDrawBright(255, 255, 0);
 	}
+
+	EnemyBase::Draw(); //基底クラスの描画処理を呼び出す
+
+	//レーザー描画
+	
+
+	SetDrawBright(255, 255, 255);
 }
 
 //ボスの出現処理
@@ -133,13 +166,36 @@ void Boss4::BossStateChange()
 			}
 
 			break;
+
+		case BOSS_STATE::CHARGEDASH:
+
+			if (stateChangeTimer > 240)
+			{
+				bossState_ = BOSS_STATE::MOVE;
+				stateChangeTimer = 0;
+			}
+
+			break;
+
+		case BOSS_STATE::STUN:
+			break;
+
+		case BOSS_STATE::LASER:
+
+			if (stateChangeTimer > 240)
+			{
+				bossState_ = BOSS_STATE::MOVE;
+				stateChangeTimer = 0;
+			}
+
+			break;
 	}
 }
 
 //次の行動パターンを決める関数
 void Boss4::SelectNextState()
 {
-	int randomStateNum_ = rand() % (BOSS_STATE::MAX - 2);
+	int randomStateNum_ = rand() % 4;
 
 	switch (randomStateNum_)
 	{
@@ -148,6 +204,24 @@ void Boss4::SelectNextState()
 			break;
 		case 1:
 			bossState_ = BOSS_STATE::DASH;
+			break;
+		case 2:
+			bossState_ = BOSS_STATE::CHARGEDASH;
+			//チャージダッシュ開始時に初期化
+			chargeDashState_ = CHARGEDASH_STATE::AIM;
+			chargeDashTimer = 0;
+
+			//一旦停止
+			vx_ = 0.0f;
+			vy_ = 0.0f;
+
+			break;
+		case 3:
+			bossState_ = BOSS_STATE::LASER;
+			laserTimer = 0;
+
+			vx_ = 0.0f;
+			vy_ = 0.0f;
 			break;
 		default:
 			break;
@@ -187,6 +261,7 @@ void Boss4::Dash()
 	angle += rotateSpeed;
 
 	Move();
+	Jump();
 
 	//高速移動
 	if (vx_ > 0)
@@ -197,4 +272,118 @@ void Boss4::Dash()
 	{
 		vx_ = -20.0f;
 	}
+}
+
+void Boss4::ChargeDash()
+{
+	chargeDashTimer++;
+
+	switch (chargeDashState_)
+	{
+		case CHARGEDASH_STATE::AIM:
+		{
+			EnemyShake();
+
+			// ボスを停止
+			vx_ = 0.0f;
+			vy_ = 0.0f;
+
+			Player* player = sceneGame_->GetPlayer();
+
+			if (!player)
+			{
+				return;
+			}
+
+			// プレイヤー方向を計算
+			float dx = player->GetWorldX() - x_;
+			float dy = player->GetWorldY() - y_;
+
+			float len = sqrtf(dx * dx + dy * dy);
+
+			if (len > 0.0f)
+			{
+				// 正規化
+				dx /= len;
+				dy /= len;
+
+				// プレイヤーの方向を向く
+				angle = atan2f(dy, dx) + DX_PI_F / 2.0f;
+
+				// 突撃方向を記録
+				chargeDashVX_ = dx * 50.0f;
+				chargeDashVY_ = dy * 50.0f;
+			}
+
+			// 1秒チャージ
+			if (chargeDashTimer >= 60)
+			{
+				chargeDashTimer = 0;
+
+				// 突撃開始
+				vx_ = chargeDashVX_;
+				vy_ = chargeDashVY_;
+
+				chargeDashState_ = CHARGEDASH_STATE::DASH;
+			}
+
+			break;
+		}
+
+		case CHARGEDASH_STATE::DASH:
+
+			int nextX = static_cast<int>(x_ + vx_);
+			int nextY = static_cast<int>(y_ + vy_);
+
+			if (stage_.CheckHitWallRect(
+				nextX,
+				nextY,
+				static_cast<int>(width_ * scale),
+				static_cast<int>(height_ * scale)))
+			{
+				// 壁に激突
+				vx_ = 0.0f;
+				vy_ = 0.0f;
+
+				stunFlag = true;
+				stunTimer = 0;
+
+				bossState_ = BOSS_STATE::STUN;
+				stateChangeTimer = 0;
+
+				return;
+			}
+
+			// 壁に当たらなければ移動
+			MoveX();
+			MoveY();
+
+			break;
+	}
+}
+
+void Boss4::Stun()
+{
+	//動きを止める
+	vx_ = 0.0f;
+	MoveY();
+
+	stunTimer++;
+
+	// 2秒間スタン
+	if (stunTimer >= 120)
+	{
+		stunTimer = 0;
+		stunFlag = false;
+		angle = 0.0f;
+
+		// 通常状態へ
+		bossState_ = BOSS_STATE::WAIT;
+		stateChangeTimer = 0;
+	}
+}
+
+void Boss4::LaserAttack()
+{
+	
 }

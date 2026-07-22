@@ -13,6 +13,7 @@ public:
 		WAIT,
 		MOVE,
 		SHOT,
+		FUNSHOT,
 		SUMMON,
 
 		MAX
@@ -26,6 +27,7 @@ public:
 	void Wait();
 	void Move();
 	void ShotAttack();
+	void FunShotAttack();
 	void EnemySummon();
 	void BossStateChange();
 	void SelectNextState();
@@ -36,7 +38,7 @@ private:
 
 	BOSS_STATE bossState_;
 	int stateChangeTimer;
-	int shotTimer = 0;
+	int shotTimer;
 	bool summonFlag_;
 };
 
