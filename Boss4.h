@@ -3,6 +3,8 @@
 #include "IBoss.h"
 #include "EnemyBase.h"
 
+class Player;
+
 class Boss4 : public EnemyBase, public IBoss
 {
 public:
@@ -46,6 +48,7 @@ public:
 	void ChargeDash();
 	void Stun();
 	void LaserAttack();
+	void CheckLaserHit(Player& player);
 	void BossStateChange();
 	void SelectNextState();
 private:
@@ -62,6 +65,7 @@ private:
 	int laserTimer;
 	float laserAngle;
 	bool laserFlag;
+	bool lockLaserFlag;
 	float laserDirX_;
 	float laserDirY_;
 };

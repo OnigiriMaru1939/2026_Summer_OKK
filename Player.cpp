@@ -727,8 +727,8 @@ RECT Player::GetRect() const
 	int hitHeight = static_cast<int>(height_ * scale);
 
 	rc.left = (LONG)(posX - hitWidth / 2);
-	rc.right = (LONG)(posX + hitHeight / 2);
-	rc.top = (LONG)(posY - hitWidth / 2);
+	rc.right = (LONG)(posX + hitWidth / 2);
+	rc.top = (LONG)(posY - hitHeight / 2);
 	rc.bottom = (LONG)(posY + hitHeight / 2);
 
 	return rc;

@@ -68,13 +68,6 @@ void Boss2::Update()
 void Boss2::Draw() const
 {
 	EnemyBase::Draw(); // 基底クラスの描画処理を呼び出す
-
-	//HPが0になると描画しない
-	if (hp_ > 0)
-	{
-		//HPゲージの描画
-		//DrawGauge(1300, 100, 500, 40, hp_, hpMax_, GetColor(255, 0, 0));		//ボスのHPゲージ
-	}
 }
 
 //ボスの出現処理
@@ -139,7 +132,7 @@ void Boss2::BossStateChange()
 //次の行動パターンを決める関数
 void Boss2::SelectNextState()
 {
-	int randomStateNum_ = rand() % (BOSS_STATE::MAX - 2);
+	int randomStateNum_ = rand() % 2;
 
 	switch (randomStateNum_)
 	{

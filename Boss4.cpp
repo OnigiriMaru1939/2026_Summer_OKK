@@ -24,6 +24,7 @@ Boss4::Boss4(FileManager& fileMng, Stage& stage, SceneGame* sceneGame, float x, 
 	laserTimer = 0;
 	laserAngle = 0.0f;
 	laserFlag = false;
+	lockLaserFlag = false;
 	laserState_ = LASER_STATE::AIM;
 	laserTimer = 0;
 	laserDirX_ = 0.0f;
@@ -102,10 +103,38 @@ void Boss4::Draw() const
 		SetDrawBright(255, 255, 0);
 	}
 
-	EnemyBase::Draw(); //基底クラスの描画処理を呼び出す
-
 	//レーザー描画
-	
+	int laserLength = 2000;
+
+	int startX = static_cast<int>(x_) - stage_.GetScrollX();
+	int startY = static_cast<int>(y_) - stage_.GetScrollY();
+
+	//保存しておいたレーザー方向から角度を計算
+	float laserAngle = atan2f(laserDirY_, laserDirX_);
+
+	int endX = startX + static_cast<int>(cosf(laserAngle) * laserLength);
+	int endY = startY + static_cast<int>(sinf(laserAngle) * laserLength);
+
+
+	if (lockLaserFlag && laserState_ == LASER_STATE::AIM)
+	{
+		DrawLine(startX, startY, endX, endY, GetColor(255, 255, 0), 20);
+	}
+
+	if (lockLaserFlag && laserState_ == LASER_STATE::LOCK_ON)
+	{
+		if ((GetNowCount() / 50) % 2 == 0)
+		{
+			DrawLine(startX, startY, endX, endY, GetColor(255, 255, 0), 20);
+		}
+	}
+
+	if (laserFlag)
+	{
+		DrawLine(startX, startY, endX, endY, GetColor(255, 0, 0), 50);
+	}
+
+	EnemyBase::Draw(); //基底クラスの描画処理を呼び出す
 
 	SetDrawBright(255, 255, 255);
 }
@@ -181,13 +210,6 @@ void Boss4::BossStateChange()
 			break;
 
 		case BOSS_STATE::LASER:
-
-			if (stateChangeTimer > 240)
-			{
-				bossState_ = BOSS_STATE::MOVE;
-				stateChangeTimer = 0;
-			}
-
 			break;
 	}
 }
@@ -284,7 +306,6 @@ void Boss4::ChargeDash()
 		{
 			EnemyShake();
 
-			// ボスを停止
 			vx_ = 0.0f;
 			vy_ = 0.0f;
 
@@ -295,7 +316,7 @@ void Boss4::ChargeDash()
 				return;
 			}
 
-			// プレイヤー方向を計算
+			//プレイヤー方向を計算
 			float dx = player->GetWorldX() - x_;
 			float dy = player->GetWorldY() - y_;
 
@@ -303,24 +324,22 @@ void Boss4::ChargeDash()
 
 			if (len > 0.0f)
 			{
-				// 正規化
 				dx /= len;
 				dy /= len;
 
-				// プレイヤーの方向を向く
-				angle = atan2f(dy, dx) + DX_PI_F / 2.0f;
+				//プレイヤーの方向を向く
+				angle_ = atan2f(dy, dx) + DX_PI_F / 2.0f;
 
-				// 突撃方向を記録
+				//突撃方向を記録
 				chargeDashVX_ = dx * 50.0f;
 				chargeDashVY_ = dy * 50.0f;
 			}
 
-			// 1秒チャージ
 			if (chargeDashTimer >= 60)
 			{
 				chargeDashTimer = 0;
 
-				// 突撃開始
+				//突撃開始
 				vx_ = chargeDashVX_;
 				vy_ = chargeDashVY_;
 
@@ -341,7 +360,7 @@ void Boss4::ChargeDash()
 				static_cast<int>(width_ * scale),
 				static_cast<int>(height_ * scale)))
 			{
-				// 壁に激突
+				//壁に激突
 				vx_ = 0.0f;
 				vy_ = 0.0f;
 
@@ -354,7 +373,7 @@ void Boss4::ChargeDash()
 				return;
 			}
 
-			// 壁に当たらなければ移動
+			//壁に当たらなければ移動
 			MoveX();
 			MoveY();
 
@@ -370,14 +389,14 @@ void Boss4::Stun()
 
 	stunTimer++;
 
-	// 2秒間スタン
 	if (stunTimer >= 120)
 	{
 		stunTimer = 0;
 		stunFlag = false;
-		angle = 0.0f;
+		angle_ = 0.0f;
 
-		// 通常状態へ
+		//通常状態へ
+		vx_ = (vx_ >= 0.0f) ? 5.0f : -5.0f;
 		bossState_ = BOSS_STATE::WAIT;
 		stateChangeTimer = 0;
 	}
@@ -385,5 +404,146 @@ void Boss4::Stun()
 
 void Boss4::LaserAttack()
 {
-	
+	laserTimer++;
+
+	Player* player = sceneGame_->GetPlayer();
+
+	if (!player)
+	{
+		return;
+	}
+
+	switch (laserState_)
+	{
+		case LASER_STATE::AIM:
+		{
+			lockLaserFlag = true;
+
+			vx_ = 0.0f;
+			vy_ = 0.0f;
+
+			//プレイヤーの方向を計算
+			float dx = player->GetWorldX() - x_;
+			float dy = player->GetWorldY() - y_;
+
+			float len = sqrtf(dx * dx + dy * dy);
+
+			if (len > 0.0f)
+			{
+				dx /= len;
+				dy /= len;
+
+				//プレイヤーを追いかけて照準
+				laserDirX_ = dx;
+				laserDirY_ = dy;
+
+				//ボスの向きも変更
+				angle_ = atan2f(dy, dx) + DX_PI_F / 2.0f;
+			}
+
+			if (laserTimer >= 120)
+			{
+				laserTimer = 0;
+
+				//ここで照準を固定
+				laserState_ = LASER_STATE::LOCK_ON;
+			}
+
+			break;
+		}
+
+		case LASER_STATE::LOCK_ON:
+		{
+			laserTimer++;
+
+			if (laserTimer >= 120)
+			{
+				lockLaserFlag = false;
+				laserFlag = true;
+
+				laserTimer = 0;
+
+				laserState_ = LASER_STATE::FIRE;
+			}
+
+			break;
+		}
+
+		case LASER_STATE::FIRE:
+		{
+			//レーザーとプレイヤーの当たり判定
+			CheckLaserHit(*player);
+
+			laserTimer++;
+
+			//発射終了
+			if (laserTimer >= 120)
+			{
+				laserTimer = 0;
+
+				laserFlag = false;
+				laserState_ = LASER_STATE::AIM;
+
+				//通常移動速度に戻す
+				vx_ = (vx_ >= 0.0f) ? 5.0f : -5.0f;
+				angle_ = 0.0f;
+
+				bossState_ = BOSS_STATE::WAIT;
+				stateChangeTimer = 0;
+			}
+
+			break;
+		}
+	}
+}
+
+void Boss4::CheckLaserHit(Player& player)
+{
+	//レーザーの始点
+	float startX = x_;
+	float startY = y_;
+
+	//レーザー方向
+	float dirX = laserDirX_;
+	float dirY = laserDirY_;
+
+	//プレイヤー位置
+	float playerX = player.GetWorldX();
+	float playerY = player.GetWorldY();
+
+	//レーザー始点からプレイヤーまでのベクトル
+	float dx = playerX - startX;
+	float dy = playerY - startY;
+
+	//レーザー方向への射影
+	float distance = dx * dirX + dy * dirY;
+
+	//レーザーの後ろにいる場合は当たらない
+	if (distance < 0.0f)
+	{
+		return;
+	}
+
+	//レーザー上の最も近い点
+	float closestX = startX + dirX * distance;
+	float closestY = startY + dirY * distance;
+
+	//最近点とプレイヤーの距離
+	float diffX = playerX - closestX;
+	float diffY = playerY - closestY;
+
+	float distanceSquared = diffX * diffX + diffY * diffY;
+
+	//レーザーの太さ
+	float laserRadius = 50.0f;
+
+	//プレイヤーの半径
+	float playerRadius = 32.0f;
+
+	float hitDistance = laserRadius + playerRadius;
+
+	if (distanceSquared <= hitDistance * hitDistance)
+	{
+		player.Damage(20.0f);
+	}
 }
