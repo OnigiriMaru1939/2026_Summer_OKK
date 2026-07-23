@@ -54,10 +54,12 @@ const std::vector<StageConfig>& GetStageConfigs()
 			scene.SetBossArea(80, 4600, 1900, 6500);
 			//敵の生成
 			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 500.0f, 200.0f);
-			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 800.0f, 1700.0f);
+			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 1000.0f, 1200.0f);
 			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 800.0f, 500.0f);
 			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 100.0f, 500.0f);
-
+			scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_3, 1700.0f, 600.0f);
+			//アイテムの生成
+			scene.AddItem(ItemBase::ITEM_TYPE::APPLE, 1800.0f, 1200.0f);
 			//テレポートギミックの生成
 			scene.AddTeleport(960.0f, 250.0f, 960.0f, 5500.0f);
 			
