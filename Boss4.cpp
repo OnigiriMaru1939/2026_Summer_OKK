@@ -104,7 +104,7 @@ void Boss4::Draw() const
 	}
 
 	//レーザー描画
-	int laserLength = 2000;
+	int laserLength = 3000;
 
 	int startX = static_cast<int>(x_) - stage_.GetScrollX();
 	int startY = static_cast<int>(y_) - stage_.GetScrollY();
@@ -544,6 +544,6 @@ void Boss4::CheckLaserHit(Player& player)
 
 	if (distanceSquared <= hitDistance * hitDistance)
 	{
-		player.Damage(20.0f);
+		player.Damage(50.0f);
 	}
 }
