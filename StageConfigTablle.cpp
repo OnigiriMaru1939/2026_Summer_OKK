@@ -77,21 +77,26 @@ const std::vector<StageConfig>& GetStageConfigs()
 				//プレイヤーの初期化
 				scene.GetPlayer()->SetPosition(200.0f, 4500.0f);
 				//敵の生成
-				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 1200.0f, 1500.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 1000.0f, 1200.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 120.0f, 3000.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 700.0f, 100.0f);
+
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 1200.0f, 1500.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 500.0f, 1500.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 400.0f, 1500.0f);
-				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 120.0f, 3000.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 500.0f, 500.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 500.0f, 500.0f);
+
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_3, 500.0f, 100.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_3, 120.0f, 3000.0f);
-				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 700.0f, 100.0f);
-				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 500.0f, 500.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_3, 400.0f, 2800.0f);
-				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 500.0f, 500.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_3, 900.0f, 4000.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_3, 900.0f, 2000.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_3, 500.0f, 2000.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_3, 1600.0f, 2700.0f);
+				//アイテムの生成
+				scene.AddItem(ItemBase::ITEM_TYPE::APPLE, 1800.0f, 1200.0f);
+				scene.AddItem(ItemBase::ITEM_TYPE::APPLE, 960.0f, 5500.0f);
 				//ボスエリアの初期設定
 				scene.SetBossArea(80, 4600, 1900, 6500);
 				//テレポートギミックの生成
@@ -111,24 +116,31 @@ const std::vector<StageConfig>& GetStageConfigs()
 				//ボスエリアの初期設定
 				scene.SetBossArea(80, 8500, 1900, 10500);
 				//敵の生成
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 120.0f, 3000.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 1200.0f, 8100.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 1700.0f, 3200.0f);
+
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 1200.0f, 2000.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 1700.0f, 2500.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 800.0f, 1700.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 500.0f, 1800.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 800.0f, 8000.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 500.0f, 1800.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 1000.0f, 6000.0f);
+				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 1400.0f, 6000.0f);
+
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_3, 400.0f, 1800.0f);
-				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 120.0f, 3000.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_3, 700.0f, 500.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_3, 500.0f, 500.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_3, 400.0f, 2800.0f);
-				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_1, 1200.0f, 8100.0f);
-				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 800.0f, 8000.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_3, 800.0f, 8000.0f);
-				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 500.0f, 1800.0f);
 				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_3, 400.0f, 1800.0f);
-				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 1000.0f, 6000.0f);
-				scene.AddEnemy(EnemyBase::ENEMY_TYPE::E_TYPE_2, 1400.0f, 6000.0f);
+
+				scene.AddItem(ItemBase::ITEM_TYPE::APPLE, 900.0f, 2400.0f);
+				scene.AddItem(ItemBase::ITEM_TYPE::MENTOS, 900.0f, 7600.0f);
 				//テレポートギミックの生成
 				scene.AddTeleport(1700.0f, 7500.0f, 200.0f, 6500.0f);
-				scene.AddTeleport(950.0f, 6000.0f, 200.0f, 5000.0f);
+				scene.AddTeleport(950.0f, 6300.0f, 200.0f, 5000.0f);
 				scene.AddTeleport(150.0f, 1650.0f, 100.0f,800.0f);
 				scene.AddTeleport(960.0f, 900.0f, 100.0f, 9500.0f);
 			},
